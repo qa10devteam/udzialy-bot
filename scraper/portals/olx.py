@@ -33,7 +33,7 @@ class OlxScraper(BaseScraper):
     """OLX.pl real estate scraper (curl_cffi + Tor, HTML parsing)."""
 
     def __init__(self, **kwargs):
-        kwargs.setdefault("use_tor", True)
+        kwargs.setdefault("use_tor", False)  # Tor unnecessary for OLX (proven: curl_cffi works direct)
         kwargs.setdefault("tor_proxy", "socks5://127.0.0.1:9050")
         super().__init__(stealth_layer=3, **kwargs)
 
