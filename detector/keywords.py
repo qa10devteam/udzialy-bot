@@ -17,12 +17,18 @@ HIGH_CONFIDENCE: List[str] = [
     r"udzia[łl]\s+\d+\s*/\s*\d+",
     r"wsp[óo][łl]w[łl]asno[śs][ćc]\s+sprzeda",
     r"sprzedam\s+udzia[łl]",
+    r"sprzeda\s+udzia[łl]",  # FIX: 3rd person 'sprzeda' (e.g., "Syndyk sprzeda udział")
     r"udzia[łl]\s+w\s+mieszkaniu",
     r"udzia[łl]\s+w\s+domu",
     r"udzia[łl]\s+w\s+lokalu",
     r"udzia[łl]\s+w\s+kamienicy",
+    r"udzia[łl]\s+w\s+dzia[łl]ce",  # FIX: property context - 'działce'
+    r"udzia[łl]\s+w\s+budynku",  # FIX: property context - 'budynku'
+    r"udzia[łl]\s+w\s+terenie",  # FIX: property context - 'terenie'
     r"sprzeda[żz]\s+cz[ęe][śs]ci\s+nieruchomo[śs]ci",
     r"udzia[łl]\s+w\s+prawie\s+w[łl]asno[śs]ci",
+    r"syndyk\s+sprzeda.*udzia[łl]",  # FIX: 'syndyk sprzeda...udział' is strongest share sale signal
+    r"udzia[łl][óo]w\s+w\s+nieruchomo[śs]ci",  # FIX: genitive 'udziałów w nieruchomości'
 ]
 
 # --- MEDIUM CONFIDENCE keywords ---
@@ -38,6 +44,9 @@ MEDIUM_CONFIDENCE: List[str] = [
     r"dzia[łl]\s+spadkow[yae]",
     r"udzia[łl]\s+spadkow[yae]",
     r"udzia[łl]y\s+w\s+nieruchomo[śs]ci",
+    r"udzia[łl][óo]w",  # FIX: genitive form 'udziałów' standalone
+    r"udzia[łl]em",  # FIX: instrumental form 'udziałem'
+    r"udzia[łl]u\s+w",  # FIX: genitive 'udziału w ...'
 ]
 
 # --- LOW CONFIDENCE keywords ---
@@ -58,6 +67,7 @@ NEGATIVE: List[str] = [
     r"udzia[łl]\s+w\s+gruncie",
     r"wk[łl]ad\s+w[łl]asny",
     r"udzia[łl]y\s+w\s+sp[óo][łl]ce",
+    r"udzia[łl][óo]w\s+w\s+sp[óo][łl]ce",  # genitive: "udziałów w spółce"
     r"udzia[łl]\s+w\s+sp[óo][łl]ce",
     r"cz[ęe][śs]ci\s+wsp[óo]lne\s+nieruchomo[śs]ci",
     r"cz[ęe][śs]ci\s+wsp[óo]lne",
@@ -86,6 +96,14 @@ FRACTION_PATTERNS: List[str] = [
     r"\b5\s*/\s*8\b",
     r"\b7\s*/\s*8\b",
     r"\b\d{1,3}\s*/\s*\d{1,4}\b",  # General fraction pattern
+    # FIX: Unicode fraction characters (common in copy-paste from documents)
+    r"½",
+    r"¼",
+    r"¾",
+    r"⅓",
+    r"⅔",
+    r"⅕",
+    r"⅛",
 ]
 
 # --- INHERITANCE/LEGAL CONTEXT ---
@@ -105,6 +123,7 @@ INHERITANCE_CONTEXT: List[str] = [
     r"notariusz",
     r"podzia[łl]\s+maj[ąa]tku",
     r"rozw[óo]d",
+    r"syndyk",  # FIX: syndyk (bankruptcy trustee) is strong legal context for shares
 ]
 
 # --- SEARCH QUERIES ---

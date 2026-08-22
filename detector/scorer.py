@@ -9,6 +9,7 @@ Scoring breakdown:
 - Description pattern match: up to +25 points
 - Fraction detected: +15 points
 - Inheritance/legal context: up to +10 points
+- Syndyk + udział combo boost: +20 points
 - Price anomaly (unusually low): up to +8 points
 - Negative penalties: -15 to -35 points each
 """
@@ -29,6 +30,9 @@ from detector.keywords import (
     COMPILED_INHERITANCE,
 )
 
+# Threshold for is_share classification (lowered from 50 to 25 for title-only scoring)
+SHARE_THRESHOLD = 25
+
 
 @dataclass
 class ScoringResult:
@@ -38,7 +42,7 @@ class ScoringResult:
         score: Confidence score 0-100 that this listing is a property share sale.
         matched_keywords: List of keyword/pattern strings that matched.
         fraction_detected: The ownership fraction found (e.g., '1/2') or None.
-        is_share: Whether score >= 50, indicating likely property share.
+        is_share: Whether score >= threshold, indicating likely property share.
         reasons: Human-readable list of scoring reasons (for debugging/display).
     """
 
@@ -51,7 +55,7 @@ class ScoringResult:
     def __post_init__(self) -> None:
         """Ensure score is clamped to 0-100 and is_share is set correctly."""
         self.score = max(0, min(100, self.score))
-        self.is_share = self.score >= 50
+        self.is_share = self.score >= SHARE_THRESHOLD
 
 
 class PropertyShareScorer:
@@ -130,11 +134,21 @@ class PropertyShareScorer:
         Returns:
             The fraction string (e.g., '1/2') or None.
         """
+        # Unicode fraction mapping for normalization in output
+        unicode_fraction_map = {
+            '½': '1/2', '¼': '1/4', '¾': '3/4',
+            '⅓': '1/3', '⅔': '2/3', '⅕': '1/5', '⅛': '1/8',
+        }
+
         for pattern in COMPILED_FRACTIONS:
             match = pattern.search(text)
             if match:
+                fraction = match.group(0)
+                # Normalize unicode fractions to slash form
+                if fraction in unicode_fraction_map:
+                    return unicode_fraction_map[fraction]
                 # Clean up whitespace around slash
-                fraction = re.sub(r"\s*/\s*", "/", match.group(0))
+                fraction = re.sub(r"\s*/\s*", "/", fraction)
                 return fraction
         return None
 
@@ -185,6 +199,7 @@ class PropertyShareScorer:
         penalty_map = [
             (r"udzia[łl]\s+w\s+gruncie\s+pod\s+budynkiem", -35, "udział w gruncie pod budynkiem"),
             (r"udzia[łl]y\s+w\s+sp[óo][łl]ce", -30, "udziały w spółce"),
+            (r"udzia[łl][óo]w\s+w\s+sp[óo][łl]ce", -30, "udziałów w spółce"),
             (r"udzia[łl]\s+w\s+sp[óo][łl]ce", -30, "udział w spółce"),
             (r"wk[łl]ad\s+w[łl]asny", -20, "wkład własny"),
             (r"udzia[łl]\s+w\s+drodze", -15, "udział w drodze"),
@@ -198,6 +213,22 @@ class PropertyShareScorer:
                 reasons.append(f"Negative: '{label}' ({penalty})")
 
         return total_penalty, reasons
+
+    def _check_syndyk_boost(self, text: str) -> Tuple[int, List[str]]:
+        """Check for syndyk + udział combination which is a very strong signal.
+
+        Args:
+            text: Combined normalized text.
+
+        Returns:
+            Tuple of (bonus_points, reasons).
+        """
+        has_syndyk = bool(re.search(r"syndyk", text, re.IGNORECASE))
+        has_udzial = bool(re.search(r"udzia[łl]", text, re.IGNORECASE))
+
+        if has_syndyk and has_udzial:
+            return 20, ["Syndyk + udział combo boost: +20"]
+        return 0, []
 
     def score(
         self,
@@ -304,6 +335,11 @@ class PropertyShareScorer:
             all_matched.extend(inherit_matched)
             all_reasons.extend(inherit_reasons)
             all_reasons.append(f"Inheritance context: +{inherit_score}")
+
+        # --- SYNDYK + UDZIAŁ COMBO BOOST (+20) ---
+        syndyk_bonus, syndyk_reasons = self._check_syndyk_boost(combined)
+        total_score += syndyk_bonus
+        all_reasons.extend(syndyk_reasons)
 
         # --- PRICE ANOMALY (up to +8) ---
         price_bonus, price_reasons = self._check_price_anomaly(price, area)
