@@ -2,7 +2,7 @@
 ScraperManager - Orchestrator for parallel portal scraping.
 
 Coordinates all portal scrapers, handles deduplication,
-progress callbacks, timeout management, and share scoring.
+progress callbacks, timeout management, share scoring, and LLM analysis.
 """
 
 import asyncio
@@ -17,10 +17,13 @@ logger = logging.getLogger(__name__)
 # Type for progress callback: (portal_name, status, count) -> None
 ProgressCallback = Callable[[str, str, int], Any]
 
+# Minimum score threshold for LLM analysis (only analyze pre-filtered shares)
+LLM_ANALYSIS_SCORE_THRESHOLD = 25
+
 
 class ScraperManager:
     """
-    Orchestrates parallel portal scraping with deduplication and scoring.
+    Orchestrates parallel portal scraping with deduplication, scoring, and LLM analysis.
 
     Usage:
         manager = ScraperManager()
@@ -50,6 +53,31 @@ class ScraperManager:
         self.enabled_portals = portals or self.MAIN_PORTALS
         self.timeout_per_portal = timeout_per_portal
         self.scorer = PropertyShareScorer()
+        self._llm_analyzer = None
+
+    def _get_llm_analyzer(self):
+        """Lazily initialize the LLM analyzer from config."""
+        if self._llm_analyzer is None:
+            try:
+                from detector.llm_analyzer import create_analyzer_from_config
+                import yaml
+                from pathlib import Path
+
+                # Find config.yaml
+                config_path = Path(__file__).resolve().parent.parent / "config.yaml"
+                if config_path.exists():
+                    with open(config_path, "r", encoding="utf-8") as f:
+                        config = yaml.safe_load(f) or {}
+                    llm_config = config.get("llm", {})
+                    self._llm_analyzer = create_analyzer_from_config(llm_config)
+                else:
+                    self._llm_analyzer = False  # Sentinel: config not found
+            except Exception as e:
+                logger.warning(f"Failed to initialize LLM analyzer: {e}")
+                self._llm_analyzer = False  # Sentinel: init failed
+
+        # Return None if sentinel (False means "tried and failed")
+        return self._llm_analyzer if self._llm_analyzer else None
 
     def _instantiate_scrapers(self) -> List[BaseScraper]:
         """Instantiate all enabled portal scrapers."""
@@ -92,7 +120,7 @@ class ScraperManager:
         Returns:
             List of result dicts sorted by share score DESC.
             Each dict has: title, price, city, voivodeship, url,
-            source_portal, raw_description, score, is_share
+            source_portal, raw_description, score, is_share, llm_analysis (optional)
         """
         scrapers = self._instantiate_scrapers()
         if not scrapers:
@@ -146,6 +174,9 @@ class ScraperManager:
         # Score each result with PropertyShareScorer
         scored = self._score_results(deduplicated)
 
+        # Run LLM analysis on high-scoring listings
+        await self._run_llm_analysis(scored)
+
         # Sort by score DESC
         scored.sort(key=lambda x: x.get("score", 0), reverse=True)
 
@@ -179,6 +210,61 @@ class ScraperManager:
             listing["is_share"] = scoring_result.is_share
 
         return listings
+
+    async def _run_llm_analysis(self, listings: List[dict]) -> None:
+        """Run LLM analysis on listings that pass the score threshold.
+
+        Only analyzes listings with score >= LLM_ANALYSIS_SCORE_THRESHOLD.
+        Runs analyses in parallel (limited by analyzer's semaphore).
+        Attaches AnalysisResult to each listing dict under 'llm_analysis' key.
+        """
+        analyzer = self._get_llm_analyzer()
+        if not analyzer:
+            logger.debug("LLM analyzer not available, skipping analysis")
+            return
+
+        # Filter to only high-scoring listings
+        candidates = [
+            listing for listing in listings
+            if listing.get("score", 0) >= LLM_ANALYSIS_SCORE_THRESHOLD
+        ]
+
+        if not candidates:
+            return
+
+        logger.info(f"Running LLM analysis on {len(candidates)} listings (score >= {LLM_ANALYSIS_SCORE_THRESHOLD})")
+
+        async def _analyze_one(listing: dict) -> None:
+            """Analyze a single listing and attach result."""
+            title = listing.get("title", "")
+            description = listing.get("raw_description", "")
+            price = listing.get("price")
+            city = listing.get("city", "")
+            voivodeship = listing.get("voivodeship", "")
+            location = f"{city}, {voivodeship}" if city else voivodeship
+            fraction = listing.get("fraction", "")
+
+            result = await analyzer.analyze(
+                title=title,
+                description=description,
+                price=price,
+                location=location or None,
+                fraction=fraction or None,
+            )
+
+            if result:
+                listing["llm_analysis"] = result
+
+        # Run all analyses in parallel (semaphore inside analyzer limits concurrency)
+        tasks = [_analyze_one(listing) for listing in candidates]
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Log stats
+        analyzed_count = sum(1 for l in candidates if "llm_analysis" in l)
+        logger.info(
+            f"LLM analysis complete: {analyzed_count}/{len(candidates)} successful. "
+            f"Stats: {analyzer.stats}"
+        )
 
     # --- Legacy interface compatibility ---
 

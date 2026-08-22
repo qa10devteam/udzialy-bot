@@ -11,7 +11,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from aiogram import Router, F
 from aiogram.filters import Command, CommandStart
@@ -147,6 +147,20 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         )
         return
 
+    # Run LLM analysis if enabled and configured
+    if settings.llm.enabled and settings.llm.api_key:
+        try:
+            await progress_msg.edit_text(
+                f"🤖 <b>Analizuję {len(results)} ofert...</b>\n\n"
+                f"Uruchamiam AI do oceny atrakcyjności.\n"
+                f"⏳ Proszę czekać...",
+            )
+        except Exception:
+            pass
+        results = await _run_llm_analysis(results)
+        # Re-store with analysis data
+        await state.update_data(search_results=results)
+
     # Show first page of results
     page_size = 5
     total_pages = (len(results) + page_size - 1) // page_size
@@ -257,6 +271,84 @@ async def _run_search(
     return results
 
 
+async def _run_llm_analysis(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Run LLM analysis on search results using ListingAnalyzer.
+
+    Adds 'analysis' key to each result dict with AnalysisResult data,
+    or None if analysis failed/skipped.
+    Returns results sorted by stars (best first).
+    """
+    settings = get_settings()
+    llm_config = {
+        "enabled": settings.llm.enabled,
+        "api_key": settings.llm.api_key,
+        "model": settings.llm.model,
+        "base_url": settings.llm.base_url,
+        "max_concurrent": settings.llm.max_concurrent,
+        "timeout": settings.llm.timeout,
+    }
+
+    try:
+        from detector.llm_analyzer import create_analyzer_from_config, AnalysisResult
+    except ImportError as e:
+        logger.warning(f"LLM analyzer not available: {e}")
+        return results
+
+    analyzer = create_analyzer_from_config(llm_config)
+    if analyzer is None:
+        return results
+
+    async def _analyze_one(item: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze a single listing and attach result."""
+        title = item.get("title", "")
+        description = item.get("description", "")
+        price = item.get("price")
+        location = item.get("city", "") or item.get("location", "")
+        fraction = item.get("fraction", "")
+
+        result = await analyzer.analyze(
+            title=title,
+            description=description,
+            price=price,
+            location=location,
+            fraction=fraction,
+        )
+
+        if result is not None:
+            item["analysis"] = {
+                "stars": result.stars,
+                "summary": result.summary,
+                "is_real_share": result.is_real_share,
+                "fraction": result.key_facts.get("fraction", ""),
+                "property_type": result.key_facts.get("property_type", ""),
+                "seller_motivation": result.key_facts.get("seller_motivation", ""),
+                "price_per_m2_estimate": result.key_facts.get("price_per_m2_estimate"),
+            }
+        else:
+            item["analysis"] = None
+        return item
+
+    # Run all analyses concurrently (semaphore in analyzer limits parallelism)
+    analyzed = await asyncio.gather(*[_analyze_one(r) for r in results])
+
+    # Sort by stars descending (items without analysis go to end)
+    def sort_key(item: Dict[str, Any]) -> int:
+        a = item.get("analysis")
+        if a and a.get("stars"):
+            return -a["stars"]
+        return 0
+
+    analyzed_list = list(analyzed)
+    analyzed_list.sort(key=sort_key)
+
+    logger.info(
+        f"LLM analysis complete: {sum(1 for r in analyzed_list if r.get('analysis'))}/"
+        f"{len(analyzed_list)} analyzed, stats={analyzer.stats}"
+    )
+    return analyzed_list
+
+
 # --- Formatters ---
 
 def _format_results_page(
@@ -265,28 +357,9 @@ def _format_results_page(
     total_pages: int,
     total_results: int,
 ) -> str:
-    """Format a page of results for display."""
-    lines: List[str] = [
-        f"📋 <b>Wyniki wyszukiwania</b> (str. {page + 1}/{total_pages}, "
-        f"łącznie: {total_results})\n",
-    ]
-
-    for i, listing in enumerate(results, start=page * 5 + 1):
-        title = listing.get("title", "Bez tytułu")[:60]
-        price = listing.get("price")
-        city = listing.get("city", "—")
-        score = listing.get("score", 0)
-        source = listing.get("source", "")
-
-        price_str = f"{price:,.0f} PLN" if price else "cena nieznana"
-
-        lines.append(
-            f"<b>{i}.</b> {title}\n"
-            f"   💰 {price_str} | 📍 {city}\n"
-            f"   📊 Trafność: {score}/100 | 🏷️ {source}\n"
-        )
-
-    return "\n".join(lines)
+    """Format a page of results for display (delegates to results module)."""
+    from bot.routers.results import _format_results_page as _results_format
+    return _results_format(results, page, total_pages, total_results)
 
 
 def _format_active_filters(data: Dict[str, Any]) -> str:

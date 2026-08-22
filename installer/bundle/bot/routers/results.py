@@ -164,7 +164,11 @@ def _format_results_page(
     total_pages: int,
     total_results: int,
 ) -> str:
-    """Format a page of results for display."""
+    """Format a page of results for display.
+
+    If analysis data is present (LLM mode), shows stars + summary + risks.
+    Otherwise falls back to basic title + price + link format.
+    """
     lines: List[str] = [
         f"📋 <b>Wyniki</b> (str. {page + 1}/{total_pages}, "
         f"łącznie: {total_results})\n",
@@ -174,26 +178,62 @@ def _format_results_page(
         title = listing.get("title", "Bez tytułu")[:60]
         price = listing.get("price")
         city = listing.get("city", "—")
-        score = listing.get("score", 0)
-        source = listing.get("source", "")
         url = listing.get("url", "")
+        analysis = listing.get("analysis")
 
         price_str = f"{price:,.0f} PLN" if price else "—"
 
-        line = (
-            f"<b>{i}.</b> {title}\n"
-            f"   💰 {price_str} | 📍 {city}\n"
-            f"   📊 {score}/100 | 🏷️ {source}"
-        )
-        if url:
-            line += f'\n   🔗 <a href="{url}">Link</a>'
+        if analysis:
+            # LLM-enriched format: stars + summary + risks
+            stars = analysis.get("stars", 0)
+            stars_str = "⭐" * stars + "☆" * (5 - stars)
+            summary = analysis.get("summary", "")
+            is_real = analysis.get("is_real_share", True)
+            fraction = analysis.get("fraction", "")
+            prop_type = analysis.get("property_type", "")
+            motivation = analysis.get("seller_motivation", "")
+
+            # Build risk indicators
+            risks: List[str] = []
+            if not is_real:
+                risks.append("⚠️ Możliwe nie-udział")
+            if motivation and motivation.lower() in ("egzekucja", "syndyk"):
+                risks.append(f"⚡ {motivation}")
+
+            line = (
+                f"<b>{i}.</b> {stars_str} {title}\n"
+                f"   💰 {price_str} | 📍 {city}\n"
+            )
+            if fraction:
+                line += f"   📊 Udział: {fraction}"
+                if prop_type:
+                    line += f" | 🏠 {prop_type}"
+                line += "\n"
+            if summary:
+                line += f"   💡 <i>{summary[:120]}</i>\n"
+            if risks:
+                line += f"   {'  '.join(risks)}\n"
+            if url:
+                line += f'   🔗 <a href="{url}">Link</a>'
+        else:
+            # Basic format (no LLM)
+            source = listing.get("source", "")
+            score = listing.get("score", 0)
+            line = (
+                f"<b>{i}.</b> {title}\n"
+                f"   💰 {price_str} | 📍 {city}\n"
+                f"   📊 {score}/100 | 🏷️ {source}"
+            )
+            if url:
+                line += f'\n   🔗 <a href="{url}">Link</a>'
+
         lines.append(line + "\n")
 
     return "\n".join(lines)
 
 
 def _format_listing_detail(listing: Dict[str, Any]) -> str:
-    """Format a single listing detail view."""
+    """Format a single listing detail view with optional LLM analysis."""
     title = listing.get("title", "Bez tytułu")
     price = listing.get("price")
     city = listing.get("city", "—")
@@ -203,6 +243,7 @@ def _format_listing_detail(listing: Dict[str, Any]) -> str:
     fraction = listing.get("fraction", "")
     area = listing.get("area")
     url = listing.get("url", "")
+    analysis = listing.get("analysis")
 
     price_str = f"{price:,.0f} PLN" if price else "—"
     area_str = f"{area} m²" if area else "—"
@@ -215,8 +256,36 @@ def _format_listing_detail(listing: Dict[str, Any]) -> str:
         f"📊 Trafność: {score}/100\n"
         f"🏷️ Portal: {source}\n"
     )
-    if fraction:
-        text += f"📊 Udział: {fraction}\n"
+
+    if analysis:
+        # LLM analysis section
+        stars = analysis.get("stars", 0)
+        stars_str = "⭐" * stars + "☆" * (5 - stars)
+        summary = analysis.get("summary", "")
+        is_real = analysis.get("is_real_share", True)
+        a_fraction = analysis.get("fraction", "")
+        prop_type = analysis.get("property_type", "")
+        motivation = analysis.get("seller_motivation", "")
+        price_m2 = analysis.get("price_per_m2_estimate")
+
+        text += f"\n{'─' * 20}\n"
+        text += f"🤖 <b>Analiza AI:</b> {stars_str}\n"
+        if a_fraction:
+            text += f"📊 Udział: {a_fraction}\n"
+        if prop_type:
+            text += f"🏠 Typ: {prop_type}\n"
+        if motivation and motivation != "nieznana":
+            text += f"👤 Motywacja: {motivation}\n"
+        if price_m2:
+            text += f"💲 Szt. cena/m²: ~{price_m2:,.0f} PLN\n"
+        if not is_real:
+            text += "⚠️ <b>Uwaga:</b> Może nie być prawdziwym udziałem!\n"
+        if summary:
+            text += f"\n💡 <i>{summary}</i>\n"
+    else:
+        if fraction:
+            text += f"📊 Udział: {fraction}\n"
+
     if url:
         text += f'\n🔗 <a href="{url}">Otwórz ogłoszenie</a>'
 

@@ -69,7 +69,7 @@ done
 # -----------------------------------------------------------
 echo ""
 echo "[4/6] Copying root files..."
-for file in config_wizard.pyw requirements.txt start_bot.bat stop_bot.bat; do
+for file in launcher.pyw config_wizard.pyw config.yaml requirements.txt start_bot.bat stop_bot.bat; do
     if [ -f "$PROJECT_DIR/$file" ]; then
         cp "$PROJECT_DIR/$file" "$BUNDLE_DIR/$file"
         echo "  + $file"

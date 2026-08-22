@@ -95,7 +95,7 @@ Section "Pliki konfiguracyjne" SecConfig
     SetOutPath "$INSTDIR"
     File "${PROJECT_BUNDLE}\config_wizard.pyw"
     File "${PROJECT_BUNDLE}\requirements.txt"
-    File "${PROJECT_BUNDLE}\start_bot.bat"
+    File "${PROJECT_BUNDLE}\launcher.pyw"
     File "${PROJECT_BUNDLE}\stop_bot.bat"
     File "${PROJECT_BUNDLE}\setup_env.bat"
     
@@ -114,13 +114,13 @@ Section "-Post" SecPost
     
     ; --- Start Menu ---
     CreateDirectory "$SMPROGRAMS\Bot Udziały"
-    CreateShortCut "$SMPROGRAMS\Bot Udziały\Uruchom Bota.lnk" "$INSTDIR\start_bot.bat" "" "$INSTDIR\start_bot.bat" 0
+    CreateShortCut "$SMPROGRAMS\Bot Udziały\Uruchom Bota.lnk" "$INSTDIR\launcher.pyw" "" "$INSTDIR\launcher.pyw" 0
     CreateShortCut "$SMPROGRAMS\Bot Udziały\Konfiguracja.lnk" "$INSTDIR\python\pythonw.exe" '"$INSTDIR\config_wizard.pyw"' "$INSTDIR\python\pythonw.exe" 0
     CreateShortCut "$SMPROGRAMS\Bot Udziały\Zatrzymaj.lnk" "$INSTDIR\stop_bot.bat" "" "$INSTDIR\stop_bot.bat" 0
     CreateShortCut "$SMPROGRAMS\Bot Udziały\Odinstaluj.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
     
     ; --- Desktop Shortcut ---
-    CreateShortCut "$DESKTOP\Bot Udziały.lnk" "$INSTDIR\start_bot.bat" "" "$INSTDIR\start_bot.bat" 0
+    CreateShortCut "$DESKTOP\Bot Udziały.lnk" "$INSTDIR\launcher.pyw" "" "$INSTDIR\launcher.pyw" 0
     
     ; --- Uninstaller ---
     WriteUninstaller "$INSTDIR\uninstall.exe"
@@ -157,7 +157,7 @@ Section "Uninstall"
     
     Delete "$INSTDIR\config_wizard.pyw"
     Delete "$INSTDIR\requirements.txt"
-    Delete "$INSTDIR\start_bot.bat"
+    Delete "$INSTDIR\launcher.pyw"
     Delete "$INSTDIR\stop_bot.bat"
     Delete "$INSTDIR\setup_env.bat"
     Delete "$INSTDIR\config.yaml"

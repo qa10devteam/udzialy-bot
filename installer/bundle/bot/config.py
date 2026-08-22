@@ -107,6 +107,17 @@ class DatabaseConfig(BaseModel):
     path: str = "data/udzialy.db"
 
 
+class LLMConfig(BaseModel):
+    """LLM analysis settings (optional)."""
+    enabled: bool = False
+    provider: str = "openai"  # openai, anthropic, local
+    api_key: str = ""
+    model: str = "gpt-4o-mini"
+    base_url: str = "https://api.openai.com/v1"
+    max_concurrent: int = 5
+    timeout: int = 15
+
+
 class LoggingConfig(BaseModel):
     """Logging settings."""
     level: str = "INFO"
@@ -134,6 +145,7 @@ class Settings(BaseSettings):
     scraping: ScrapingConfig = ScrapingConfig()
     tor: TorConfig = TorConfig()
     database: DatabaseConfig = DatabaseConfig()
+    llm: LLMConfig = LLMConfig()
     logging: LoggingConfig = LoggingConfig()
 
     # Convenience properties
