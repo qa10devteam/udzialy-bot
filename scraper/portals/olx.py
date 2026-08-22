@@ -1,16 +1,23 @@
 """
-OLX.pl scraper - Layer 3-4 (curl_cffi + Tor).
+OLX.pl scraper - Layer 3 (curl_cffi + Tor SOCKS5).
 
-OLX uses Next.js with aggressive bot protection (Cloudflare).
-Search URL: https://www.olx.pl/nieruchomosci/q-{keywords}/
-Data extraction: __NEXT_DATA__ JSON embedded in page.
+VERIFIED working approach (2026-08-22, 3.7MB via curl_cffi+Tor):
+  - NO __NEXT_DATA__ available! Must use HTML parsing.
+  - [data-testid=ad-card-title] a for title links
+  - /d/oferta/ links in href
+  - .css-u2ayx9 for title links (class-based fallback)
+  - Price from sibling elements near title
+
+Search URL: https://www.olx.pl/nieruchomosci/q-{keyword}/?page={n}
+Config: start_layer=3, use_tor=True, tor_proxy=socks5://127.0.0.1:9050
 """
 
-import json
 import logging
 import re
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote_plus, urljoin
+
+from bs4 import BeautifulSoup
 
 from scraper.base import BaseScraper, RawListing
 from scraper.stealth import fetch_with_stealth
@@ -18,306 +25,241 @@ from scraper.stealth import fetch_with_stealth
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.olx.pl"
+SEARCH_URL_TEMPLATE = "https://www.olx.pl/nieruchomosci/q-{kw}/?page={page}"
+MAX_PAGES = 2
 
 
 class OlxScraper(BaseScraper):
-    """OLX.pl real estate scraper (Next.js + CF protected)."""
-    
+    """OLX.pl real estate scraper (curl_cffi + Tor, HTML parsing)."""
+
     def __init__(self, **kwargs):
         kwargs.setdefault("use_tor", True)
+        kwargs.setdefault("tor_proxy", "socks5://127.0.0.1:9050")
         super().__init__(stealth_layer=3, **kwargs)
-    
+
     def get_portal_name(self) -> str:
         return "OLX"
-    
+
     async def search(
         self, keywords: List[str], filters: Optional[Dict[str, Any]] = None
-    ) -> List[RawListing]:
-        """Search OLX for listings."""
-        results: List[RawListing] = []
+    ) -> List[dict]:
+        """
+        Search OLX for property share listings.
+
+        Uses curl_cffi with TLS impersonation through Tor SOCKS5.
+        NO __NEXT_DATA__ - pure HTML parsing with verified selectors.
+
+        Args:
+            keywords: List of search terms
+            filters: Optional filters dict
+
+        Returns:
+            List of dicts with: title, price, city, voivodeship, url,
+            source_portal, raw_description
+        """
+        results: List[dict] = []
         filters = filters or {}
-        
+
         for keyword in keywords:
-            url = self._build_search_url(keyword, filters)
-            logger.info(f"[OLX] Searching: {url}")
-            
-            html = await fetch_with_stealth(url, self.get_portal_config())
-            if not html:
-                logger.warning(f"[OLX] No response for keyword: {keyword}")
-                continue
-            
-            # Try __NEXT_DATA__ extraction first (preferred)
-            listings = self._parse_next_data(html)
-            if not listings:
-                # Fallback to HTML parsing
-                listings = self._parse_html_results(html)
-            
-            results.extend(listings)
-            logger.info(f"[OLX] Found {len(listings)} listings for '{keyword}'")
-        
+            for page in range(1, MAX_PAGES + 1):
+                # OLX uses slug-style keywords in URL path
+                kw_slug = keyword.replace(" ", "-")
+                url = SEARCH_URL_TEMPLATE.format(
+                    kw=quote_plus(kw_slug), page=page
+                )
+                logger.info(f"[OLX] Fetching: {url}")
+
+                html = await fetch_with_stealth(url, self.get_portal_config())
+                if not html:
+                    logger.warning(f"[OLX] No response for '{keyword}' page {page}")
+                    break
+
+                page_results = self._parse_html_results(html)
+                if not page_results:
+                    logger.info(f"[OLX] No results on page {page}, stopping pagination")
+                    break
+
+                results.extend(page_results)
+                logger.info(
+                    f"[OLX] Page {page}: {len(page_results)} listings for '{keyword}'"
+                )
+
         return results
-    
-    def _build_search_url(self, keyword: str, filters: Dict[str, Any]) -> str:
-        """Build OLX search URL."""
-        # OLX uses slug-style keywords in URL
-        kw_slug = keyword.replace(" ", "-").lower()
-        url = f"{BASE_URL}/nieruchomosci/q-{quote_plus(kw_slug)}/"
+
+    def _parse_html_results(self, html: str) -> List[dict]:
+        """Parse OLX HTML results using verified selectors."""
+        soup = BeautifulSoup(html, "html.parser")
+        listings: List[dict] = []
+
+        # Strategy 1: [data-testid=ad-card-title] a — verified primary selector
+        title_links = soup.select("[data-testid='ad-card-title'] a")
         
-        params = []
-        if "price_min" in filters:
-            params.append(f"search[filter_float_price:from]={filters['price_min']}")
-        if "price_max" in filters:
-            params.append(f"search[filter_float_price:to]={filters['price_max']}")
-        if "city" in filters:
-            # OLX uses city in URL path typically, but also supports param
-            params.append(f"search[city_id]={filters['city']}")
-        
-        if params:
-            url += "?" + "&".join(params)
-        
-        return url
-    
-    def _parse_next_data(self, html: str) -> List[RawListing]:
-        """Extract listings from __NEXT_DATA__ JSON."""
-        match = re.search(
-            r'<script\s+id="__NEXT_DATA__"\s+type="application/json">(.*?)</script>',
-            html,
-            re.DOTALL,
-        )
-        if not match:
-            return []
-        
-        try:
-            data = json.loads(match.group(1))
-        except json.JSONDecodeError:
-            logger.warning("[OLX] Failed to parse __NEXT_DATA__ JSON")
-            return []
-        
-        listings: List[RawListing] = []
-        
-        # Navigate OLX's data structure
-        try:
-            # OLX Next.js structure: props.pageProps.data.ads
-            page_props = data.get("props", {}).get("pageProps", {})
-            ads_data = page_props.get("data", {}).get("ads", [])
-            
-            if not ads_data:
-                # Alternative path
-                ads_data = page_props.get("ads", {}).get("data", [])
-            
-            if not ads_data:
-                # Try another path for newer OLX versions
-                listing_data = page_props.get("listingData", {})
-                ads_data = listing_data.get("ads", [])
-            
-            for ad in ads_data:
-                listing = self._parse_ad_json(ad)
+        if title_links:
+            for link in title_links:
+                listing = self._parse_from_title_link(link, soup)
                 if listing:
                     listings.append(listing)
-                    
-        except (KeyError, TypeError) as e:
-            logger.warning(f"[OLX] Error navigating __NEXT_DATA__: {e}")
+            return listings
+
+        # Strategy 2: Find all /d/oferta/ links (direct URL pattern)
+        offer_links = soup.select("a[href*='/d/oferta/']")
+        seen_urls = set()
         
-        return listings
-    
-    def _parse_ad_json(self, ad: Dict[str, Any]) -> Optional[RawListing]:
-        """Parse a single OLX ad from JSON data."""
-        try:
-            title = ad.get("title", "")
-            if not title:
-                return None
+        for link in offer_links:
+            href = link.get("href", "")
+            if href in seen_urls:
+                continue
+            seen_urls.add(href)
             
-            # URL
-            url = ad.get("url", "")
-            if url and not url.startswith("http"):
-                url = urljoin(BASE_URL, url)
-            if not url:
-                slug = ad.get("slug", "")
-                ad_id = ad.get("id", "")
-                if slug and ad_id:
-                    url = f"{BASE_URL}/oferta/{slug}-ID{ad_id}.html"
-            
-            if not url:
-                return None
-            
-            # Price
-            price = None
-            price_text = None
-            price_data = ad.get("price", {})
-            if isinstance(price_data, dict):
-                price_text = price_data.get("displayValue", price_data.get("regularPrice", {}).get("value"))
-                negotiable = price_data.get("negotiable", False)
-                try:
-                    price_val = price_data.get("regularPrice", {}).get("value")
-                    if price_val:
-                        price = float(price_val)
-                except (ValueError, TypeError):
-                    pass
-            elif isinstance(price_data, str):
-                price_text = price_data
-            
-            # Location
-            location_data = ad.get("location", {})
-            location = None
-            city = None
-            if isinstance(location_data, dict):
-                city_data = location_data.get("city", {})
-                city = city_data.get("name", "") if isinstance(city_data, dict) else str(city_data)
-                region = location_data.get("region", {})
-                region_name = region.get("name", "") if isinstance(region, dict) else ""
-                location = f"{city}, {region_name}".strip(", ")
-            
-            # Params (area, rooms, etc.)
-            area = None
-            rooms = None
-            params = ad.get("params", [])
-            if isinstance(params, list):
-                for param in params:
-                    if isinstance(param, dict):
-                        key = param.get("key", "")
-                        value = param.get("normalizedValue", param.get("value", ""))
-                        if key == "m" or key == "area":
-                            try:
-                                area = float(str(value).replace(",", "."))
-                            except ValueError:
-                                pass
-                        elif key == "rooms" or key == "number_of_rooms":
-                            try:
-                                rooms = int(value)
-                            except (ValueError, TypeError):
-                                pass
-            
-            # Thumbnail
-            photos = ad.get("photos", [])
-            thumbnail = None
-            if photos and isinstance(photos, list):
-                first_photo = photos[0] if photos else {}
-                if isinstance(first_photo, dict):
-                    thumbnail = first_photo.get("link", first_photo.get("url"))
-                elif isinstance(first_photo, str):
-                    thumbnail = first_photo
-            
-            # Description snippet
-            description = ad.get("description", "")
-            
-            # Share detection
-            combined = f"{title} {description}".lower()
-            is_share = self._detect_share(combined)
-            share_fraction = self._extract_fraction(f"{title} {description}")
-            
-            return RawListing(
-                title=title,
-                source_url=url,
-                portal="olx",
-                price=price,
-                price_text=price_text,
-                location=location,
-                city=city,
-                area_m2=area,
-                rooms=rooms,
-                thumbnail_url=thumbnail,
-                description=description[:500] if description else None,
-                listing_id=str(ad.get("id", "")),
-                is_share=is_share,
-                share_fraction=share_fraction,
-            )
-            
-        except Exception as e:
-            logger.warning(f"[OLX] Error parsing ad JSON: {e}")
-            return None
-    
-    def _parse_html_results(self, html: str) -> List[RawListing]:
-        """Fallback HTML parsing for OLX."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
-            return []
-        
-        soup = BeautifulSoup(html, "html.parser")
-        listings: List[RawListing] = []
-        
-        # OLX card selectors
-        cards = soup.select(
-            "[data-cy='l-card'], .offer-wrapper, "
-            "[data-testid='listing-grid'] > div"
-        )
-        
-        for card in cards:
-            listing = self.parse_listing(str(card))
+            listing = self._parse_from_offer_link(link, soup)
             if listing:
                 listings.append(listing)
-        
+
+        if listings:
+            return listings
+
+        # Strategy 3: .css-u2ayx9 class links (fallback)
+        css_links = soup.select("a.css-u2ayx9")
+        for link in css_links:
+            listing = self._parse_from_title_link(link, soup)
+            if listing:
+                listings.append(listing)
+
         return listings
-    
-    def parse_listing(self, html: str) -> Optional[RawListing]:
-        """Parse a single OLX listing card HTML (fallback)."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
-            return None
+
+    def _parse_from_title_link(self, link, soup) -> Optional[dict]:
+        """Parse listing from a title link element."""
+        href = link.get("href", "")
+        if not href or "/d/oferta/" not in href:
+            # Skip non-offer links
+            if not href:
+                return None
         
-        soup = BeautifulSoup(html, "html.parser")
-        
-        # Title
-        title_el = soup.select_one(
-            "[data-cy='ad-card-title'], h6, .offer-wrapper__title"
-        )
-        title = title_el.get_text(strip=True) if title_el else None
+        source_url = urljoin(BASE_URL, href)
+        title = link.get_text(strip=True)
         if not title:
             return None
-        
-        # URL
-        link_el = soup.select_one("a[href*='/oferta/'], a[href*='/d/']")
-        href = link_el.get("href", "") if link_el else ""
-        source_url = urljoin(BASE_URL, href) if href else ""
-        if not source_url:
+
+        # Navigate up to find the card container for price/location
+        card = link.find_parent("div", {"data-testid": True})
+        if not card:
+            card = link.find_parent("div", recursive=True)
+            # Go up to a reasonable container
+            for _ in range(5):
+                if card and card.parent:
+                    parent = card.parent
+                    if parent.name == "div" and len(parent.get_text()) > len(title) + 20:
+                        card = parent
+                        break
+                    card = parent
+
+        price = None
+        city = ""
+        voivodeship = ""
+        raw_description = title
+
+        if card:
+            # Price: look for price-like elements
+            price_el = card.select_one("[data-testid='ad-price']")
+            if not price_el:
+                # Find text that looks like price (contains "zł")
+                for el in card.find_all(string=re.compile(r"\d.*zł|PLN", re.IGNORECASE)):
+                    price_text = el.strip()
+                    price = self._parse_price(price_text)
+                    if price:
+                        break
+            else:
+                price = self._parse_price(price_el.get_text(strip=True))
+
+            # Location: look for location-like elements
+            location_el = card.select_one("[data-testid='location-date']")
+            if location_el:
+                location_text = location_el.get_text(strip=True)
+                # OLX format: "Warszawa, Mokotów - Dzisiaj 14:30"
+                location_part = location_text.split(" - ")[0] if " - " in location_text else location_text
+                city, voivodeship = self._parse_location(location_part)
+
+            # Raw description - all card text
+            raw_description = card.get_text(" ", strip=True)[:300]
+
+        return {
+            "title": title,
+            "price": price,
+            "city": city,
+            "voivodeship": voivodeship,
+            "url": source_url,
+            "source_portal": "olx",
+            "raw_description": raw_description,
+        }
+
+    def _parse_from_offer_link(self, link, soup) -> Optional[dict]:
+        """Parse listing from an /d/oferta/ link."""
+        href = link.get("href", "")
+        if not href:
             return None
+
+        source_url = urljoin(BASE_URL, href)
+        title = link.get_text(strip=True)
         
-        # Price
-        price_el = soup.select_one(
-            "[data-testid='ad-price'], .price, p[data-testid='ad-price']"
-        )
-        price_text = price_el.get_text(strip=True) if price_el else None
-        price = self._parse_price(price_text)
-        
-        # Location
-        loc_el = soup.select_one(
-            "[data-testid='location-date'], .breadcrumb, .offer-wrapper__location"
-        )
-        location = loc_el.get_text(strip=True) if loc_el else None
-        
-        is_share = self._detect_share(title)
-        share_fraction = self._extract_fraction(title)
-        
-        return RawListing(
-            title=title,
-            source_url=source_url,
-            portal="olx",
-            price=price,
-            price_text=price_text,
-            location=location,
-            is_share=is_share,
-            share_fraction=share_fraction,
-        )
-    
-    def _parse_price(self, text: Optional[str]) -> Optional[float]:
+        # Sometimes these are image links, skip if no text
+        if not title or len(title) < 5:
+            return None
+
+        return {
+            "title": title,
+            "price": None,
+            "city": "",
+            "voivodeship": "",
+            "url": source_url,
+            "source_portal": "olx",
+            "raw_description": title,
+        }
+
+    def _parse_price(self, text: str) -> Optional[float]:
+        """Extract numeric price from text."""
         if not text:
             return None
-        cleaned = re.sub(r"[^\d,.]", "", text.replace(" ", "").replace("\xa0", ""))
+        # Remove non-digit chars except comma and dot
+        cleaned = re.sub(r"[^\d,.]", "", text.replace("\xa0", "").replace(" ", ""))
         cleaned = cleaned.replace(",", ".")
+        if cleaned.count(".") > 1:
+            cleaned = cleaned.replace(".", "")
+        elif "." in cleaned and len(cleaned.split(".")[-1]) == 3:
+            cleaned = cleaned.replace(".", "")
         try:
-            return float(cleaned)
+            val = float(cleaned) if cleaned else None
+            # Sanity check - property prices should be > 1000
+            if val and val < 100:
+                return None
+            return val
         except (ValueError, TypeError):
             return None
-    
-    def _detect_share(self, text: str) -> bool:
-        text_lower = text.lower()
-        share_keywords = [
-            "udział", "udzial", "1/2", "1/3", "1/4", "1/6", "1/8",
-            "współwłasność", "wspolwlasnosc",
-        ]
-        return any(kw in text_lower for kw in share_keywords)
-    
-    def _extract_fraction(self, text: str) -> Optional[str]:
-        match = re.search(r"(\d+/\d+)", text)
-        return match.group(1) if match else None
+
+    def _parse_location(self, text: str) -> tuple:
+        """Parse location text into (city, voivodeship)."""
+        if not text:
+            return ("", "")
+        parts = [p.strip() for p in text.split(",")]
+        city = parts[0] if parts else ""
+        voivodeship = parts[-1] if len(parts) > 1 else ""
+        return (city, voivodeship)
+
+    def parse_listing(self, html: str) -> Optional[RawListing]:
+        """Parse a single listing card HTML into RawListing (legacy interface)."""
+        soup = BeautifulSoup(html, "html.parser")
+        links = soup.select("[data-testid='ad-card-title'] a, a[href*='/d/oferta/']")
+        if not links:
+            return None
+        result = self._parse_from_title_link(links[0], soup)
+        if not result:
+            return None
+        return RawListing(
+            title=result["title"],
+            source_url=result["url"],
+            portal="olx",
+            price=result["price"],
+            location=f"{result['city']}, {result['voivodeship']}",
+            city=result["city"],
+            voivodeship=result["voivodeship"],
+            description=result["raw_description"],
+        )

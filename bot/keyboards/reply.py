@@ -1,5 +1,7 @@
 """
 Reply keyboard builders — persistent main menu keyboard.
+
+Buttons: [🔍 Szukaj] [⚙️ Filtry] [📋 Zapisane] [❓ Pomoc]
 """
 
 from __future__ import annotations
@@ -13,16 +15,19 @@ def main_menu_keyboard() -> ReplyKeyboardMarkup:
     Build the main menu reply keyboard.
 
     Shown persistently at the bottom of the chat.
+    Layout:
+        [🔍 Szukaj]  [⚙️ Filtry]
+        [📋 Zapisane] [❓ Pomoc]
     """
     builder = ReplyKeyboardBuilder()
 
     builder.row(
         KeyboardButton(text="🔍 Szukaj"),
-        KeyboardButton(text="🗺️ Filtry"),
+        KeyboardButton(text="⚙️ Filtry"),
     )
     builder.row(
-        KeyboardButton(text="💾 Zapisane"),
-        KeyboardButton(text="⚙️ Ustawienia"),
+        KeyboardButton(text="📋 Zapisane"),
+        KeyboardButton(text="❓ Pomoc"),
     )
 
     return builder.as_markup(

@@ -1,14 +1,15 @@
 """
 Morizon.pl scraper - Layer 1 (httpx with Chrome headers).
 
-Search URL: https://www.morizon.pl/nieruchomosci/?q={keywords}
-Selectors:
-  - .property-card (listing card container)
-  - .property-card__title (title)
-  - .property-card__price--main (price)
-  - .property-card__location (location)
-  - .property-card__area (area)
-  - .property-card__rooms (rooms)
+VERIFIED working selectors (2026-08-22, 830KB response):
+  - a.property-card for card links (37 per page)
+  - [data-cy=propertyUrl] alternate selector
+  - .property-card__title for title
+  - .property-card__price--main for price
+  - .property-card__location for location (city, district, voivodeship)
+
+Search URL: https://www.morizon.pl/mieszkania/?q={keyword}
+Pagination: &page=2, &page=3, etc. (page=1 causes 404!)
 """
 
 import logging
@@ -16,211 +17,162 @@ import re
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote_plus, urljoin
 
+from bs4 import BeautifulSoup
+
 from scraper.base import BaseScraper, RawListing
 from scraper.stealth import fetch_with_stealth
 
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.morizon.pl"
-SEARCH_URL = f"{BASE_URL}/nieruchomosci/"
+MAX_PAGES = 2
 
 
 class MorizonScraper(BaseScraper):
     """Morizon.pl real estate portal scraper."""
-    
+
     def __init__(self, **kwargs):
         super().__init__(stealth_layer=1, use_tor=False, **kwargs)
-    
+
     def get_portal_name(self) -> str:
         return "Morizon"
-    
+
+    def _build_url(self, keyword: str, page: int) -> str:
+        """Build search URL. page=1 uses no page param (Morizon 404s on page=1)."""
+        base = f"https://www.morizon.pl/mieszkania/?q={quote_plus(keyword)}"
+        if page > 1:
+            return f"{base}&page={page}"
+        return base
+
     async def search(
         self, keywords: List[str], filters: Optional[Dict[str, Any]] = None
-    ) -> List[RawListing]:
-        """Search Morizon for listings."""
-        results: List[RawListing] = []
+    ) -> List[dict]:
+        """
+        Search Morizon for property listings.
+
+        Returns:
+            List of dicts with: title, price, city, voivodeship, url,
+            source_portal, raw_description
+        """
+        results: List[dict] = []
         filters = filters or {}
-        
+
         for keyword in keywords:
-            url = self._build_search_url(keyword, filters)
-            logger.info(f"[Morizon] Searching: {url}")
-            
-            html = await fetch_with_stealth(url, self.get_portal_config())
-            if not html:
-                logger.warning(f"[Morizon] No response for keyword: {keyword}")
-                continue
-            
-            listings = self._parse_search_results(html)
-            results.extend(listings)
-            logger.info(f"[Morizon] Found {len(listings)} listings for '{keyword}'")
-        
+            for page in range(1, MAX_PAGES + 1):
+                url = self._build_url(keyword, page)
+                logger.info(f"[Morizon] Fetching: {url}")
+
+                html = await fetch_with_stealth(url, self.get_portal_config())
+                if not html:
+                    logger.warning(f"[Morizon] No response for '{keyword}' page {page}")
+                    break
+
+                page_results = self._parse_search_results(html)
+                if not page_results:
+                    logger.info(f"[Morizon] No results on page {page}, stopping")
+                    break
+
+                results.extend(page_results)
+                logger.info(
+                    f"[Morizon] Page {page}: {len(page_results)} listings for '{keyword}'"
+                )
+
         return results
-    
-    def _build_search_url(self, keyword: str, filters: Dict[str, Any]) -> str:
-        """Build Morizon search URL with filters."""
-        params = [f"q={quote_plus(keyword)}"]
-        
-        if "price_min" in filters:
-            params.append(f"ps[price_from]={filters['price_min']}")
-        if "price_max" in filters:
-            params.append(f"ps[price_to]={filters['price_max']}")
-        if "city" in filters:
-            params.append(f"ps[location]={quote_plus(filters['city'])}")
-        if "area_min" in filters:
-            params.append(f"ps[living_area_from]={filters['area_min']}")
-        if "area_max" in filters:
-            params.append(f"ps[living_area_to]={filters['area_max']}")
-        
-        return f"{SEARCH_URL}?{'&'.join(params)}"
-    
-    def _parse_search_results(self, html: str) -> List[RawListing]:
-        """Parse search results page HTML."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
-            logger.error("bs4 not available for parsing")
-            return []
-        
+
+    def _parse_search_results(self, html: str) -> List[dict]:
+        """Parse search results using VERIFIED selectors."""
         soup = BeautifulSoup(html, "html.parser")
-        listings: List[RawListing] = []
-        
-        # Find all property cards
-        cards = soup.select(".property-card, [data-testid='property-card'], .listing-item")
-        
+        listings: List[dict] = []
+
+        # Primary: a.property-card (verified 37 per page)
+        cards = soup.select("a.property-card")
+        if not cards:
+            cards = soup.select("[data-cy=propertyUrl]")
+
         for card in cards:
-            listing = self.parse_listing(str(card))
+            listing = self._parse_card(card)
             if listing:
                 listings.append(listing)
-        
+
         return listings
-    
-    def parse_listing(self, html: str) -> Optional[RawListing]:
-        """Parse a single property card HTML."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
+
+    def _parse_card(self, card) -> Optional[dict]:
+        """Parse a single a.property-card element."""
+        # URL from href
+        href = card.get("href", "")
+        if not href:
             return None
-        
-        soup = BeautifulSoup(html, "html.parser")
-        
-        # Title
-        title_el = soup.select_one(
-            ".property-card__title, .property-card__title a, "
-            "[data-testid='listing-title'], h2.listing-title"
-        )
-        title = title_el.get_text(strip=True) if title_el else None
+        source_url = urljoin(BASE_URL, href)
+
+        # Title: .property-card__title
+        title_el = card.select_one(".property-card__title")
+        title = title_el.get_text(strip=True) if title_el else ""
         if not title:
             return None
-        
-        # URL
-        link_el = soup.select_one(
-            ".property-card__title a, a.property-card__link, "
-            "[data-testid='listing-link'], a[href*='/oferta/']"
-        )
-        href = link_el.get("href", "") if link_el else ""
-        source_url = urljoin(BASE_URL, href) if href else ""
-        if not source_url:
-            return None
-        
-        # Price
-        price_el = soup.select_one(
-            ".property-card__price--main, .property-card__price, "
-            "[data-testid='listing-price'], .listing-price"
-        )
-        price_text = price_el.get_text(strip=True) if price_el else None
+
+        # Price: .property-card__price--main
+        price_el = card.select_one(".property-card__price--main")
+        price_text = price_el.get_text(strip=True) if price_el else ""
         price = self._parse_price(price_text)
-        
-        # Location
-        location_el = soup.select_one(
-            ".property-card__location, [data-testid='listing-location'], "
-            ".listing-location"
-        )
-        location = location_el.get_text(strip=True) if location_el else None
-        
-        # Area
-        area_el = soup.select_one(
-            ".property-card__area, [data-testid='listing-area'], "
-            ".listing-area"
-        )
-        area_text = area_el.get_text(strip=True) if area_el else None
-        area = self._parse_area(area_text)
-        
-        # Rooms
-        rooms_el = soup.select_one(
-            ".property-card__rooms, [data-testid='listing-rooms'], "
-            ".listing-rooms"
-        )
-        rooms_text = rooms_el.get_text(strip=True) if rooms_el else None
-        rooms = self._parse_rooms(rooms_text)
-        
-        # Thumbnail
-        img_el = soup.select_one("img.property-card__image, img[data-testid='listing-image']")
-        thumbnail = img_el.get("src", None) if img_el else None
-        
-        # Check if it's a share (udział)
-        is_share = self._detect_share(title, price_text or "")
-        share_fraction = self._extract_fraction(title)
-        
-        return RawListing(
-            title=title,
-            source_url=source_url,
-            portal="morizon",
-            price=price,
-            price_text=price_text,
-            location=location,
-            area_m2=area,
-            rooms=rooms,
-            thumbnail_url=thumbnail,
-            is_share=is_share,
-            share_fraction=share_fraction,
-        )
-    
-    def _parse_price(self, text: Optional[str]) -> Optional[float]:
-        """Extract numeric price from text."""
+
+        # Location: .property-card__location
+        location_el = card.select_one(".property-card__location")
+        location_text = location_el.get_text(strip=True) if location_el else ""
+        city, voivodeship = self._parse_location(location_text)
+
+        # Description from property details
+        desc_el = card.select_one(".property-card__property-description, .property-card__property-details")
+        raw_description = desc_el.get_text(strip=True) if desc_el else title
+
+        return {
+            "title": title,
+            "price": price,
+            "city": city,
+            "voivodeship": voivodeship,
+            "url": source_url,
+            "source_portal": "morizon",
+            "raw_description": raw_description,
+        }
+
+    def _parse_price(self, text: str) -> Optional[float]:
+        """Extract numeric price from '470 000 zł'."""
         if not text:
             return None
-        # Remove currency, spaces, "zł", and "PLN"
-        cleaned = re.sub(r"[^\d,.]", "", text.replace(" ", ""))
-        cleaned = cleaned.replace(",", ".")
+        cleaned = re.sub(r"[^\d]", "", text.replace("\xa0", ""))
         try:
-            return float(cleaned)
+            return float(cleaned) if cleaned else None
         except (ValueError, TypeError):
             return None
-    
-    def _parse_area(self, text: Optional[str]) -> Optional[float]:
-        """Extract area in m² from text."""
+
+    def _parse_location(self, text: str) -> tuple:
+        """Parse 'Stroma, Tarninów, Legnica, dolnośląskie' -> (city, voivodeship)."""
         if not text:
+            return ("", "")
+        parts = [p.strip() for p in text.split(",")]
+        # Format: street, district, city, voivodeship
+        # or: city, voivodeship
+        if len(parts) >= 4:
+            city = parts[-2]  # city is second from last
+            voivodeship = parts[-1]
+        elif len(parts) >= 2:
+            city = parts[0]
+            voivodeship = parts[-1]
+        else:
+            city = parts[0]
+            voivodeship = ""
+        return (city, voivodeship)
+
+    def parse_listing(self, html: str) -> Optional[RawListing]:
+        """Legacy interface."""
+        soup = BeautifulSoup(html, "html.parser")
+        result = self._parse_card(soup)
+        if not result:
             return None
-        match = re.search(r"([\d,.]+)\s*m", text)
-        if match:
-            try:
-                return float(match.group(1).replace(",", "."))
-            except ValueError:
-                pass
-        return None
-    
-    def _parse_rooms(self, text: Optional[str]) -> Optional[int]:
-        """Extract room count from text."""
-        if not text:
-            return None
-        match = re.search(r"(\d+)", text)
-        if match:
-            try:
-                return int(match.group(1))
-            except ValueError:
-                pass
-        return None
-    
-    def _detect_share(self, title: str, description: str) -> bool:
-        """Detect if listing is for a property share (udział)."""
-        combined = f"{title} {description}".lower()
-        share_keywords = [
-            "udział", "udzial", "1/2", "1/3", "1/4", "1/6", "1/8",
-            "współwłasność", "wspolwlasnosc", "ułamek", "ulamek",
-        ]
-        return any(kw in combined for kw in share_keywords)
-    
-    def _extract_fraction(self, text: str) -> Optional[str]:
-        """Extract share fraction from text."""
-        match = re.search(r"(\d+/\d+)", text)
-        return match.group(1) if match else None
+        return RawListing(
+            title=result["title"],
+            source_url=result["url"],
+            portal="morizon",
+            price=result["price"],
+            city=result["city"],
+            voivodeship=result["voivodeship"],
+        )

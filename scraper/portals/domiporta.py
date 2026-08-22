@@ -1,13 +1,16 @@
 """
 Domiporta.pl scraper - Layer 1 (httpx with Chrome headers).
 
-Search URL: https://www.domiporta.pl/nieruchomosci/szukaj?KeyWords={keywords}
-Selectors:
-  - article.sneakpeak (listing card container)
-  - h2.sneakpeak__title--bold (title)
-  - span.sneakpeak__price_value (price)
-  - .sneakpeak__details_item (details: area, rooms)
-  - .sneakpeak__location (location)
+VERIFIED working selectors (2026-08-22, 435KB response):
+  - article.sneakpeak for card containers (36 per page)
+  - h2.sneakpeak__title--bold a for title + href
+  - span.sneakpeak__price_value for price
+  - .sneakpeak__title--inblock for location (e.g. "mieszkanie Gdynia, Chwarzno")
+  - .sneakpeak__details_item--area for area
+  - .sneakpeak__description for description text
+
+Search URL: https://www.domiporta.pl/mieszkanie/sprzedam?KeyWords={keyword}&PageNumber={n}
+(PageNumber=1 works on Domiporta!)
 """
 
 import logging
@@ -15,203 +18,171 @@ import re
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote_plus, urljoin
 
+from bs4 import BeautifulSoup
+
 from scraper.base import BaseScraper, RawListing
 from scraper.stealth import fetch_with_stealth
 
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.domiporta.pl"
-SEARCH_URL = f"{BASE_URL}/nieruchomosci/szukaj"
+SEARCH_URL_TEMPLATE = (
+    "https://www.domiporta.pl/mieszkanie/sprzedam?KeyWords={kw}&PageNumber={page}"
+)
+MAX_PAGES = 2
 
 
 class DomiportaScraper(BaseScraper):
     """Domiporta.pl real estate portal scraper."""
-    
+
     def __init__(self, **kwargs):
         super().__init__(stealth_layer=1, use_tor=False, **kwargs)
-    
+
     def get_portal_name(self) -> str:
         return "Domiporta"
-    
+
     async def search(
         self, keywords: List[str], filters: Optional[Dict[str, Any]] = None
-    ) -> List[RawListing]:
-        """Search Domiporta for listings."""
-        results: List[RawListing] = []
+    ) -> List[dict]:
+        """
+        Search Domiporta for property listings.
+
+        Returns:
+            List of dicts with: title, price, city, voivodeship, url,
+            source_portal, raw_description
+        """
+        results: List[dict] = []
         filters = filters or {}
-        
+
         for keyword in keywords:
-            url = self._build_search_url(keyword, filters)
-            logger.info(f"[Domiporta] Searching: {url}")
-            
-            html = await fetch_with_stealth(url, self.get_portal_config())
-            if not html:
-                logger.warning(f"[Domiporta] No response for keyword: {keyword}")
-                continue
-            
-            listings = self._parse_search_results(html)
-            results.extend(listings)
-            logger.info(f"[Domiporta] Found {len(listings)} listings for '{keyword}'")
-        
+            for page in range(1, MAX_PAGES + 1):
+                url = SEARCH_URL_TEMPLATE.format(
+                    kw=quote_plus(keyword), page=page
+                )
+                logger.info(f"[Domiporta] Fetching: {url}")
+
+                html = await fetch_with_stealth(url, self.get_portal_config())
+                if not html:
+                    logger.warning(f"[Domiporta] No response for '{keyword}' page {page}")
+                    break
+
+                page_results = self._parse_search_results(html)
+                if not page_results:
+                    logger.info(f"[Domiporta] No results on page {page}, stopping")
+                    break
+
+                results.extend(page_results)
+                logger.info(
+                    f"[Domiporta] Page {page}: {len(page_results)} listings for '{keyword}'"
+                )
+
         return results
-    
-    def _build_search_url(self, keyword: str, filters: Dict[str, Any]) -> str:
-        """Build Domiporta search URL."""
-        params = [f"KeyWords={quote_plus(keyword)}"]
-        
-        if "price_min" in filters:
-            params.append(f"Price.From={filters['price_min']}")
-        if "price_max" in filters:
-            params.append(f"Price.To={filters['price_max']}")
-        if "city" in filters:
-            params.append(f"Location={quote_plus(filters['city'])}")
-        if "area_min" in filters:
-            params.append(f"Surface.From={filters['area_min']}")
-        if "area_max" in filters:
-            params.append(f"Surface.To={filters['area_max']}")
-        
-        return f"{SEARCH_URL}?{'&'.join(params)}"
-    
-    def _parse_search_results(self, html: str) -> List[RawListing]:
-        """Parse search results page."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
-            logger.error("bs4 not available")
-            return []
-        
+
+    def _parse_search_results(self, html: str) -> List[dict]:
+        """Parse search results using VERIFIED selectors."""
         soup = BeautifulSoup(html, "html.parser")
-        listings: List[RawListing] = []
-        
-        # Domiporta uses article.sneakpeak for listing cards
-        cards = soup.select(
-            "article.sneakpeak, .sneakpeak, "
-            "[data-testid='search-result'], .listing-item"
-        )
-        
+        listings: List[dict] = []
+
+        # Primary: article.sneakpeak (verified 36 per page)
+        cards = soup.select("article.sneakpeak")
+
         for card in cards:
-            listing = self.parse_listing(str(card))
+            listing = self._parse_card(card)
             if listing:
                 listings.append(listing)
-        
+
         return listings
-    
-    def parse_listing(self, html: str) -> Optional[RawListing]:
-        """Parse a single sneakpeak article card."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
+
+    def _parse_card(self, card) -> Optional[dict]:
+        """Parse a single article.sneakpeak element."""
+        # URL + Title from h2.sneakpeak__title--bold a
+        h2 = card.select_one("h2.sneakpeak__title--bold")
+        if not h2:
             return None
         
-        soup = BeautifulSoup(html, "html.parser")
+        link = h2.select_one("a")
+        if not link:
+            # Try the picture link
+            link = card.select_one("a.sneakpeak__picture_container")
         
-        # Title - h2.sneakpeak__title--bold
-        title_el = soup.select_one(
-            "h2.sneakpeak__title--bold, h2.sneakpeak__title, "
-            ".sneakpeak__title a, .listing-item__title"
-        )
-        title = title_el.get_text(strip=True) if title_el else None
+        if not link:
+            return None
+
+        href = link.get("href", "")
+        if not href:
+            return None
+        source_url = urljoin(BASE_URL, href)
+
+        title = h2.get_text(strip=True)
+        if not title:
+            title = link.get_text(strip=True)
         if not title:
             return None
-        
-        # URL
-        link_el = soup.select_one(
-            "a.sneakpeak__title, a.sneakpeak__link, "
-            "h2.sneakpeak__title--bold a, a[href*='/nieruchomosci/']"
-        )
-        if not link_el:
-            link_el = soup.select_one("a[href]")
-        href = link_el.get("href", "") if link_el else ""
-        source_url = urljoin(BASE_URL, href) if href else ""
-        if not source_url:
-            return None
-        
-        # Price - span.sneakpeak__price_value
-        price_el = soup.select_one(
-            "span.sneakpeak__price_value, .sneakpeak__price, "
-            ".listing-item__price, [data-testid='price']"
-        )
-        price_text = price_el.get_text(strip=True) if price_el else None
+
+        # Price: span.sneakpeak__price_value
+        price_el = card.select_one("span.sneakpeak__price_value")
+        price_text = price_el.get_text(strip=True) if price_el else ""
         price = self._parse_price(price_text)
-        
-        # Location - .sneakpeak__location
-        location_el = soup.select_one(
-            ".sneakpeak__location, .sneakpeak__address, "
-            ".listing-item__location"
-        )
-        location = location_el.get_text(strip=True) if location_el else None
-        
-        # Area and rooms from details
-        area = None
-        rooms = None
-        details = soup.select(
-            ".sneakpeak__details_item, .sneakpeak__param, "
-            ".listing-item__params li"
-        )
-        for detail in details:
-            text = detail.get_text(strip=True).lower()
-            if "m²" in text or "m2" in text or "powierzchnia" in text:
-                area = self._parse_area(text)
-            elif "poko" in text or "room" in text:
-                rooms = self._parse_rooms(text)
-        
-        # Thumbnail
-        img_el = soup.select_one("img.sneakpeak__img, img.sneakpeak__photo")
-        thumbnail = img_el.get("src", None) or img_el.get("data-src", None) if img_el else None
-        
-        # Share detection
-        is_share = self._detect_share(title)
-        share_fraction = self._extract_fraction(title)
-        
-        return RawListing(
-            title=title,
-            source_url=source_url,
-            portal="domiporta",
-            price=price,
-            price_text=price_text,
-            location=location,
-            area_m2=area,
-            rooms=rooms,
-            thumbnail_url=thumbnail,
-            is_share=is_share,
-            share_fraction=share_fraction,
-        )
-    
-    def _parse_price(self, text: Optional[str]) -> Optional[float]:
+
+        # Location from .sneakpeak__title--inblock
+        # Format: "mieszkanie Gdynia, Chwarzno-Wiczlino, Fort Forest, Niemena"
+        loc_el = card.select_one(".sneakpeak__title--inblock")
+        location_text = loc_el.get_text(strip=True) if loc_el else ""
+        city, voivodeship = self._parse_location(location_text)
+
+        # Description from .sneakpeak__description
+        desc_el = card.select_one(".sneakpeak__description")
+        raw_description = desc_el.get_text(strip=True) if desc_el else title
+
+        return {
+            "title": title,
+            "price": price,
+            "city": city,
+            "voivodeship": voivodeship,
+            "url": source_url,
+            "source_portal": "domiporta",
+            "raw_description": raw_description,
+        }
+
+    def _parse_price(self, text: str) -> Optional[float]:
+        """Extract numeric price from '1 099 000 zł'."""
         if not text:
             return None
-        cleaned = re.sub(r"[^\d,.]", "", text.replace(" ", "").replace("\xa0", ""))
-        cleaned = cleaned.replace(",", ".")
+        cleaned = re.sub(r"[^\d]", "", text.replace("\xa0", ""))
         try:
-            return float(cleaned)
+            return float(cleaned) if cleaned else None
         except (ValueError, TypeError):
             return None
-    
-    def _parse_area(self, text: Optional[str]) -> Optional[float]:
+
+    def _parse_location(self, text: str) -> tuple:
+        """Parse 'mieszkanie Gdynia, Chwarzno-Wiczlino, ...' -> (city, voivodeship).
+        
+        Domiporta format: "type City, District, Street"
+        The first word is the property type (mieszkanie/dom), skip it.
+        """
         if not text:
+            return ("", "")
+        
+        # Remove property type prefix
+        text = re.sub(r"^(mieszkanie|dom|lokal|działka)\s+", "", text, flags=re.IGNORECASE)
+        
+        parts = [p.strip() for p in text.split(",")]
+        city = parts[0] if parts else ""
+        # Domiporta doesn't show voivodeship in the subtitle
+        voivodeship = ""
+        return (city, voivodeship)
+
+    def parse_listing(self, html: str) -> Optional[RawListing]:
+        """Legacy interface."""
+        soup = BeautifulSoup(html, "html.parser")
+        result = self._parse_card(soup)
+        if not result:
             return None
-        match = re.search(r"([\d,.]+)\s*m", text)
-        if match:
-            try:
-                return float(match.group(1).replace(",", "."))
-            except ValueError:
-                pass
-        return None
-    
-    def _parse_rooms(self, text: Optional[str]) -> Optional[int]:
-        if not text:
-            return None
-        match = re.search(r"(\d+)", text)
-        return int(match.group(1)) if match else None
-    
-    def _detect_share(self, title: str) -> bool:
-        combined = title.lower()
-        share_keywords = [
-            "udział", "udzial", "1/2", "1/3", "1/4", "1/6", "1/8",
-            "współwłasność", "wspolwlasnosc",
-        ]
-        return any(kw in combined for kw in share_keywords)
-    
-    def _extract_fraction(self, text: str) -> Optional[str]:
-        match = re.search(r"(\d+/\d+)", text)
-        return match.group(1) if match else None
+        return RawListing(
+            title=result["title"],
+            source_url=result["url"],
+            portal="domiporta",
+            price=result["price"],
+            city=result["city"],
+            voivodeship=result["voivodeship"],
+        )

@@ -52,7 +52,7 @@ tor:
   control_port: 9051
   control_password: "udzialy2026"
   circuit_rotate_interval: 300  # Rotate circuit every N seconds
-  binary_path: "/usr/bin/tor"  # Linux; Windows: tor/tor.exe    # Relative to project root
+  binary_path: "/usr/bin/tor"  # Linux; Windows: tor/tor.exe
 
 # Database
 database:

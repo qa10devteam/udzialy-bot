@@ -1,8 +1,11 @@
 """
 Udziały Bot — Main entry point.
 
-Sets up the aiogram Dispatcher, registers routers, configures middleware,
-and starts polling.
+Sets up the aiogram Bot + Dispatcher, registers all routers, configures middleware,
+initializes DB on startup, closes on shutdown, and runs polling.
+
+Usage:
+    cd /home/ubuntu/udzialy-bot && .venv/bin/python -m bot.main
 """
 
 from __future__ import annotations
@@ -18,7 +21,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from bot.config import get_settings
+from bot.config import get_settings, PROJECT_ROOT
 from bot.middlewares import setup_middlewares
 from bot.routers import register_routers
 
@@ -31,7 +34,7 @@ def setup_logging() -> None:
     settings = get_settings()
 
     # Ensure log directory exists
-    log_path = Path(settings.logging.file)
+    log_path = PROJECT_ROOT / settings.logging.file
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
     logging.basicConfig(
@@ -46,22 +49,34 @@ def setup_logging() -> None:
 
     # Suppress noisy loggers
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("aiogram").setLevel(logging.INFO)
+    logging.getLogger("aiogram.event").setLevel(logging.WARNING)
+    logging.getLogger("aiohttp").setLevel(logging.WARNING)
 
 
 async def on_startup(bot: Bot) -> None:
-    """Actions to perform on bot startup."""
+    """Actions to perform on bot startup — init DB, notify owner."""
     settings = get_settings()
     logger.info("Bot starting up...")
 
     # Ensure data directory exists
-    Path(settings.database.path).parent.mkdir(parents=True, exist_ok=True)
+    db_path = PROJECT_ROOT / settings.database.path
+    db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Notify owner
-    if settings.telegram.owner_id:
+    # Initialize database
+    try:
+        from storage.database import DatabaseManager
+        db = DatabaseManager(str(db_path))
+        await db.initialize()
+        await db.close()
+        logger.info(f"Database initialized at: {db_path}")
+    except Exception as e:
+        logger.warning(f"Database initialization failed: {e}")
+
+    # Notify owner that bot is up
+    if settings.owner_id and settings.owner_id != 0:
         try:
             await bot.send_message(
-                settings.telegram.owner_id,
+                settings.owner_id,
                 "🟢 Bot uruchomiony i gotowy do pracy."
             )
         except Exception as e:
@@ -69,14 +84,24 @@ async def on_startup(bot: Bot) -> None:
 
 
 async def on_shutdown(bot: Bot) -> None:
-    """Actions to perform on bot shutdown."""
+    """Actions to perform on bot shutdown — close DB, notify owner."""
     settings = get_settings()
     logger.info("Bot shutting down...")
 
-    if settings.telegram.owner_id:
+    # Close database connections
+    try:
+        from storage.database import DatabaseManager
+        db_path = PROJECT_ROOT / settings.database.path
+        db = DatabaseManager(str(db_path))
+        await db.close()
+    except Exception:
+        pass
+
+    # Notify owner
+    if settings.owner_id and settings.owner_id != 0:
         try:
             await bot.send_message(
-                settings.telegram.owner_id,
+                settings.owner_id,
                 "🔴 Bot zatrzymany."
             )
         except Exception:
@@ -84,28 +109,31 @@ async def on_shutdown(bot: Bot) -> None:
 
 
 async def run_bot() -> None:
-    """Initialize and run the bot."""
+    """Initialize and run the bot with polling."""
     settings = get_settings()
 
     # Validate token
-    if settings.telegram.token == "YOUR_BOT_TOKEN_HERE" or not settings.telegram.token:
-        logger.error("Bot token not configured! Edit config.yaml first.")
+    if settings.telegram_token in ("YOUR_BOT_TOKEN_HERE", ""):
+        logger.error(
+            "❌ Bot token not configured!\n"
+            "   Edit config.yaml and set telegram.token to your BotFather token."
+        )
         sys.exit(1)
 
     # Create bot instance
     bot = Bot(
-        token=settings.telegram.token,
+        token=settings.telegram_token,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML),
     )
 
-    # Create dispatcher with FSM storage
+    # Create dispatcher with in-memory FSM storage
     dp = Dispatcher(storage=MemoryStorage())
 
     # Register startup/shutdown hooks
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
-    # Setup middlewares
+    # Setup middlewares (throttle)
     setup_middlewares(dp)
 
     # Register all routers
@@ -120,14 +148,19 @@ async def run_bot() -> None:
 
 def main() -> None:
     """Entry point for the bot."""
+    # Add project root to path so storage/scraper/geo modules are importable
+    project_root_str = str(PROJECT_ROOT)
+    if project_root_str not in sys.path:
+        sys.path.insert(0, project_root_str)
+
     setup_logging()
     logger.info("=" * 50)
     logger.info("Udziały Bot v0.1.0")
+    logger.info(f"Project root: {PROJECT_ROOT}")
     logger.info("=" * 50)
 
     # Handle graceful shutdown on Windows
     if sys.platform == "win32":
-        # Windows needs special signal handling
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         signal.signal(signal.SIGTERM, signal.SIG_DFL)
 

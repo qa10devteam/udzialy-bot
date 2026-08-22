@@ -2,223 +2,192 @@
 ScraperManager - Orchestrator for parallel portal scraping.
 
 Coordinates all portal scrapers, handles deduplication,
-progress callbacks, and timeout management.
+progress callbacks, timeout management, and share scoring.
 """
 
 import asyncio
 import logging
-from typing import Any, Callable, Coroutine, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
-from scraper.base import BaseScraper, RawListing
-from scraper.tor_manager import TorManager
+from scraper.base import BaseScraper
+from detector.scorer import PropertyShareScorer
 
 logger = logging.getLogger(__name__)
 
-# Type for progress callback: (portal_name, status_message) -> None
-ProgressCallback = Callable[[str, str], Coroutine[Any, Any, None]]
+# Type for progress callback: (portal_name, status, count) -> None
+ProgressCallback = Callable[[str, str, int], Any]
 
 
 class ScraperManager:
     """
-    Orchestrates parallel portal scraping with deduplication.
-    
+    Orchestrates parallel portal scraping with deduplication and scoring.
+
     Usage:
         manager = ScraperManager()
         results = await manager.search_all(
-            keywords=["udział", "1/2 nieruchomości"],
+            keywords=["udział w nieruchomości", "sprzedam udział"],
             filters={"price_max": 200000},
-            progress_callback=send_telegram_update,
+            progress_callback=lambda name, status, count: print(f"{name}: {status} ({count})"),
         )
     """
-    
+
+    # Only the 4 main verified portals
+    MAIN_PORTALS = ["morizon", "gratka", "domiporta", "olx"]
+
     def __init__(
         self,
-        scrapers: Optional[List[BaseScraper]] = None,
-        tor_manager: Optional[TorManager] = None,
-        default_timeout: float = 20.0,
-        max_concurrent: int = 5,
+        portals: Optional[List[str]] = None,
+        timeout_per_portal: float = 25.0,
     ):
-        self.scrapers: List[BaseScraper] = scrapers or []
-        self.tor_manager = tor_manager or TorManager()
-        self.default_timeout = default_timeout
-        self.max_concurrent = max_concurrent
-        self._semaphore = asyncio.Semaphore(max_concurrent)
-    
-    def register_scraper(self, scraper: BaseScraper) -> None:
-        """Register a portal scraper."""
-        self.scrapers.append(scraper)
-        logger.info(f"Registered scraper: {scraper.get_portal_name()}")
-    
-    def register_all_portals(self) -> None:
-        """Register all available portal scrapers with default configs."""
-        from scraper.portals.morizon import MorizonScraper
-        from scraper.portals.gratka import GratkaScraper
-        from scraper.portals.domiporta import DomiportaScraper
-        from scraper.portals.olx import OlxScraper
-        from scraper.portals.otodom import OtodomScraper
-        from scraper.portals.trojmiasto import TrojmiastoScraper
-        from scraper.portals.szybko import SzybkoScraper
-        from scraper.portals.nieruchomosci_online import NieruchomosciOnlineScraper
-        from scraper.portals.allegro import AllegroScraper
-        
-        self.scrapers = [
-            MorizonScraper(),
-            GratkaScraper(),
-            DomiportaScraper(),
-            OlxScraper(use_tor=True),
-            OtodomScraper(use_tor=True),
-            TrojmiastoScraper(use_tor=True),
-            SzybkoScraper(use_tor=True),
-            NieruchomosciOnlineScraper(),
-            AllegroScraper(),
-        ]
-        logger.info(f"Registered {len(self.scrapers)} portal scrapers")
-    
+        """
+        Initialize the ScraperManager.
+
+        Args:
+            portals: List of portal names to enable. Defaults to MAIN_PORTALS.
+            timeout_per_portal: Per-portal asyncio timeout in seconds.
+        """
+        self.enabled_portals = portals or self.MAIN_PORTALS
+        self.timeout_per_portal = timeout_per_portal
+        self.scorer = PropertyShareScorer()
+
+    def _instantiate_scrapers(self) -> List[BaseScraper]:
+        """Instantiate all enabled portal scrapers."""
+        scrapers: List[BaseScraper] = []
+
+        for portal_name in self.enabled_portals:
+            if portal_name == "morizon":
+                from scraper.portals.morizon import MorizonScraper
+                scrapers.append(MorizonScraper())
+            elif portal_name == "gratka":
+                from scraper.portals.gratka import GratkaScraper
+                scrapers.append(GratkaScraper())
+            elif portal_name == "domiporta":
+                from scraper.portals.domiporta import DomiportaScraper
+                scrapers.append(DomiportaScraper())
+            elif portal_name == "olx":
+                from scraper.portals.olx import OlxScraper
+                scrapers.append(OlxScraper(use_tor=True))
+            else:
+                logger.warning(f"Unknown portal: {portal_name}, skipping")
+
+        return scrapers
+
     async def search_all(
         self,
         keywords: List[str],
         filters: Optional[Dict[str, Any]] = None,
         progress_callback: Optional[ProgressCallback] = None,
-        timeout: Optional[float] = None,
-    ) -> List[RawListing]:
+    ) -> List[dict]:
         """
-        Search all registered portals in parallel.
-        
+        Search all enabled portals in parallel.
+
         Args:
-            keywords: Search terms
-            filters: Optional filters (price_min, price_max, city, etc.)
-            progress_callback: Async callback(portal_name, status) for Telegram updates
-            timeout: Per-portal timeout override
-        
+            keywords: Search terms (from detector.keywords.SEARCH_QUERIES)
+            filters: Optional filters (price_min, price_max, city)
+            progress_callback: Called as progress_callback(portal_name, status, count)
+                after each portal finishes.
+
         Returns:
-            Deduplicated list of RawListing from all portals
+            List of result dicts sorted by share score DESC.
+            Each dict has: title, price, city, voivodeship, url,
+            source_portal, raw_description, score, is_share
         """
-        if not self.scrapers:
-            logger.warning("No scrapers registered!")
+        scrapers = self._instantiate_scrapers()
+        if not scrapers:
+            logger.warning("No scrapers instantiated!")
             return []
-        
-        portal_timeout = timeout or self.default_timeout
-        
-        # Notify start
-        if progress_callback:
-            portal_names = [s.get_portal_name() for s in self.scrapers]
-            await progress_callback(
-                "manager",
-                f"🔍 Szukam na {len(self.scrapers)} portalach: {', '.join(portal_names)}"
-            )
-        
-        # Create tasks for parallel execution
-        tasks = [
-            self._search_portal(scraper, keywords, filters, portal_timeout, progress_callback)
-            for scraper in self.scrapers
-        ]
-        
-        # Execute in parallel with gather
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        
-        # Collect all listings
-        all_listings: List[RawListing] = []
-        successful_portals = 0
-        failed_portals = 0
-        
-        for i, result in enumerate(results):
-            portal_name = self.scrapers[i].get_portal_name()
-            
-            if isinstance(result, Exception):
-                failed_portals += 1
-                logger.error(f"Portal {portal_name} failed: {result}")
-                if progress_callback:
-                    await progress_callback(portal_name, f"❌ {portal_name}: błąd - {str(result)[:50]}")
-            elif isinstance(result, list):
-                successful_portals += 1
-                all_listings.extend(result)
-                if progress_callback:
-                    await progress_callback(portal_name, f"✅ {portal_name}: {len(result)} wyników")
-            else:
-                failed_portals += 1
-                logger.warning(f"Portal {portal_name} returned unexpected: {type(result)}")
-        
-        # Deduplicate by source_url
-        deduplicated = self._deduplicate(all_listings)
-        
-        # Final summary
-        if progress_callback:
-            await progress_callback(
-                "manager",
-                f"📊 Gotowe: {len(deduplicated)} unikalnych wyników "
-                f"z {successful_portals}/{len(self.scrapers)} portali"
-            )
-        
-        logger.info(
-            f"Search complete: {len(deduplicated)} unique listings from "
-            f"{successful_portals} portals ({failed_portals} failed)"
-        )
-        
-        return deduplicated
-    
-    async def _search_portal(
-        self,
-        scraper: BaseScraper,
-        keywords: List[str],
-        filters: Optional[Dict[str, Any]],
-        timeout: float,
-        progress_callback: Optional[ProgressCallback],
-    ) -> List[RawListing]:
-        """Search a single portal with timeout and semaphore."""
-        portal_name = scraper.get_portal_name()
-        
-        async with self._semaphore:
-            # New Tor circuit for portals that use Tor
-            if scraper.use_tor and self.tor_manager:
-                await self.tor_manager.new_circuit_for_portal(portal_name)
-            
-            if progress_callback:
-                await progress_callback(portal_name, f"🔄 {portal_name}: szukam...")
-            
+
+        filters = filters or {}
+
+        # Create tasks for parallel execution with per-portal timeout
+        async def _run_portal(scraper: BaseScraper) -> tuple:
+            """Run a single portal scraper with timeout."""
+            portal_name = scraper.get_portal_name()
             try:
-                result = await asyncio.wait_for(
+                results = await asyncio.wait_for(
                     scraper.search(keywords, filters),
-                    timeout=timeout,
+                    timeout=self.timeout_per_portal,
                 )
-                return result
-            except asyncio.TimeoutError:
-                logger.warning(f"Portal {portal_name} timed out after {timeout}s")
                 if progress_callback:
-                    await progress_callback(portal_name, f"⏰ {portal_name}: timeout")
-                return []
+                    progress_callback(portal_name, "done", len(results))
+                return (portal_name, results, None)
+            except asyncio.TimeoutError:
+                logger.warning(f"Portal {portal_name} timed out after {self.timeout_per_portal}s")
+                if progress_callback:
+                    progress_callback(portal_name, "timeout", 0)
+                return (portal_name, [], "timeout")
             except Exception as e:
                 logger.error(f"Portal {portal_name} error: {e}")
-                raise
-    
-    def _deduplicate(self, listings: List[RawListing]) -> List[RawListing]:
-        """Deduplicate listings by source_url."""
+                if progress_callback:
+                    progress_callback(portal_name, "error", 0)
+                return (portal_name, [], str(e))
+
+        # Execute all portals in parallel
+        tasks = [_run_portal(scraper) for scraper in scrapers]
+        results = await asyncio.gather(*tasks)
+
+        # Collect all listings
+        all_listings: List[dict] = []
+        for portal_name, listings, error in results:
+            if listings:
+                all_listings.extend(listings)
+                logger.info(f"Portal {portal_name}: {len(listings)} results")
+            elif error:
+                logger.warning(f"Portal {portal_name}: {error}")
+
+        # Deduplicate by URL
+        deduplicated = self._deduplicate_by_url(all_listings)
+        logger.info(
+            f"Total: {len(all_listings)} raw -> {len(deduplicated)} after dedup"
+        )
+
+        # Score each result with PropertyShareScorer
+        scored = self._score_results(deduplicated)
+
+        # Sort by score DESC
+        scored.sort(key=lambda x: x.get("score", 0), reverse=True)
+
+        return scored
+
+    def _deduplicate_by_url(self, listings: List[dict]) -> List[dict]:
+        """Deduplicate listings by URL."""
         seen_urls: set = set()
-        unique: List[RawListing] = []
-        
+        unique: List[dict] = []
+
         for listing in listings:
-            if listing.source_url not in seen_urls:
-                seen_urls.add(listing.source_url)
+            url = listing.get("url", "")
+            if url and url not in seen_urls:
+                seen_urls.add(url)
                 unique.append(listing)
-        
-        duplicates_removed = len(listings) - len(unique)
-        if duplicates_removed > 0:
-            logger.info(f"Deduplication: removed {duplicates_removed} duplicates")
-        
+
+        removed = len(listings) - len(unique)
+        if removed > 0:
+            logger.info(f"Deduplication: removed {removed} duplicates")
+
         return unique
-    
-    async def search_portal(
-        self,
-        portal_name: str,
-        keywords: List[str],
-        filters: Optional[Dict[str, Any]] = None,
-    ) -> List[RawListing]:
-        """Search a single portal by name."""
-        for scraper in self.scrapers:
-            if scraper.get_portal_name().lower() == portal_name.lower():
-                return await scraper.search(keywords, filters)
-        
-        raise ValueError(f"Portal not found: {portal_name}")
-    
+
+    def _score_results(self, listings: List[dict]) -> List[dict]:
+        """Score each listing with PropertyShareScorer."""
+        for listing in listings:
+            title = listing.get("title", "")
+            description = listing.get("raw_description", "")
+            
+            scoring_result = self.scorer.score(title, description)
+            listing["score"] = scoring_result.score
+            listing["is_share"] = scoring_result.is_share
+
+        return listings
+
+    # --- Legacy interface compatibility ---
+
+    def register_scraper(self, scraper: BaseScraper) -> None:
+        """Register a portal scraper (legacy interface)."""
+        pass
+
+    def register_all_portals(self) -> None:
+        """Register all available portal scrapers (legacy interface)."""
+        self.enabled_portals = self.MAIN_PORTALS
+
     def get_portal_names(self) -> List[str]:
-        """Get list of registered portal names."""
-        return [s.get_portal_name() for s in self.scrapers]
+        """Get list of enabled portal names."""
+        return list(self.enabled_portals)

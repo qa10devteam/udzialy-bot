@@ -1,18 +1,33 @@
 """
-Bot configuration via Pydantic Settings.
+Bot configuration — loads config.yaml relative to project root.
 
-Loads configuration from config.yaml with environment variable overrides
-(prefix: UDZIALY_).
+Exposes a Settings dataclass with: telegram_token, owner_id, portals dict,
+tor config, scraping timeouts. Uses pydantic-settings with YAML source.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 import yaml
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# --- Project root detection ---
+
+def _find_project_root() -> Path:
+    """Find project root by looking for config.yaml upward from this file."""
+    current = Path(__file__).resolve().parent  # bot/
+    for parent in [current.parent, current.parent.parent, Path.cwd()]:
+        if (parent / "config.yaml").exists():
+            return parent
+    # Fallback: assume CWD is project root
+    return Path.cwd()
+
+
+PROJECT_ROOT = _find_project_root()
 
 
 # --- Sub-models ---
@@ -30,7 +45,9 @@ class PortalEntry(BaseModel):
 
 
 class PortalsConfig(BaseModel):
-    """All portal switches."""
+    """All portal switches — dynamic dict of portal entries."""
+    model_config = {"extra": "allow"}
+
     otodom: PortalEntry = PortalEntry()
     olx: PortalEntry = PortalEntry()
     gratka: PortalEntry = PortalEntry()
@@ -43,10 +60,21 @@ class PortalsConfig(BaseModel):
 
     def enabled_portals(self) -> list[str]:
         """Return list of enabled portal names."""
-        return [
-            name for name, entry in self.__dict__.items()
-            if isinstance(entry, PortalEntry) and entry.enabled
-        ]
+        result = []
+        for name in self.model_fields:
+            entry = getattr(self, name, None)
+            if isinstance(entry, PortalEntry) and entry.enabled:
+                result.append(name)
+        return result
+
+    def as_dict(self) -> Dict[str, Dict[str, Any]]:
+        """Return portals as plain dict."""
+        result = {}
+        for name in self.model_fields:
+            entry = getattr(self, name, None)
+            if isinstance(entry, PortalEntry):
+                result[name] = {"enabled": entry.enabled, "base_url": entry.base_url}
+        return result
 
 
 class ScrapingConfig(BaseModel):
@@ -64,7 +92,7 @@ class TorConfig(BaseModel):
     enabled: bool = True
     socks_port: int = 9050
     control_port: int = 9051
-    control_password: str = "udzialy_tor_pass"
+    control_password: str = "udzialy2026"
     circuit_rotate_interval: int = 300
     binary_path: str = "tor/tor.exe"
 
@@ -108,9 +136,20 @@ class Settings(BaseSettings):
     database: DatabaseConfig = DatabaseConfig()
     logging: LoggingConfig = LoggingConfig()
 
+    # Convenience properties
+    @property
+    def telegram_token(self) -> str:
+        return self.telegram.token
+
+    @property
+    def owner_id(self) -> int:
+        return self.telegram.owner_id
+
     @classmethod
-    def from_yaml(cls, path: str | Path = "config.yaml") -> "Settings":
+    def from_yaml(cls, path: str | Path | None = None) -> "Settings":
         """Load settings from YAML file, then apply env var overrides."""
+        if path is None:
+            path = PROJECT_ROOT / "config.yaml"
         config_path = Path(path)
         yaml_data: dict[str, Any] = {}
 
@@ -126,9 +165,15 @@ class Settings(BaseSettings):
 _settings: Settings | None = None
 
 
-def get_settings(config_path: str | Path = "config.yaml") -> Settings:
+def get_settings(config_path: str | Path | None = None) -> Settings:
     """Get or create settings singleton."""
     global _settings
     if _settings is None:
         _settings = Settings.from_yaml(config_path)
     return _settings
+
+
+def reset_settings() -> None:
+    """Reset singleton (for testing)."""
+    global _settings
+    _settings = None
