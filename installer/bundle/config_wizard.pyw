@@ -79,7 +79,7 @@ class ConfigWizard:
         # Instructions text
         instructions = tk.Text(frame, height=6, width=60, wrap=tk.WORD,
                                font=("Segoe UI", 9), relief=tk.FLAT,
-                               bg=frame.cget("background") if hasattr(frame, "cget") else "#f0f0f0")
+                               bg="#f0f0f0")
         instructions.insert(tk.END,
                             "1. Otwórz Telegram i wyszukaj @BotFather\n"
                             "2. Wyślij komendę /newbot\n"
@@ -118,7 +118,7 @@ class ConfigWizard:
         # Instructions
         instructions = tk.Text(frame, height=4, width=60, wrap=tk.WORD,
                                font=("Segoe UI", 9), relief=tk.FLAT,
-                               bg=frame.cget("background") if hasattr(frame, "cget") else "#f0f0f0")
+                               bg="#f0f0f0")
         instructions.insert(tk.END,
                             "1. Otwórz Telegram i wyszukaj @userinfobot\n"
                             "2. Wyślij /start\n"
