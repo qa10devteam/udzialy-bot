@@ -449,596 +449,606 @@ class ProcessManager:
 # SETUP WIZARD — 5 Steps (Gap #9: multi-LLM)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class SetupWizard(tk.Toplevel):
-    """5-step first-run wizard: Welcome → Token → OwnerID → LLM → Portals."""
 
-    def __init__(self, parent, on_complete):
-        super().__init__(parent)
+# ═══════════════════════════════════════════════════════════════════════════════
+# UI THEME — Dark Modern (Gap #2: clam + custom overrides)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Colors
+C_BG = "#1a1a2e"           # Dark navy background
+C_CARD = "#16213e"         # Card panels
+C_ACCENT = "#0f3460"       # Deep blue accent
+C_CORAL = "#e94560"        # Coral/red action buttons
+C_TEXT = "#ffffff"          # Primary text
+C_MUTED = "#a0aec0"        # Secondary/muted text
+C_INPUT_BG = "#0f3460"     # Input field background
+C_SUCCESS = "#22c55e"      # Green status
+C_ERROR = "#ef4444"        # Red status
+C_LOG_BG = "#0d1117"       # Terminal-like log background
+
+# Fonts
+F_HEADER = ("Segoe UI", 20, "bold")
+F_CARD_TITLE = ("Segoe UI", 13, "bold")
+F_LABEL = ("Segoe UI", 10)
+F_MUTED = ("Segoe UI", 9)
+F_INPUT = ("Consolas", 10)
+F_BUTTON = ("Segoe UI", 11, "bold")
+F_BIG_BUTTON = ("Segoe UI", 13, "bold")
+F_LOG = ("Consolas", 9)
+
+# LLM Providers
+LLM_PROVIDERS = [
+    ("openai", "OpenAI (GPT-4o-mini)"),
+    ("deepseek", "DeepSeek"),
+    ("gemini", "Google Gemini"),
+    ("claude", "Anthropic Claude"),
+    ("ollama", "Ollama (lokalny)"),
+]
+
+
+def _apply_dark_theme(root):
+    """Apply dark theme styling to ttk widgets."""
+    style = ttk.Style(root)
+    style.theme_use("clam")
+
+    style.configure(".", background=C_BG, foreground=C_TEXT, font=F_LABEL)
+    style.configure("TFrame", background=C_BG)
+    style.configure("Card.TFrame", background=C_CARD)
+    style.configure("TLabel", background=C_BG, foreground=C_TEXT)
+    style.configure("Card.TLabel", background=C_CARD, foreground=C_TEXT)
+    style.configure("Muted.TLabel", background=C_CARD, foreground=C_MUTED, font=F_MUTED)
+    style.configure("Header.TLabel", background=C_BG, foreground=C_TEXT, font=F_HEADER)
+    style.configure("CardTitle.TLabel", background=C_CARD, foreground=C_TEXT, font=F_CARD_TITLE)
+
+    style.configure("Accent.TButton", background=C_CORAL, foreground=C_TEXT,
+                    font=F_BIG_BUTTON, padding=(20, 12))
+    style.map("Accent.TButton",
+              background=[("active", "#d63851"), ("pressed", "#c0304a")])
+
+    style.configure("Secondary.TButton", background=C_CARD, foreground=C_MUTED,
+                    font=F_BUTTON, padding=(16, 8))
+    style.map("Secondary.TButton",
+              background=[("active", C_ACCENT)])
+
+    style.configure("Small.TButton", background=C_ACCENT, foreground=C_TEXT,
+                    font=F_LABEL, padding=(12, 6))
+    style.map("Small.TButton",
+              background=[("active", "#1a4a80")])
+
+    style.configure("TCheckbutton", background=C_CARD, foreground=C_TEXT, font=F_LABEL)
+    style.map("TCheckbutton", background=[("active", C_CARD)])
+
+    style.configure("TCombobox", fieldbackground=C_INPUT_BG, foreground=C_TEXT,
+                    background=C_ACCENT, font=F_INPUT)
+
+    root.configure(bg=C_BG)
+
+
+def _make_card(parent, **kwargs):
+    """Create a styled card frame."""
+    card = tk.Frame(parent, bg=C_CARD, padx=20, pady=16, **kwargs)
+    return card
+
+
+def _make_entry(parent, show=None, width=50):
+    """Create a styled dark entry field."""
+    entry = tk.Entry(parent, bg=C_INPUT_BG, fg=C_TEXT, insertbackground=C_TEXT,
+                     font=F_INPUT, relief="flat", bd=0, highlightthickness=1,
+                     highlightcolor=C_CORAL, highlightbackground=C_ACCENT,
+                     width=width)
+    if show:
+        entry.configure(show=show)
+    return entry
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SETUP WIZARD — Dark Card-Based (5 steps in one scrollable view)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class SetupWizard(tk.Toplevel):
+    """Modern dark-themed configuration wizard."""
+
+    def __init__(self, master, on_complete=None):
+        super().__init__(master)
         self.on_complete = on_complete
-        self.title("Kreator konfiguracji")
-        self.geometry("550x480")
+        self.title("Bot Udziały — Konfiguracja")
+        self.geometry("650x820")
+        self.configure(bg=C_BG)
         self.resizable(False, False)
-        self.configure(bg=BG)
-        self.transient(parent)
+
+        # Center on screen
+        self.update_idletasks()
+        x = (self.winfo_screenwidth() - 650) // 2
+        y = (self.winfo_screenheight() - 820) // 2
+        self.geometry(f"+{x}+{y}")
+
+        # Variables
+        self.token_var = tk.StringVar()
+        self.owner_id_var = tk.StringVar()
+        self.llm_provider_var = tk.StringVar(value="openai")
+        self.llm_key_var = tk.StringVar()
+        self.portal_vars = {}
+        self.token_status = tk.StringVar()
+
+        self._build_ui()
         self.grab_set()
 
-        self.current_step = 0
-        self.data = {'token': '', 'owner_id': '', 'llm_provider': 'openai',
-                     'llm_key': '', 'portals': {k: True for k, _ in ALL_PORTALS}}
+    def _build_ui(self):
+        # Scrollable container
+        canvas = tk.Canvas(self, bg=C_BG, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        self.scroll_frame = tk.Frame(canvas, bg=C_BG)
 
-        # Container
-        self.container = tk.Frame(self, bg=BG, padx=32, pady=24)
-        self.container.pack(fill='both', expand=True)
+        self.scroll_frame.bind("<Configure>",
+                               lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw", width=630)
+        canvas.configure(yscrollcommand=scrollbar.set)
 
-        # Progress bar area
-        self.progress_frame = tk.Frame(self.container, bg=BG)
-        self.progress_frame.pack(fill='x', pady=(0, 16))
+        canvas.pack(side="left", fill="both", expand=True, padx=10, pady=10)
+        scrollbar.pack(side="right", fill="y")
 
-        # Content area
-        self.content = tk.Frame(self.container, bg=BG)
-        self.content.pack(fill='both', expand=True)
+        # Bind mousewheel
+        canvas.bind_all("<MouseWheel>",
+                        lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
 
-        # Navigation
-        self.nav_frame = tk.Frame(self.container, bg=BG)
-        self.nav_frame.pack(fill='x', pady=(16, 0))
+        container = self.scroll_frame
 
-        self.btn_back = ttk.Button(self.nav_frame, text="← Wstecz",
-                                   style='Secondary.TButton', command=self._prev)
-        self.btn_back.pack(side='left')
-        self.btn_next = ttk.Button(self.nav_frame, text="Dalej →",
-                                   style='Accent.TButton', command=self._next)
-        self.btn_next.pack(side='right')
+        # ── HEADER ──
+        header = tk.Frame(container, bg=C_BG)
+        header.pack(fill="x", pady=(20, 24))
+        tk.Label(header, text="🏠 Bot Udziały", font=("Segoe UI", 22, "bold"),
+                 bg=C_BG, fg=C_TEXT).pack()
+        tk.Label(header, text="Wyszukiwarka udziałów w nieruchomościach",
+                 font=F_MUTED, bg=C_BG, fg=C_MUTED).pack(pady=(4, 0))
 
-        self.steps = [
-            self._build_welcome, self._build_token,
-            self._build_owner, self._build_llm, self._build_portals,
-        ]
-        self._show_step(0)
+        # ── CARD 1: Token ──
+        card1 = _make_card(container)
+        card1.pack(fill="x", pady=(0, 16))
 
-    def _show_step(self, idx):
-        self.current_step = idx
-        for w in self.content.winfo_children():
-            w.destroy()
-        self.steps[idx]()
-        self.btn_back.configure(state='normal' if idx > 0 else 'disabled')
-        self.btn_next.configure(text="Zakończ ✓" if idx == 4 else "Dalej →")
-        self._update_progress()
+        tk.Label(card1, text="🤖  Token Bota Telegram", font=F_CARD_TITLE,
+                 bg=C_CARD, fg=C_TEXT).pack(anchor="w")
+        tk.Label(card1, text="Utwórz bota u @BotFather → skopiuj token",
+                 font=F_MUTED, bg=C_CARD, fg=C_MUTED).pack(anchor="w", pady=(4, 10))
 
-    def _update_progress(self):
-        for w in self.progress_frame.winfo_children():
-            w.destroy()
-        for i in range(5):
-            color = ACCENT if i <= self.current_step else BORDER
-            c = tk.Canvas(self.progress_frame, width=40, height=6,
-                         bg=BG, highlightthickness=0)
-            c.create_rectangle(0, 0, 40, 6, fill=color, outline='')
-            c.pack(side='left', padx=2)
+        token_frame = tk.Frame(card1, bg=C_CARD)
+        token_frame.pack(fill="x")
+        self.token_entry = _make_entry(token_frame, width=45)
+        self.token_entry.pack(side="left", fill="x", expand=True, ipady=8)
 
-    def _next(self):
-        if not self._validate_step():
+        check_btn = tk.Button(token_frame, text="Sprawdź", font=F_LABEL,
+                              bg=C_ACCENT, fg=C_TEXT, relief="flat", padx=16, pady=6,
+                              activebackground="#1a4a80", activeforeground=C_TEXT,
+                              cursor="hand2", command=self._check_token)
+        check_btn.pack(side="right", padx=(10, 0))
+
+        self.token_status_label = tk.Label(card1, textvariable=self.token_status,
+                                           font=F_MUTED, bg=C_CARD, fg=C_MUTED)
+        self.token_status_label.pack(anchor="w", pady=(6, 0))
+
+        # ── CARD 2: Owner ID ──
+        card2 = _make_card(container)
+        card2.pack(fill="x", pady=(0, 16))
+
+        tk.Label(card2, text="👤  ID Użytkownika", font=F_CARD_TITLE,
+                 bg=C_CARD, fg=C_TEXT).pack(anchor="w")
+        tk.Label(card2, text="Wyślij /start do @userinfobot → skopiuj liczbę",
+                 font=F_MUTED, bg=C_CARD, fg=C_MUTED).pack(anchor="w", pady=(4, 10))
+
+        self.id_entry = _make_entry(card2, width=50)
+        self.id_entry.pack(fill="x", ipady=8)
+
+        # ── CARD 3: LLM / AI ──
+        card3 = _make_card(container)
+        card3.pack(fill="x", pady=(0, 16))
+
+        tk.Label(card3, text="🧠  Analiza AI (opcjonalnie)", font=F_CARD_TITLE,
+                 bg=C_CARD, fg=C_TEXT).pack(anchor="w")
+        tk.Label(card3, text="Dodaj klucz API aby bot analizował ogłoszenia z AI",
+                 font=F_MUTED, bg=C_CARD, fg=C_MUTED).pack(anchor="w", pady=(4, 10))
+
+        # Provider selection
+        prov_frame = tk.Frame(card3, bg=C_CARD)
+        prov_frame.pack(fill="x", pady=(0, 8))
+        tk.Label(prov_frame, text="Provider:", font=F_LABEL,
+                 bg=C_CARD, fg=C_MUTED).pack(side="left")
+
+        provider_names = [p[1] for p in LLM_PROVIDERS]
+        self.provider_combo = ttk.Combobox(prov_frame, values=provider_names,
+                                           state="readonly", width=25, font=F_INPUT)
+        self.provider_combo.set("OpenAI (GPT-4o-mini)")
+        self.provider_combo.pack(side="left", padx=(10, 0))
+
+        # API Key
+        tk.Label(card3, text="Klucz API:", font=F_LABEL,
+                 bg=C_CARD, fg=C_MUTED).pack(anchor="w", pady=(8, 4))
+        self.llm_key_entry = _make_entry(card3, width=50)
+        self.llm_key_entry.pack(fill="x", ipady=8)
+
+        tk.Label(card3, text="💡 Pomiń jeśli nie chcesz AI — bot działa bez tego.",
+                 font=("Segoe UI", 8), bg=C_CARD, fg="#6b7280").pack(anchor="w", pady=(8, 0))
+
+        # ── CARD 4: Portals ──
+        card4 = _make_card(container)
+        card4.pack(fill="x", pady=(0, 24))
+
+        tk.Label(card4, text="🌐  Portale do przeszukiwania", font=F_CARD_TITLE,
+                 bg=C_CARD, fg=C_TEXT).pack(anchor="w", pady=(0, 10))
+
+        portals_frame = tk.Frame(card4, bg=C_CARD)
+        portals_frame.pack(fill="x")
+        for portal in ["OLX", "Morizon", "Domiporta", "Otodom"]:
+            var = tk.BooleanVar(value=True)
+            self.portal_vars[portal.lower()] = var
+            cb = tk.Checkbutton(portals_frame, text=portal, variable=var,
+                                font=F_LABEL, bg=C_CARD, fg=C_TEXT,
+                                selectcolor=C_INPUT_BG, activebackground=C_CARD,
+                                activeforeground=C_TEXT)
+            cb.pack(side="left", padx=(0, 20))
+
+        # ── BUTTONS ──
+        btn_frame = tk.Frame(container, bg=C_BG)
+        btn_frame.pack(fill="x", pady=(0, 20))
+
+        launch_btn = tk.Button(btn_frame, text="🚀  Uruchom Bota", font=F_BIG_BUTTON,
+                               bg=C_CORAL, fg=C_TEXT, relief="flat", cursor="hand2",
+                               activebackground="#d63851", activeforeground=C_TEXT,
+                               padx=20, pady=14, command=self._save_and_launch)
+        launch_btn.pack(fill="x", ipady=4)
+
+        save_btn = tk.Button(btn_frame, text="Tylko zapisz", font=F_LABEL,
+                             bg=C_BG, fg=C_MUTED, relief="flat", cursor="hand2",
+                             activebackground=C_CARD, activeforeground=C_TEXT,
+                             bd=1, highlightthickness=1, highlightbackground=C_MUTED,
+                             padx=16, pady=8, command=self._save_only)
+        save_btn.pack(fill="x", pady=(10, 0), ipady=2)
+
+    def _check_token(self):
+        """Validate Telegram bot token via API."""
+        token = self.token_entry.get().strip()
+        if not token or not re.match(r'^\d+:[A-Za-z0-9_-]+$', token):
+            self.token_status.set("❌ Nieprawidłowy format tokena")
+            self.token_status_label.configure(fg=C_ERROR)
             return
-        if self.current_step < 4:
-            self._show_step(self.current_step + 1)
+
+        try:
+            url = f"https://api.telegram.org/bot{token}/getMe"
+            req = urllib.request.Request(url, method='GET')
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                import json
+                data = json.loads(resp.read().decode())
+                if data.get("ok"):
+                    name = data["result"].get("username", "?")
+                    self.token_status.set(f"✅ Token poprawny! Bot: @{name}")
+                    self.token_status_label.configure(fg=C_SUCCESS)
+                    self.token_var.set(token)
+                else:
+                    self.token_status.set("❌ Token odrzucony przez Telegram")
+                    self.token_status_label.configure(fg=C_ERROR)
+        except Exception as e:
+            self.token_status.set(f"❌ Błąd połączenia: {str(e)[:40]}")
+            self.token_status_label.configure(fg=C_ERROR)
+
+    def _get_config(self):
+        """Build config dict from wizard inputs."""
+        # Get provider key from combo selection
+        combo_val = self.provider_combo.get()
+        provider_key = "openai"
+        for key, name in LLM_PROVIDERS:
+            if name == combo_val:
+                provider_key = key
+                break
+
+        return {
+            "telegram": {
+                "token": self.token_entry.get().strip(),
+                "owner_id": int(self.id_entry.get().strip() or "0"),
+            },
+            "llm": {
+                "enabled": bool(self.llm_key_entry.get().strip()),
+                "provider": provider_key,
+                "api_key": self.llm_key_entry.get().strip(),
+                "model": "gpt-4o-mini",
+                "base_url": "",
+                "max_concurrent": 3,
+                "timeout": 15,
+            },
+            "portals": {k: v.get() for k, v in self.portal_vars.items()},
+            "tor": {
+                "enabled": True,
+                "socks_port": 9050,
+                "control_port": 9051,
+                "control_password": "udzialy2026",
+            },
+            "scraping": {"timeout": 25, "delay_between": 2, "max_pages": 2},
+            "scorer": {"threshold": 25},
+            "database": {"path": "data/udzialy.db"},
+            "logging": {"level": "INFO", "file": "data/bot.log"},
+        }
+
+    def _save_config(self):
+        """Save config to yaml file."""
+        config = self._get_config()
+        config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yaml")
+
+        if HAS_YAML:
+            with open(config_path, "w", encoding="utf-8") as f:
+                yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
         else:
-            self._finish()
+            # Fallback: write simple yaml manually
+            lines = []
+            for section, values in config.items():
+                lines.append(f"{section}:")
+                if isinstance(values, dict):
+                    for k, v in values.items():
+                        if isinstance(v, bool):
+                            lines.append(f"  {k}: {'true' if v else 'false'}")
+                        elif isinstance(v, str):
+                            lines.append(f'  {k}: "{v}"')
+                        else:
+                            lines.append(f"  {k}: {v}")
+                lines.append("")
+            with open(config_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
 
-    def _prev(self):
-        if self.current_step > 0:
-            self._show_step(self.current_step - 1)
-
-    def _validate_step(self):
-        step = self.current_step
-        if step == 1:
-            token = self._token_var.get().strip()
-            if not re.match(r'^\d+:[A-Za-z0-9_-]{35,}$', token):
-                messagebox.showwarning("Błąd", "Token nieprawidłowy.\nFormat: 123456:ABC...")
-                return False
-            self.data['token'] = token
-        elif step == 2:
-            oid = self._owner_var.get().strip()
-            if not oid.isdigit():
-                messagebox.showwarning("Błąd", "Owner ID musi być liczbą.")
-                return False
-            self.data['owner_id'] = oid
-        elif step == 3:
-            provider = self._provider_var.get()
-            key = self._llm_key_var.get().strip()
-            if provider != 'ollama' and not key:
-                messagebox.showwarning("Błąd", "Podaj klucz API.")
-                return False
-            self.data['llm_provider'] = provider
-            self.data['llm_key'] = key
-        elif step == 4:
-            portals = {}
-            for key, var in self._portal_vars.items():
-                portals[key] = var.get()
-            self.data['portals'] = portals
         return True
 
-    def _finish(self):
-        save_config(
-            self.data['token'], self.data['owner_id'],
-            self.data['llm_provider'], self.data['llm_key'],
-            self.data['portals'],
-        )
-        self.on_complete()
-        self.destroy()
-
-    # ── Step builders ──
-
-    def _build_welcome(self):
-        ttk.Label(self.content, text="👋 Witaj!", style='Title.TLabel').pack(
-            anchor='w', pady=(0, 8))
-        ttk.Label(self.content, text=(
-            "Ten kreator pomoże Ci skonfigurować Bot Udziały.\n\n"
-            "Potrzebujesz:\n"
-            "• Token bota z @BotFather\n"
-            "• Twoje Telegram ID (owner_id)\n"
-            "• Klucz API do wybranego modelu LLM\n\n"
-            "Kliknij 'Dalej' aby rozpocząć."
-        ), style='Body.TLabel', wraplength=460).pack(anchor='w')
-
-    def _build_token(self):
-        ttk.Label(self.content, text="🔑 Token Telegram", style='Title.TLabel').pack(
-            anchor='w', pady=(0, 8))
-        ttk.Label(self.content, text="Wklej token bota od @BotFather:",
-                  style='Subtitle.TLabel').pack(anchor='w', pady=(0, 12))
-        self._token_var = tk.StringVar(value=self.data['token'])
-        entry = ttk.Entry(self.content, textvariable=self._token_var,
-                          font=FONT_MONO, width=50)
-        entry.pack(fill='x', pady=(0, 12))
-        entry.focus_set()
-        ttk.Label(self.content, text="Format: 123456789:ABCDefGhIjKlMnOpQrStUvWxYz...",
-                  style='Hint.TLabel').pack(anchor='w')
-
-    def _build_owner(self):
-        ttk.Label(self.content, text="👤 Owner ID", style='Title.TLabel').pack(
-            anchor='w', pady=(0, 8))
-        ttk.Label(self.content, text=(
-            "Twoje numeryczne Telegram ID.\n"
-            "Możesz je sprawdzić: wyślij /start do @userinfobot"
-        ), style='Subtitle.TLabel', wraplength=460).pack(anchor='w', pady=(0, 12))
-        self._owner_var = tk.StringVar(value=self.data['owner_id'])
-        ttk.Entry(self.content, textvariable=self._owner_var, font=FONT, width=20).pack(
-            anchor='w', pady=(0, 12))
-
-    def _build_llm(self):
-        """Step 4: Multi-LLM provider selection (Gap #9)."""
-        ttk.Label(self.content, text="🧠 Model LLM", style='Title.TLabel').pack(
-            anchor='w', pady=(0, 8))
-        ttk.Label(self.content, text="Wybierz dostawcę AI i podaj klucz API:",
-                  style='Subtitle.TLabel').pack(anchor='w', pady=(0, 12))
-
-        # Provider radio buttons
-        self._provider_var = tk.StringVar(value=self.data['llm_provider'])
-        radio_frame = tk.Frame(self.content, bg=BG)
-        radio_frame.pack(fill='x', pady=(0, 16))
-        for value, label in LLM_PROVIDERS:
-            rb = ttk.Radiobutton(radio_frame, text=label, variable=self._provider_var,
-                                 value=value, style='TRadiobutton',
-                                 command=self._on_provider_change)
-            rb.pack(anchor='w', pady=2)
-
-        # Key entry
-        self._llm_key_frame = tk.Frame(self.content, bg=BG)
-        self._llm_key_frame.pack(fill='x')
-        self._llm_key_label = ttk.Label(self._llm_key_frame, text="Klucz API:",
-                                        style='Body.TLabel')
-        self._llm_key_label.pack(anchor='w', pady=(0, 4))
-        self._llm_key_var = tk.StringVar(value=self.data['llm_key'])
-        self._llm_key_entry = ttk.Entry(self._llm_key_frame,
-                                        textvariable=self._llm_key_var,
-                                        font=FONT_MONO, width=50, show='•')
-        self._llm_key_entry.pack(fill='x')
-        self._on_provider_change()
-
-    def _on_provider_change(self):
-        provider = self._provider_var.get()
-        hints = {
-            'openai': 'sk-...', 'deepseek': 'sk-...',
-            'gemini': 'AIza...', 'claude': 'sk-ant-...',
-            'ollama': '(nie wymagany — lokalne API)',
-        }
-        if provider == 'ollama':
-            self._llm_key_label.configure(text="URL Ollama (domyślnie http://localhost:11434):")
-            self._llm_key_entry.configure(show='')
-        else:
-            self._llm_key_label.configure(text=f"Klucz API ({hints.get(provider, '')}):")
-            self._llm_key_entry.configure(show='•')
-
-    def _build_portals(self):
-        ttk.Label(self.content, text="🌐 Portale", style='Title.TLabel').pack(
-            anchor='w', pady=(0, 8))
-        ttk.Label(self.content, text="Wybierz portale do monitorowania:",
-                  style='Subtitle.TLabel').pack(anchor='w', pady=(0, 12))
-        self._portal_vars = {}
-        frame = tk.Frame(self.content, bg=BG)
-        frame.pack(fill='x')
-        for key, label in ALL_PORTALS:
-            var = tk.BooleanVar(value=self.data['portals'].get(key, True))
-            self._portal_vars[key] = var
-            ttk.Checkbutton(frame, text=label, variable=var,
-                           style='TCheckbutton').pack(anchor='w', pady=1)
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# SETTINGS DIALOG
-# ═══════════════════════════════════════════════════════════════════════════════
-
-class SettingsDialog(tk.Toplevel):
-    """Edit configuration after initial setup."""
-
-    def __init__(self, parent, cfg, on_save):
-        super().__init__(parent)
-        self.on_save = on_save
-        self.title("Ustawienia")
-        self.geometry("500x520")
-        self.resizable(False, False)
-        self.configure(bg=BG)
-        self.transient(parent)
-        self.grab_set()
-
-        frame = tk.Frame(self, bg=BG, padx=24, pady=20)
-        frame.pack(fill='both', expand=True)
-
-        ttk.Label(frame, text="⚙️ Ustawienia", style='Title.TLabel').pack(
-            anchor='w', pady=(0, 16))
-
-        # Token
-        ttk.Label(frame, text="Token Telegram:", style='Body.TLabel').pack(anchor='w')
-        self._token_var = tk.StringVar(value=cfg.get('telegram', {}).get('token', ''))
-        ttk.Entry(frame, textvariable=self._token_var, font=FONT_MONO, width=50).pack(
-            fill='x', pady=(0, 12))
-
-        # Owner
-        ttk.Label(frame, text="Owner ID:", style='Body.TLabel').pack(anchor='w')
-        self._owner_var = tk.StringVar(
-            value=str(cfg.get('telegram', {}).get('owner_id', '')))
-        ttk.Entry(frame, textvariable=self._owner_var, font=FONT, width=20).pack(
-            anchor='w', pady=(0, 12))
-
-        # LLM Provider
-        ttk.Label(frame, text="Dostawca LLM:", style='Body.TLabel').pack(anchor='w')
-        self._provider_var = tk.StringVar(
-            value=cfg.get('llm', {}).get('provider', 'openai'))
-        combo = ttk.Combobox(frame, textvariable=self._provider_var,
-                            values=[v for v, _ in LLM_PROVIDERS], state='readonly')
-        combo.pack(anchor='w', pady=(0, 8))
-
-        # LLM Key
-        ttk.Label(frame, text="Klucz API LLM:", style='Body.TLabel').pack(anchor='w')
-        self._llm_key_var = tk.StringVar(value=cfg.get('llm', {}).get('api_key', ''))
-        ttk.Entry(frame, textvariable=self._llm_key_var, font=FONT_MONO,
-                  width=50, show='•').pack(fill='x', pady=(0, 12))
-
-        # Portals
-        ttk.Label(frame, text="Portale:", style='Body.TLabel').pack(anchor='w', pady=(0, 4))
-        self._portal_vars = {}
-        pf = tk.Frame(frame, bg=BG)
-        pf.pack(fill='x', pady=(0, 16))
-        portals_cfg = cfg.get('portals', {})
-        for key, label in ALL_PORTALS:
-            enabled = portals_cfg.get(key, {}).get('enabled', True) if isinstance(
-                portals_cfg.get(key), dict) else True
-            var = tk.BooleanVar(value=enabled)
-            self._portal_vars[key] = var
-            ttk.Checkbutton(pf, text=label, variable=var).pack(anchor='w', pady=1)
-
-        # Save button
-        ttk.Button(frame, text="Zapisz", style='Accent.TButton',
-                   command=self._save).pack(anchor='e')
-
-    def _save(self):
-        token = self._token_var.get().strip()
-        owner = self._owner_var.get().strip()
-        provider = self._provider_var.get()
-        key = self._llm_key_var.get().strip()
-        portals = {k: v.get() for k, v in self._portal_vars.items()}
-        if not token or not owner.isdigit():
-            messagebox.showwarning("Błąd", "Token i Owner ID są wymagane.")
+    def _save_and_launch(self):
+        """Save config and signal to launch bot."""
+        if not self.token_entry.get().strip():
+            messagebox.showwarning("Uwaga", "Wklej token bota!", parent=self)
             return
-        save_config(token, owner, provider, key, portals)
-        self.on_save()
+        self._save_config()
         self.destroy()
+        if self.on_complete:
+            self.on_complete(launch=True)
+
+    def _save_only(self):
+        """Save config without launching."""
+        self._save_config()
+        messagebox.showinfo("Zapisano", "Konfiguracja zapisana!", parent=self)
+        self.destroy()
+        if self.on_complete:
+            self.on_complete(launch=False)
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# DASHBOARD — Main Application Screen
+# DASHBOARD — Dark terminal-like status view
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class Dashboard(tk.Frame):
-    """Main dashboard with status, log display, and control buttons."""
+    """Main runtime dashboard with dark theme."""
 
-    def __init__(self, parent, pm):
-        super().__init__(parent, bg=BG)
-        self.pm = pm
-        self.state = 'stopped'  # stopped / starting / running
+    def __init__(self, master, process_manager, on_settings=None):
+        super().__init__(master, bg=C_BG)
+        self.pm = process_manager
+        self.on_settings = on_settings
+        self._log_queue = queue.Queue()
         self._build_ui()
+        self._poll_logs()
 
     def _build_ui(self):
         # Header
-        header = tk.Frame(self, bg=BG)
-        header.pack(fill='x', padx=32, pady=(24, 0))
-        ttk.Label(header, text="🤖 Bot Udziały", style='Title.TLabel').pack(
-            side='left')
-        ttk.Label(header, text=f"v{VERSION}", style='Hint.TLabel').pack(
-            side='left', padx=(8, 0), pady=(6, 0))
-        ttk.Button(header, text="⚙️", style='Secondary.TButton', width=3,
-                   command=self._open_settings).pack(side='right')
+        header = tk.Frame(self, bg=C_BG)
+        header.pack(fill="x", padx=30, pady=(30, 20))
+
+        tk.Label(header, text="🏠 Bot Udziały", font=("Segoe UI", 18, "bold"),
+                 bg=C_BG, fg=C_TEXT).pack(side="left")
+        tk.Label(header, text=f"v{VERSION}", font=F_MUTED,
+                 bg=C_BG, fg=C_MUTED).pack(side="left", padx=(10, 0))
 
         # Status card
-        self.status_card = tk.Frame(self, bg=CARD_BG, padx=20, pady=14)
-        self.status_card.pack(fill='x', padx=32, pady=(16, 0))
+        status_card = _make_card(self)
+        status_card.pack(fill="x", padx=30, pady=(0, 16))
 
-        status_row = tk.Frame(self.status_card, bg=CARD_BG)
-        status_row.pack(fill='x')
+        status_row = tk.Frame(status_card, bg=C_CARD)
+        status_row.pack(fill="x")
 
-        self.status_dot = tk.Canvas(status_row, width=12, height=12,
-                                    bg=CARD_BG, highlightthickness=0)
-        self.status_dot.pack(side='left', padx=(0, 8))
-        self._draw_dot('#9CA3AF')  # gray=unknown
+        self.status_canvas = tk.Canvas(status_row, width=20, height=20,
+                                       bg=C_CARD, highlightthickness=0)
+        self.status_canvas.pack(side="left")
+        self.status_dot = self.status_canvas.create_oval(2, 2, 18, 18, fill=C_ERROR, outline="")
 
-        self.status_label = tk.Label(status_row, text="Zatrzymany", bg=CARD_BG,
-                                     font=FONT_BOLD, fg=TEXT)
-        self.status_label.pack(side='left')
+        self.status_label = tk.Label(status_row, text="  Zatrzymany", font=F_CARD_TITLE,
+                                     bg=C_CARD, fg=C_TEXT)
+        self.status_label.pack(side="left")
 
-        self.uptime_label = tk.Label(status_row, text="", bg=CARD_BG,
-                                     font=FONT, fg=TEXT_SEC)
-        self.uptime_label.pack(side='right')
+        # Control buttons
+        btn_frame = tk.Frame(self, bg=C_BG)
+        btn_frame.pack(fill="x", padx=30, pady=(0, 16))
 
-        # Buttons
-        btn_frame = tk.Frame(self, bg=BG)
-        btn_frame.pack(fill='x', padx=32, pady=(16, 0))
-        self.btn_start = ttk.Button(btn_frame, text="▶  Uruchom",
-                                    style='Accent.TButton', command=self._start)
-        self.btn_start.pack(side='left', padx=(0, 8))
-        self.btn_stop = ttk.Button(btn_frame, text="⏹  Zatrzymaj",
-                                   style='Secondary.TButton', command=self._stop)
-        self.btn_stop.pack(side='left')
-        self.btn_stop.configure(state='disabled')
+        self.start_btn = tk.Button(btn_frame, text="▶  Uruchom", font=F_BUTTON,
+                                   bg=C_CORAL, fg=C_TEXT, relief="flat", padx=20, pady=10,
+                                   cursor="hand2", activebackground="#d63851",
+                                   command=self._start)
+        self.start_btn.pack(side="left", padx=(0, 10))
 
-        # Log display
-        log_label = tk.Frame(self, bg=BG)
-        log_label.pack(fill='x', padx=32, pady=(16, 4))
-        ttk.Label(log_label, text="Logi", style='Body.TLabel').pack(side='left')
+        self.stop_btn = tk.Button(btn_frame, text="⏹  Zatrzymaj", font=F_BUTTON,
+                                  bg=C_ACCENT, fg=C_TEXT, relief="flat", padx=20, pady=10,
+                                  cursor="hand2", activebackground="#1a4a80",
+                                  state="disabled", command=self._stop)
+        self.stop_btn.pack(side="left", padx=(0, 10))
 
-        log_frame = tk.Frame(self, bg='#1E1E1E', padx=1, pady=1)
-        log_frame.pack(fill='both', expand=True, padx=32, pady=(0, 24))
+        settings_btn = tk.Button(btn_frame, text="⚙  Ustawienia", font=F_LABEL,
+                                 bg=C_CARD, fg=C_MUTED, relief="flat", padx=16, pady=8,
+                                 cursor="hand2", command=self._open_settings)
+        settings_btn.pack(side="right")
 
-        self.log_text = tk.Text(
-            log_frame, wrap='word', font=FONT_MONO,
-            bg='#1E1E1E', fg='#D4D4D4', relief='flat',
-            padx=12, pady=8, state='disabled',
-            highlightthickness=0, borderwidth=0, height=14,
-        )
-        scrollbar = ttk.Scrollbar(log_frame, orient='vertical',
-                                  command=self.log_text.yview)
-        self.log_text.configure(yscrollcommand=scrollbar.set)
-        self.log_text.pack(side='left', fill='both', expand=True)
-        scrollbar.pack(side='right', fill='y')
+        # Log area
+        log_label = tk.Label(self, text="Logi:", font=F_LABEL, bg=C_BG, fg=C_MUTED)
+        log_label.pack(anchor="w", padx=30, pady=(0, 4))
 
-        # Color tags
-        self.log_text.tag_configure('INFO', foreground='#D4D4D4')
-        self.log_text.tag_configure('SUCCESS', foreground='#10B981')
-        self.log_text.tag_configure('WARNING', foreground='#F59E0B')
-        self.log_text.tag_configure('ERROR', foreground='#EF4444')
-        self.log_text.tag_configure('TS', foreground='#6B7280')
+        log_frame = tk.Frame(self, bg=C_LOG_BG, padx=2, pady=2)
+        log_frame.pack(fill="both", expand=True, padx=30, pady=(0, 20))
 
-        self._start_time = None
-        self.log("Gotowy do uruchomienia.", "INFO")
+        self.log_text = tk.Text(log_frame, bg=C_LOG_BG, fg="#c9d1d9", font=F_LOG,
+                                relief="flat", wrap="word", state="disabled",
+                                insertbackground=C_TEXT, height=15)
+        self.log_text.pack(fill="both", expand=True)
 
-    def _draw_dot(self, color):
-        self.status_dot.delete('all')
-        self.status_dot.create_oval(2, 2, 10, 10, fill=color, outline='')
+        # Configure log tags
+        self.log_text.tag_configure("info", foreground="#8b949e")
+        self.log_text.tag_configure("success", foreground=C_SUCCESS)
+        self.log_text.tag_configure("error", foreground=C_ERROR)
+        self.log_text.tag_configure("bot", foreground="#58a6ff")
 
-    def _set_state(self, state):
-        self.state = state
-        if state == 'running':
-            self._draw_dot(SUCCESS)
-            self.status_label.configure(text="Bot działa")
-            self.btn_start.configure(state='disabled')
-            self.btn_stop.configure(state='normal')
-            self._start_time = time.time()
-        elif state == 'starting':
-            self._draw_dot(WARNING)
-            self.status_label.configure(text="Uruchamianie...")
-            self.btn_start.configure(state='disabled')
-            self.btn_stop.configure(state='disabled')
-        else:
-            self._draw_dot('#9CA3AF')
-            self.status_label.configure(text="Zatrzymany")
-            self.btn_start.configure(state='normal')
-            self.btn_stop.configure(state='disabled')
-            self._start_time = None
-            self.uptime_label.configure(text="")
+        # Footer
+        tk.Label(self, text="QA10 sp. z o.o. • qa10.io", font=("Segoe UI", 8),
+                 bg=C_BG, fg="#4a5568").pack(pady=(0, 10))
+
+    def _log(self, msg, tag="info"):
+        """Add line to log area."""
+        self.log_text.configure(state="normal")
+        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+        self.log_text.insert("end", f"[{timestamp}] {msg}\n", tag)
+        self.log_text.see("end")
+        self.log_text.configure(state="disabled")
+
+    def _poll_logs(self):
+        """Poll process manager for new log lines."""
+        if self.pm:
+            while not self.pm.log_queue.empty():
+                try:
+                    line = self.pm.log_queue.get_nowait()
+                    tag = "info"
+                    if "ERROR" in line or "error" in line.lower():
+                        tag = "error"
+                    elif "INFO" in line and "Bot" in line:
+                        tag = "bot"
+                    self._log(line.strip(), tag)
+                except queue.Empty:
+                    break
+        self.after(100, self._poll_logs)
 
     def _start(self):
-        self._set_state('starting')
-        self.pm.start_all()
+        """Start Tor + Bot."""
+        self._log("Uruchamianie...", "info")
+        self.status_canvas.itemconfig(self.status_dot, fill="#eab308")  # Yellow
+        self.status_label.configure(text="  Uruchamianie...")
+        self.start_btn.configure(state="disabled")
+
+        def _do_start():
+            success = self.pm.start_all()
+            self.after(0, lambda: self._on_started(success))
+
+        threading.Thread(target=_do_start, daemon=True).start()
+
+    def _on_started(self, success):
+        if success:
+            self.status_canvas.itemconfig(self.status_dot, fill=C_SUCCESS)
+            self.status_label.configure(text="  Działa")
+            self.stop_btn.configure(state="normal")
+            self._log("Bot uruchomiony pomyślnie!", "success")
+        else:
+            self.status_canvas.itemconfig(self.status_dot, fill=C_ERROR)
+            self.status_label.configure(text="  Błąd startu")
+            self.start_btn.configure(state="normal")
+            self._log("Nie udało się uruchomić bota.", "error")
 
     def _stop(self):
+        """Stop bot + Tor."""
+        self._log("Zatrzymywanie...", "info")
         self.pm.stop_all()
-        self._set_state('stopped')
-        self.log("Bot zatrzymany.", "INFO")
+        self.status_canvas.itemconfig(self.status_dot, fill=C_ERROR)
+        self.status_label.configure(text="  Zatrzymany")
+        self.start_btn.configure(state="normal")
+        self.stop_btn.configure(state="disabled")
+        self._log("Bot zatrzymany.", "info")
 
     def _open_settings(self):
-        cfg = load_config()
-        if cfg:
-            SettingsDialog(self.winfo_toplevel(), cfg, self._on_settings_saved)
+        if self.on_settings:
+            self.on_settings()
 
-    def _on_settings_saved(self):
-        self.log("Ustawienia zapisane. Restart bota wymagany.", "WARNING")
-
-    def log(self, msg, level='INFO'):
-        """Append a log line with timestamp and color."""
-        self.log_text.configure(state='normal')
-        ts = datetime.datetime.now().strftime('%H:%M:%S')
-        self.log_text.insert('end', f'[{ts}] ', 'TS')
-        self.log_text.insert('end', f'{msg}\n', level)
-        self.log_text.see('end')
-        # Prune to 500 lines
-        lines = int(self.log_text.index('end-1c').split('.')[0])
-        if lines > 500:
-            self.log_text.delete('1.0', f'{lines - 500}.0')
-        self.log_text.configure(state='disabled')
-
-    def poll(self):
-        """Called by Application every 100ms — drains queue, updates state."""
-        lines = self.pm.poll_output()
-        for level, msg in lines:
-            if level == '[STATUS]':
-                if msg == 'tor_ready' or msg == 'tor_already':
-                    self.log("Tor gotowy (port 9050 aktywny)", "SUCCESS")
-                elif msg == 'bot_started':
-                    self._set_state('running')
-            else:
-                self.log(msg, level)
-
-        # Detect unexpected death
-        if self.state == 'running':
-            status = self.pm.is_running()
-            if not status['bot']:
-                self._set_state('stopped')
-                self.log("Bot zakończył działanie nieoczekiwanie!", "ERROR")
-
-        # Update uptime
-        if self._start_time:
-            elapsed = int(time.time() - self._start_time)
-            h, m = divmod(elapsed, 3600)
-            m, s = divmod(m, 60)
-            self.uptime_label.configure(text=f"⏱ {h:02d}:{m:02d}:{s:02d}")
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# APPLICATION — Root Window (Gap #2: clam + style)
+# APPLICATION — Top-level controller
 # ═══════════════════════════════════════════════════════════════════════════════
 
 class Application:
-    """Main application: sets up root, style, decides wizard vs dashboard."""
+    """Main application controller."""
 
     def __init__(self):
         ensure_single_instance()
 
         self.root = tk.Tk()
-        self.root.title(APP_TITLE)
-        self.root.geometry("650x520")
-        self.root.minsize(580, 450)
-        self.root.configure(bg=BG)
-        self.root.option_add('*Background', BG)
+        self.root.title("Bot Udziały")
+        self.root.geometry("650x700")
+        self.root.configure(bg=C_BG)
+        self.root.minsize(600, 600)
 
-        self._setup_style()
+        # Center
+        self.root.update_idletasks()
+        x = (self.root.winfo_screenwidth() - 650) // 2
+        y = (self.root.winfo_screenheight() - 700) // 2
+        self.root.geometry(f"+{x}+{y}")
+
+        _apply_dark_theme(self.root)
+
+        # Process manager
         self.pm = ProcessManager()
-        self.dashboard = None
 
-        # Decide: wizard or dashboard
-        cfg = load_config()
-        if config_is_valid(cfg):
-            self._show_dashboard()
+        # Check if config exists and has token
+        self.config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yaml")
+        if self._needs_setup():
+            self.root.withdraw()
+            wizard = SetupWizard(self.root, on_complete=self._on_wizard_done)
+            wizard.protocol("WM_DELETE_WINDOW", lambda: (wizard.destroy(), self.root.destroy()))
         else:
-            self._show_wizard()
+            self._show_dashboard()
 
-        # Window close handler
-        self.root.protocol('WM_DELETE_WINDOW', self._on_close)
-        # Start polling loop (Gap #4: after(100ms))
-        self._poll_loop()
+        # Close handler
+        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
-    def _setup_style(self):
-        """Apply clam theme + full modern styling (Gap #2)."""
-        style = ttk.Style(self.root)
-        style.theme_use('clam')
+    def _needs_setup(self):
+        """Check if first-run setup is needed."""
+        if not os.path.exists(self.config_path):
+            return True
+        try:
+            if HAS_YAML:
+                with open(self.config_path) as f:
+                    cfg = yaml.safe_load(f)
+                token = cfg.get("telegram", {}).get("token", "")
+                return not token or token == "YOUR_BOT_TOKEN_HERE"
+            return True
+        except Exception:
+            return True
 
-        # Global
-        style.configure('.', background=BG, foreground=TEXT, font=FONT,
-                       borderwidth=0, focuscolor=ACCENT)
-        style.configure('TFrame', background=BG)
-        style.configure('TLabel', background=BG, foreground=TEXT, font=FONT)
-        style.configure('Title.TLabel', font=FONT_TITLE, background=BG)
-        style.configure('Subtitle.TLabel', font=FONT_SUBTITLE, foreground=TEXT_SEC,
-                       background=BG)
-        style.configure('Body.TLabel', font=FONT, background=BG)
-        style.configure('Hint.TLabel', font=('Segoe UI', 9), foreground=TEXT_SEC,
-                       background=BG)
-
-        # Accent button (primary)
-        style.configure('Accent.TButton', background=ACCENT, foreground='white',
-                       font=FONT_BOLD, padding=(20, 10), borderwidth=0, relief='flat')
-        style.map('Accent.TButton',
-                  background=[('active', ACCENT_HOVER), ('pressed', ACCENT_PRESSED),
-                              ('disabled', '#CCE4F7')],
-                  foreground=[('disabled', '#88BBDD')])
-
-        # Secondary button
-        style.configure('Secondary.TButton', background=CARD_BG, foreground=TEXT,
-                       font=FONT, padding=(16, 8), borderwidth=1, relief='flat')
-        style.map('Secondary.TButton',
-                  background=[('active', '#E8E8E8'), ('pressed', '#D0D0D0')])
-
-        # Entry
-        style.configure('TEntry', fieldbackground='white', borderwidth=1,
-                       relief='solid', padding=(10, 8), font=FONT)
-        style.map('TEntry',
-                  bordercolor=[('focus', ACCENT), ('!focus', BORDER)],
-                  lightcolor=[('focus', ACCENT)],
-                  darkcolor=[('focus', ACCENT)])
-
-        # Checkbutton / Radiobutton
-        style.configure('TCheckbutton', background=BG, font=FONT, focuscolor='')
-        style.configure('TRadiobutton', background=BG, font=FONT, focuscolor='')
-        style.map('TCheckbutton', background=[('active', BG)])
-        style.map('TRadiobutton', background=[('active', BG)])
-
-        # Combobox
-        style.configure('TCombobox', fieldbackground='white', padding=(8, 6))
-
-        # Scrollbar (thin)
-        style.configure('Vertical.TScrollbar', background=CARD_BG,
-                       troughcolor='#1E1E1E', borderwidth=0, width=10)
-
-    def _show_wizard(self):
-        SetupWizard(self.root, self._on_wizard_complete)
-
-    def _on_wizard_complete(self):
+    def _on_wizard_done(self, launch=False):
+        """Called after wizard completes."""
+        self.root.deiconify()
         self._show_dashboard()
+        if launch:
+            self.dashboard._start()
 
     def _show_dashboard(self):
-        if self.dashboard:
-            self.dashboard.destroy()
-        self.dashboard = Dashboard(self.root, self.pm)
-        self.dashboard.pack(fill='both', expand=True)
+        """Show the main dashboard."""
+        self.dashboard = Dashboard(self.root, self.pm, on_settings=self._open_settings)
+        self.dashboard.pack(fill="both", expand=True)
 
-    def _poll_loop(self):
-        """100ms polling loop for process output (Gap #4)."""
-        if self.dashboard:
-            self.dashboard.poll()
-        try:
-            self.root.after(100, self._poll_loop)
-        except tk.TclError:
-            pass  # Window destroyed
+    def _open_settings(self):
+        """Open settings (re-run wizard)."""
+        wizard = SetupWizard(self.root, on_complete=lambda launch=False: None)
 
     def _on_close(self):
-        """Handle window close — warn if bot running."""
-        status = self.pm.is_running()
-        if status.get('bot') or status.get('tor'):
-            answer = messagebox.askyesnocancel(
-                "Zamknij",
-                "Bot nadal działa.\n\n"
-                "Tak = Zatrzymaj bota i zamknij\n"
-                "Nie = Zamknij panel (bot działa w tle)\n"
-                "Anuluj = Wróć do panelu"
-            )
-            if answer is True:
+        """Handle window close."""
+        if self.pm.is_running():
+            if messagebox.askyesno("Zamknij", "Bot jest uruchomiony. Zatrzymać i zamknąć?"):
                 self.pm.stop_all()
                 self.root.destroy()
-            elif answer is False:
-                self.root.destroy()
-            # else: cancel — do nothing
         else:
             self.root.destroy()
 
     def run(self):
         self.root.mainloop()
 
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # ENTRY POINT
 # ═══════════════════════════════════════════════════════════════════════════════
 
-if __name__ == '__main__':
+def main():
     app = Application()
     app.run()
+
+
+if __name__ == "__main__":
+    main()
