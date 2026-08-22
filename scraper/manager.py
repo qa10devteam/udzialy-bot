@@ -32,7 +32,8 @@ class ScraperManager:
     """
 
     # Only the 4 main verified portals
-    MAIN_PORTALS = ["morizon", "gratka", "domiporta", "olx"]
+    # Main verified portals (otodom uses nodriver Layer 5, no Tor)
+    MAIN_PORTALS = ["otodom", "morizon", "gratka", "domiporta", "olx"]
 
     def __init__(
         self,
@@ -64,6 +65,9 @@ class ScraperManager:
             elif portal_name == "domiporta":
                 from scraper.portals.domiporta import DomiportaScraper
                 scrapers.append(DomiportaScraper())
+            elif portal_name == "otodom":
+                from scraper.portals.otodom import OtodomScraper
+                scrapers.append(OtodomScraper())
             elif portal_name == "olx":
                 from scraper.portals.olx import OlxScraper
                 scrapers.append(OlxScraper(use_tor=True))

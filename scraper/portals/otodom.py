@@ -1,331 +1,258 @@
 """
-Otodom.pl scraper - Layer 3-4 (curl_cffi + Tor).
+Otodom.pl scraper - Layer 5 (nodriver CDP, no Tor).
 
-Otodom uses Next.js with Cloudflare protection.
-Search URL: https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/cala-polska?description={keywords}
-Data extraction: __NEXT_DATA__ JSON embedded in page.
+VERIFIED: Otodom works with nodriver from datacenter IPs without Tor.
+Tor exit nodes are BLOCKED by CloudFront — use_tor=False is mandatory.
+Otodom strips 'description' search param server-side, so we fetch
+broad results and filter locally with PropertyShareScorer.
+
+Data: __NEXT_DATA__ JSON → props.pageProps.data.searchAds (list of ads).
+URL pattern: https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/cala-polska?page={n}
 """
 
 import json
 import logging
 import re
 from typing import Any, Dict, List, Optional
-from urllib.parse import quote_plus, urljoin
 
 from scraper.base import BaseScraper, RawListing
 from scraper.stealth import fetch_with_stealth
+from detector.scorer import PropertyShareScorer
 
 logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.otodom.pl"
+SEARCH_URL_TEMPLATE = (
+    "https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/cala-polska?page={page}"
+)
+MAX_PAGES = 2
 
 
 class OtodomScraper(BaseScraper):
-    """Otodom.pl real estate scraper (Next.js + CF protected)."""
-    
+    """Otodom.pl scraper using nodriver (Layer 5) without Tor.
+
+    Otodom strips description search server-side, so we fetch general
+    listing pages and filter locally using PropertyShareScorer.
+    """
+
     def __init__(self, **kwargs):
-        kwargs.setdefault("use_tor", True)
-        super().__init__(stealth_layer=3, **kwargs)
-    
+        # Layer 5 = nodriver, no Tor (CF blocks Tor exit nodes)
+        kwargs.setdefault("use_tor", False)
+        kwargs.setdefault("timeout", 30.0)
+        super().__init__(stealth_layer=5, **kwargs)
+        self.scorer = PropertyShareScorer()
+
     def get_portal_name(self) -> str:
         return "Otodom"
-    
+
+    def get_portal_config(self) -> Dict[str, Any]:
+        """Override to ensure no Tor and layer 5."""
+        return {
+            "portal_name": self.get_portal_name(),
+            "stealth_layer": 5,
+            "use_tor": False,
+            "timeout": 30,
+        }
+
     async def search(
         self, keywords: List[str], filters: Optional[Dict[str, Any]] = None
-    ) -> List[RawListing]:
-        """Search Otodom for listings."""
-        results: List[RawListing] = []
+    ) -> List[dict]:
+        """
+        Search Otodom for property share listings.
+
+        Fetches pages 1-2 of general listings, then filters locally
+        using scorer against provided keywords.
+
+        Args:
+            keywords: List of search terms (used for local filtering)
+            filters: Optional filters dict
+
+        Returns:
+            List of dicts with: title, price, city, voivodeship, url,
+            source_portal, raw_description
+        """
+        results: List[dict] = []
         filters = filters or {}
-        
-        for keyword in keywords:
-            url = self._build_search_url(keyword, filters)
-            logger.info(f"[Otodom] Searching: {url}")
-            
+
+        for page in range(1, MAX_PAGES + 1):
+            url = SEARCH_URL_TEMPLATE.format(page=page)
+            logger.info(f"[Otodom] Fetching page {page}: {url}")
+
             html = await fetch_with_stealth(url, self.get_portal_config())
             if not html:
-                logger.warning(f"[Otodom] No response for keyword: {keyword}")
-                continue
-            
-            # Try __NEXT_DATA__ first
-            listings = self._parse_next_data(html)
-            if not listings:
-                listings = self._parse_html_results(html)
-            
-            results.extend(listings)
-            logger.info(f"[Otodom] Found {len(listings)} listings for '{keyword}'")
-        
+                logger.warning(f"[Otodom] No response for page {page}")
+                break
+
+            page_results, total_pages = self._parse_next_data(html)
+            if not page_results:
+                logger.info(f"[Otodom] No results on page {page}, stopping")
+                break
+
+            results.extend(page_results)
+            logger.info(
+                f"[Otodom] Page {page}/{total_pages}: "
+                f"{len(page_results)} listings extracted"
+            )
+
+            # Don't exceed available pages
+            if page >= total_pages:
+                break
+
+        # Filter locally using scorer against keywords
+        if keywords:
+            filtered = self._filter_by_keywords(results, keywords)
+            logger.info(
+                f"[Otodom] Filtered {len(results)} -> {len(filtered)} "
+                f"matching keywords: {keywords}"
+            )
+            return filtered
+
         return results
-    
-    def _build_search_url(self, keyword: str, filters: Dict[str, Any]) -> str:
-        """Build Otodom search URL with description search."""
-        # Base search path
-        property_type = filters.get("property_type", "mieszkanie")
-        transaction = filters.get("transaction", "sprzedaz")
-        location = filters.get("location", "cala-polska")
-        
-        url = f"{BASE_URL}/pl/wyniki/{transaction}/{property_type}/{location}"
-        
-        params = [f"description={quote_plus(keyword)}"]
-        
-        if "price_min" in filters:
-            params.append(f"priceMin={filters['price_min']}")
-        if "price_max" in filters:
-            params.append(f"priceMax={filters['price_max']}")
-        if "area_min" in filters:
-            params.append(f"areaMin={filters['area_min']}")
-        if "area_max" in filters:
-            params.append(f"areaMax={filters['area_max']}")
-        if "rooms_min" in filters:
-            params.append(f"roomsNumber=%5B{filters['rooms_min']}%5D")
-        
-        return f"{url}?{'&'.join(params)}"
-    
-    def _parse_next_data(self, html: str) -> List[RawListing]:
-        """Extract listings from __NEXT_DATA__ JSON."""
+
+    def _parse_next_data(self, html: str) -> tuple:
+        """
+        Extract listings from __NEXT_DATA__ JSON.
+
+        Returns:
+            Tuple of (list_of_dicts, total_pages)
+        """
         match = re.search(
             r'<script\s+id="__NEXT_DATA__"\s+type="application/json">(.*?)</script>',
             html,
             re.DOTALL,
         )
         if not match:
-            return []
-        
+            logger.warning("[Otodom] __NEXT_DATA__ not found in HTML")
+            return [], 0
+
         try:
             data = json.loads(match.group(1))
-        except json.JSONDecodeError:
-            logger.warning("[Otodom] Failed to parse __NEXT_DATA__")
-            return []
-        
-        listings: List[RawListing] = []
-        
+        except json.JSONDecodeError as e:
+            logger.warning(f"[Otodom] Failed to parse __NEXT_DATA__: {e}")
+            return [], 0
+
+        listings: List[dict] = []
+        total_pages = 0
+
         try:
-            # Otodom Next.js structure
-            page_props = data.get("props", {}).get("pageProps", {})
-            
-            # Try multiple paths for the listing data
-            search_data = (
-                page_props.get("data", {}).get("searchAds", {}) or
-                page_props.get("searchAds", {}) or
-                page_props.get("data", {}).get("ads", {})
-            )
-            
-            items = search_data.get("items", [])
-            if not items:
-                items = search_data.get("ads", [])
-            
+            page_props = data["props"]["pageProps"]["data"]
+            search_ads = page_props.get("searchAds", [])
+
+            # Get pagination info
+            pagination = page_props.get("pagination", {})
+            total_pages = pagination.get("totalPages", 1)
+
+            if isinstance(search_ads, dict):
+                # Sometimes searchAds is a dict with items key
+                items = search_ads.get("items", search_ads.get("ads", []))
+            elif isinstance(search_ads, list):
+                items = search_ads
+            else:
+                items = []
+
             for item in items:
-                listing = self._parse_item_json(item)
+                listing = self._parse_item(item)
                 if listing:
                     listings.append(listing)
-                    
+
         except (KeyError, TypeError, AttributeError) as e:
             logger.warning(f"[Otodom] Error navigating __NEXT_DATA__: {e}")
-        
-        return listings
-    
-    def _parse_item_json(self, item: Dict[str, Any]) -> Optional[RawListing]:
-        """Parse a single Otodom listing from JSON."""
+
+        return listings, total_pages
+
+    def _parse_item(self, item: Dict[str, Any]) -> Optional[dict]:
+        """Parse a single Otodom listing from JSON into result dict."""
         try:
             title = item.get("title", "")
             if not title:
                 return None
-            
-            # URL
+
+            # URL from slug
             slug = item.get("slug", "")
-            item_id = item.get("id", "")
-            url = f"{BASE_URL}/pl/oferta/{slug}" if slug else ""
-            if not url and item_id:
-                url = f"{BASE_URL}/pl/oferta/{item_id}"
-            if not url:
+            if not slug:
                 return None
-            
+            url = f"{BASE_URL}/pl/oferta/{slug}"
+
             # Price
             price = None
-            price_text = None
             total_price = item.get("totalPrice", {})
             if isinstance(total_price, dict):
                 price = total_price.get("value")
-                currency = total_price.get("currency", "PLN")
-                if price:
-                    price_text = f"{price} {currency}"
             elif isinstance(total_price, (int, float)):
                 price = float(total_price)
-                price_text = f"{price} PLN"
-            
+
             # Location
+            city = None
+            voivodeship = None
             location_data = item.get("location", {})
-            location_parts = []
             if isinstance(location_data, dict):
                 address = location_data.get("address", {})
                 if isinstance(address, dict):
-                    city = address.get("city", {})
-                    city_name = city.get("name", "") if isinstance(city, dict) else str(city)
-                    district = address.get("district", {})
-                    district_name = district.get("name", "") if isinstance(district, dict) else ""
-                    if city_name:
-                        location_parts.append(city_name)
-                    if district_name:
-                        location_parts.append(district_name)
-            
-            location = ", ".join(location_parts) if location_parts else None
-            city = location_parts[0] if location_parts else None
-            
-            # Area
+                    city_data = address.get("city", {})
+                    city = (
+                        city_data.get("name", "")
+                        if isinstance(city_data, dict)
+                        else str(city_data)
+                    )
+                    province_data = address.get("province", {})
+                    voivodeship = (
+                        province_data.get("name", "")
+                        if isinstance(province_data, dict)
+                        else str(province_data) if province_data else None
+                    )
+
+            # Area and rooms
             area = item.get("areaInM2", item.get("area"))
-            if area:
-                try:
-                    area = float(area)
-                except (ValueError, TypeError):
-                    area = None
-            
-            # Rooms
             rooms = item.get("roomsNumber", item.get("rooms"))
-            if rooms:
-                try:
-                    rooms = int(rooms)
-                except (ValueError, TypeError):
-                    rooms = None
-            
-            # Floor
-            floor = item.get("floor")
-            if floor:
-                try:
-                    floor = int(floor)
-                except (ValueError, TypeError):
-                    floor = None
-            
-            # Thumbnail
-            images = item.get("images", [])
-            thumbnail = None
-            if images and isinstance(images, list):
-                first_img = images[0] if images else {}
-                if isinstance(first_img, dict):
-                    thumbnail = first_img.get("medium", first_img.get("small", first_img.get("url")))
-                elif isinstance(first_img, str):
-                    thumbnail = first_img
-            
-            # Description
-            description = item.get("description", "")
-            
-            # Share detection
-            combined = f"{title} {description}".lower()
-            is_share = self._detect_share(combined)
-            share_fraction = self._extract_fraction(f"{title} {description}")
-            
-            return RawListing(
-                title=title,
-                source_url=url,
-                portal="otodom",
-                price=price,
-                price_text=price_text,
-                location=location,
-                city=city,
-                area_m2=area,
-                rooms=rooms,
-                floor=floor,
-                thumbnail_url=thumbnail,
-                description=description[:500] if description else None,
-                listing_id=str(item_id),
-                is_share=is_share,
-                share_fraction=share_fraction,
-            )
-            
+
+            # Description (may be absent in list view)
+            description = item.get("description", "") or title
+
+            return {
+                "title": title,
+                "price": price,
+                "city": city or "",
+                "voivodeship": voivodeship or "",
+                "url": url,
+                "source_portal": "otodom",
+                "raw_description": description,
+                "area": area,
+                "rooms": rooms,
+            }
+
         except Exception as e:
             logger.warning(f"[Otodom] Error parsing item: {e}")
             return None
-    
-    def _parse_html_results(self, html: str) -> List[RawListing]:
-        """Fallback HTML parsing for Otodom."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
-            return []
-        
-        soup = BeautifulSoup(html, "html.parser")
-        listings: List[RawListing] = []
-        
-        cards = soup.select(
-            "[data-cy='listing-item'], [data-testid='listing-card'], "
-            "article[data-cy='listing-item-link']"
-        )
-        
-        for card in cards:
-            listing = self.parse_listing(str(card))
-            if listing:
-                listings.append(listing)
-        
-        return listings
-    
+
+    def _filter_by_keywords(
+        self, listings: List[dict], keywords: List[str]
+    ) -> List[dict]:
+        """Filter listings locally using PropertyShareScorer.
+
+        Otodom strips search keywords server-side, so we must filter
+        the broad results ourselves.
+        """
+        filtered: List[dict] = []
+
+        for listing in listings:
+            title = listing.get("title", "")
+            description = listing.get("raw_description", "")
+
+            # Score with PropertyShareScorer
+            result = self.scorer.score(title, description)
+            if result.is_share:
+                filtered.append(listing)
+                continue
+
+            # Also check direct keyword match in title
+            title_lower = title.lower()
+            for kw in keywords:
+                if kw.lower() in title_lower:
+                    filtered.append(listing)
+                    break
+
+        return filtered
+
     def parse_listing(self, html: str) -> Optional[RawListing]:
-        """Parse single Otodom listing card HTML (fallback)."""
-        try:
-            from bs4 import BeautifulSoup
-        except ImportError:
-            return None
-        
-        soup = BeautifulSoup(html, "html.parser")
-        
-        # Title
-        title_el = soup.select_one(
-            "[data-cy='listing-item-title'], h3, "
-            "[data-testid='listing-card-title']"
-        )
-        title = title_el.get_text(strip=True) if title_el else None
-        if not title:
-            return None
-        
-        # URL
-        link_el = soup.select_one("a[href*='/oferta/']")
-        href = link_el.get("href", "") if link_el else ""
-        source_url = urljoin(BASE_URL, href) if href else ""
-        if not source_url:
-            return None
-        
-        # Price
-        price_el = soup.select_one(
-            "[data-cy='listing-item-price'], [data-testid='listing-card-price']"
-        )
-        price_text = price_el.get_text(strip=True) if price_el else None
-        price = self._parse_price(price_text)
-        
-        # Location
-        loc_el = soup.select_one(
-            "[data-testid='listing-card-location'], .listing-item__location"
-        )
-        location = loc_el.get_text(strip=True) if loc_el else None
-        
-        is_share = self._detect_share(title)
-        share_fraction = self._extract_fraction(title)
-        
-        return RawListing(
-            title=title,
-            source_url=source_url,
-            portal="otodom",
-            price=price,
-            price_text=price_text,
-            location=location,
-            is_share=is_share,
-            share_fraction=share_fraction,
-        )
-    
-    def _parse_price(self, text: Optional[str]) -> Optional[float]:
-        if not text:
-            return None
-        cleaned = re.sub(r"[^\d,.]", "", text.replace(" ", "").replace("\xa0", ""))
-        cleaned = cleaned.replace(",", ".")
-        try:
-            return float(cleaned)
-        except (ValueError, TypeError):
-            return None
-    
-    def _detect_share(self, text: str) -> bool:
-        text_lower = text.lower()
-        share_keywords = [
-            "udział", "udzial", "1/2", "1/3", "1/4", "1/6", "1/8",
-            "współwłasność", "wspolwlasnosc",
-        ]
-        return any(kw in text_lower for kw in share_keywords)
-    
-    def _extract_fraction(self, text: str) -> Optional[str]:
-        match = re.search(r"(\d+/\d+)", text)
-        return match.group(1) if match else None
+        """Parse a single listing HTML (legacy interface, not used)."""
+        return None

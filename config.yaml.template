@@ -1,0 +1,20 @@
+# Konfiguracja bota udzialy
+# Skopiuj ten plik jako config.yaml i uzupelnij wartosci
+
+telegram:
+  token: "TUTAJ_WKLEJ_TOKEN_OD_BOTFATHER"
+  owner_id: 0  # Twoje ID Telegram (liczba)
+
+tor:
+  socks_port: 9050
+  control_port: 9051
+  control_password: "udzialy2026"
+
+scraping:
+  olx_enabled: true
+  otodom_enabled: true
+  check_interval_minutes: 30
+
+logging:
+  level: INFO
+  file: bot.log
