@@ -36,10 +36,10 @@ echo   Wklej token z @BotFather i swoje ID.
 echo ============================================
 echo.
 
-python\pythonw.exe config_wizard.pyw
+python\pythonw.exe launcher.pyw
 if errorlevel 1 (
     echo Proba uruchomienia z konsola...
-    python\python.exe config_wizard.pyw
+    python\python.exe launcher.pyw
 )
 
 echo.
