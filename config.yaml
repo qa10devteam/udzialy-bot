@@ -50,9 +50,9 @@ tor:
   enabled: true
   socks_port: 9050
   control_port: 9051
-  control_password: "udzialy_tor_pass"
+  control_password: "udzialy2026"
   circuit_rotate_interval: 300  # Rotate circuit every N seconds
-  binary_path: "tor/tor.exe"    # Relative to project root
+  binary_path: "/usr/bin/tor"  # Linux; Windows: tor/tor.exe    # Relative to project root
 
 # Database
 database:
