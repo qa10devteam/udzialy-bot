@@ -83,11 +83,29 @@ def cmd_setup(args):
     print("  (Enter = pomiń, bot działa bez AI)")
     llm_key = input("  API key: ").strip()
     llm_provider = "openai"
+    llm_model = ""
     if llm_key:
-        print("  Provider [1=OpenAI, 2=DeepSeek, 3=Gemini, 4=Claude, 5=Ollama]")
+        print("  Provider:")
+        print("    1 = Claude (Anthropic)")
+        print("    2 = ChatGPT (OpenAI)")
+        print("    3 = Gemini (Google)")
+        print("    4 = DeepSeek")
         choice = input("  Wybór [1]: ").strip() or "1"
-        providers = {"1": "openai", "2": "deepseek", "3": "gemini", "4": "claude", "5": "ollama"}
-        llm_provider = providers.get(choice, "openai")
+        providers = {"1": "claude", "2": "openai", "3": "gemini", "4": "deepseek"}
+        llm_provider = providers.get(choice, "claude")
+
+        # Set default model per provider
+        default_models = {
+            "claude": "claude-haiku-4-5-20251001",
+            "openai": "gpt-4o-mini",
+            "gemini": "gemini-2.0-flash",
+            "deepseek": "deepseek-chat",
+        }
+        llm_model = default_models.get(llm_provider, "gpt-4o-mini")
+        print(f"  Model: {llm_model}")
+        custom = input("  Inny model? (Enter = domyślny): ").strip()
+        if custom:
+            llm_model = custom
 
     # Save config
     config = {
@@ -96,7 +114,7 @@ def cmd_setup(args):
             "enabled": bool(llm_key),
             "provider": llm_provider,
             "api_key": llm_key or "",
-            "model": "gpt-4o-mini",
+            "model": llm_model,
         },
         "portals": {
             "otodom": {"enabled": True},
