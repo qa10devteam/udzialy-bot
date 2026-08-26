@@ -35,6 +35,7 @@ router = Router(name="ai_chat")
 
 _conversations: Dict[int, List[Dict[str, str]]] = {}
 MAX_HISTORY = 10
+MAX_USERS = 100  # Evict oldest when exceeded
 
 
 def _get_history(user_id: int) -> List[Dict[str, str]]:
@@ -45,6 +46,10 @@ def _get_history(user_id: int) -> List[Dict[str, str]]:
 def _add_message(user_id: int, role: str, content: str) -> None:
     """Add message to conversation history."""
     if user_id not in _conversations:
+        # Evict oldest user if at capacity
+        if len(_conversations) >= MAX_USERS:
+            oldest_key = next(iter(_conversations))
+            del _conversations[oldest_key]
         _conversations[user_id] = []
     _conversations[user_id].append({"role": role, "content": content})
     # Trim to last N
@@ -183,7 +188,7 @@ async def _call_claude(
             "content-type": "application/json",
         },
         json={
-            "model": "claude-haiku-4-5-20251001",
+            "model": llm_config.get("model", "claude-haiku-4-5-20251001") if isinstance(llm_config, dict) else getattr(llm_config, "model", "claude-haiku-4-5-20251001"),
             "max_tokens": 1024,
             "system": system,
             "messages": messages,
@@ -192,7 +197,7 @@ async def _call_claude(
     )
 
     if response.status_code != 200:
-        logger.warning(f"Claude API {response.status_code}: {response.text[:200]}")
+        logger.warning(f"Gemini API error {response.status_code}")
         return AIResponse(error=f"API error {response.status_code}")
 
     data = response.json()
@@ -402,7 +407,7 @@ def _is_owner(user_id: int | None) -> bool:
     settings = get_settings()
     if settings.owner_id == 0:
         return True
-    return user_id == settings.owner_id
+    return user_id == int(settings.owner_id)
 
 
 def _format_filters(data: Dict[str, Any]) -> str:

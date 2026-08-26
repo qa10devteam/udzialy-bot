@@ -26,3 +26,11 @@ def register_routers(dp: Dispatcher) -> None:
     dp.include_router(saved_router)
     dp.include_router(settings_router)
     dp.include_router(ai_chat_router)  # Must be last (catch-all)
+
+    # Catch-all for non-text (photos, stickers, voice)
+    from aiogram import F as _F
+    from aiogram.types import Message as _Msg
+
+    @dp.message(~_F.text)
+    async def _non_text_handler(message: _Msg) -> None:
+        await message.answer("💬 Wysyłaj mi tekst — zdjęcia i pliki nie obsługuję.")

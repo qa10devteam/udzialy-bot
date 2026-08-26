@@ -53,6 +53,8 @@ class ScraperManager:
         """
         self.enabled_portals = portals or self.MAIN_PORTALS
         self.timeout_per_portal = timeout_per_portal
+        self._last_search_time: float = 0
+        self._min_search_interval: float = 30.0  # Min 30s between full scans
         self.scorer = PropertyShareScorer()
         self._llm_analyzer = None
 

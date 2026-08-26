@@ -234,7 +234,9 @@ async def deep_fetch_batch(
     
     async def _fetch_one(listing):
         async with semaphore:
-            return await deep_fetch_listing(listing)
+            result = await deep_fetch_listing(listing)
+            await asyncio.sleep(0.5)  # Rate limit: max 2 req/s per portal
+            return result
     
     tasks = [_fetch_one(l) for l in listings]
     results = await asyncio.gather(*tasks, return_exceptions=True)

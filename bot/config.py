@@ -160,6 +160,13 @@ class Settings(BaseSettings):
     )
 
     telegram: TelegramConfig = TelegramConfig()
+
+    def __init__(self, **data):
+        # Strip whitespace from token (copy-paste artifact)
+        if "telegram" in data and isinstance(data["telegram"], dict):
+            if "token" in data["telegram"]:
+                data["telegram"]["token"] = str(data["telegram"]["token"]).strip()
+        super().__init__(**data)
     portals: PortalsConfig = PortalsConfig()
     scraping: ScrapingConfig = ScrapingConfig()
     tor: TorConfig = TorConfig()

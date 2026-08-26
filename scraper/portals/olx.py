@@ -216,9 +216,11 @@ class OlxScraper(BaseScraper):
         }
 
     def _parse_price(self, text: str) -> Optional[float]:
-        """Extract numeric price from text."""
+        """Extract numeric price from text. Handles: 150 000, 150.000, 150,000 PLN."""
         if not text:
             return None
+        # Remove "do negocjacji", "PLN", "zł" etc
+        text = text.replace("do negocjacji", "").replace("PLN", "").replace("zł", "")
         # Remove non-digit chars except comma and dot
         cleaned = re.sub(r"[^\d,.]", "", text.replace("\xa0", "").replace(" ", ""))
         cleaned = cleaned.replace(",", ".")

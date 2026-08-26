@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import logging.handlers
 import signal
 import sys
 from pathlib import Path
@@ -43,7 +44,9 @@ def setup_logging() -> None:
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler(log_path, encoding="utf-8"),
+            logging.handlers.RotatingFileHandler(
+                log_path, encoding="utf-8", maxBytes=5*1024*1024, backupCount=3
+            ),
         ],
     )
 
@@ -140,12 +143,19 @@ async def run_bot() -> None:
     register_routers(dp)
 
     logger.info("Starting polling...")
+    logger.info("Tip: Keep this window open. Bot stops when you close it.")
     try:
         try:
             await bot.delete_webhook(drop_pending_updates=True)
         except Exception:
             pass
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    except Exception as e:
+        if "Unauthorized" in str(e) or "401" in str(e):
+            logger.error("❌ Token odrzucony! Sprawdź token w config lub uruchom: udzialy setup")
+        else:
+            logger.error(f"❌ Bot crashed: {e}")
+            raise
     finally:
         await bot.session.close()
 

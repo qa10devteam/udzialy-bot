@@ -71,7 +71,10 @@ NEGATIVE: List[str] = [
     r"udzia[łl]\s+w\s+sp[óo][łl]ce",
     r"cz[ęe][śs]ci\s+wsp[óo]lne\s+nieruchomo[śs]ci",
     r"cz[ęe][śs]ci\s+wsp[óo]lne",
-    r"udzia[łl]\s+w\s+drodze",
+    r"udział\s+w\s+drodze",
+    r"udział\s+w\s+kosztach",
+    r"udział\s+w\s+czynszu",
+    r"udział\s+w\s+opłatach"
     r"udzia[łl]\s+w\s+drodze\s+dojazdowej",
     r"udzia[łl]\s+w\s+cz[ęe][śs]ciach\s+wsp[óo]lnych",
     r"udzia[łl]\s+w\s+nieruchomo[śs]ci\s+wsp[óo]lnej",
