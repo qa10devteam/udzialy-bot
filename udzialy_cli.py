@@ -196,6 +196,37 @@ def cmd_tor_check(args):
         return 1
 
 
+def cmd_autostart(args):
+    """Enable/disable Windows autostart."""
+    import platform
+    if platform.system() != "Windows":
+        print("  Autostart dostępny tylko na Windows.")
+        print("  Na Linux użyj: systemctl --user enable udzialy-bot")
+        return 0
+
+    import winreg
+    key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+    app_name = "UdzialyBot"
+    exe_path = f'"{sys.executable}" -m udzialy_cli run'
+
+    try:
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_ALL_ACCESS)
+        try:
+            winreg.QueryValueEx(key, app_name)
+            # Already exists — remove it
+            winreg.DeleteValue(key, app_name)
+            print("  ✗ Autostart wyłączony.")
+        except FileNotFoundError:
+            # Doesn't exist — add it
+            winreg.SetValueEx(key, app_name, 0, winreg.REG_SZ, exe_path)
+            print("  ✓ Autostart włączony!")
+            print(f"    Bot uruchomi się automatycznie po starcie Windows.")
+        winreg.CloseKey(key)
+    except Exception as e:
+        print(f"  Błąd: {e}")
+    return 0
+
+
 def cmd_scan(args):
     """Run single scan without Telegram (print results)."""
     ensure_dirs()
@@ -224,6 +255,7 @@ def main():
     sub.add_parser("gui", help="Uruchom GUI dashboard")
     sub.add_parser("tor-check", help="Sprawdź połączenie Tor")
     sub.add_parser("scan", help="Jednorazowy skan (bez Telegram)")
+    sub.add_parser("autostart", help="Włącz/wyłącz autostart z Windows")
 
     args = parser.parse_args()
 
@@ -233,6 +265,7 @@ def main():
         "gui": cmd_gui,
         "tor-check": cmd_tor_check,
         "scan": cmd_scan,
+        "autostart": cmd_autostart,
     }
 
     if args.command is None:

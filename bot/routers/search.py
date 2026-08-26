@@ -42,11 +42,22 @@ def _is_owner(user_id: int | None) -> bool:
 async def cmd_start(message: Message, state: FSMContext) -> None:
     """Handle /start command — conversational onboarding."""
     if not message.from_user or not _is_owner(message.from_user.id):
-        await message.answer("⛔ Bot jest prywatny. Brak dostępu.")
+        await message.answer("⛔ Bot jest prywatny. Skontaktuj się z właścicielem.")
         return
 
-    # Reset state on fresh start
+    # Reset state on fresh start (clean orphan keys from previous flows)
     await state.clear()
+
+    # Load persisted filters if any
+    try:
+        filters_file = PROJECT_ROOT / "filters.json"
+        if filters_file.exists():
+            import json as _json
+            saved_filters = _json.loads(filters_file.read_text())
+            if saved_filters:
+                await state.update_data(**saved_filters)
+    except Exception:
+        pass
 
     settings = get_settings()
     has_ai = settings.llm.enabled and settings.llm.api_key

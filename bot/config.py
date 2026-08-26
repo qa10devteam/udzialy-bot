@@ -193,8 +193,13 @@ class Settings(BaseSettings):
 
         if config_path.exists():
             try:
-                with open(config_path, "r", encoding="utf-8") as f:
-                    yaml_data = yaml.safe_load(f) or {}
+                with open(config_path, "rb") as fb:
+                    raw = fb.read()
+                # Strip BOM if present (Notepad on Windows adds it)
+                if raw.startswith(b"\xef\xbb\xbf"):
+                    raw = raw[3:]
+                loaded = yaml.safe_load(raw.decode("utf-8"))
+                yaml_data = loaded if isinstance(loaded, dict) else {}
             except yaml.YAMLError as e:
                 import logging
                 logging.getLogger(__name__).error(f"Config YAML parse error: {e}. Using defaults.")

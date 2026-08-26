@@ -27,8 +27,9 @@ PAGE_SIZE = 5
 # --- Pagination handler ---
 
 @router.callback_query(F.data.startswith("page:"))
-async def handle_page_navigation(callback: CallbackQuery, state: FSMContext) -> None:
+async def handle_page_change(callback: CallbackQuery, state: FSMContext) -> None:
     """Handle pagination: page:N callback."""
+    await callback.answer()  # Acknowledge immediately (prevents ⏳ spinner)
     if not callback.from_user or not _is_owner(callback.from_user.id):
         await callback.answer("⛔ Brak dostępu", show_alert=True)
         return

@@ -178,6 +178,8 @@ class ScraperManager:
                 f"ALL portals failed: {failed_portals}. "
                 "Check: internet connection, firewall, antivirus blocking python.exe"
             )
+        elif failed_portals:
+            logger.info(f"Partial success. Failed portals: {failed_portals}")
 
         # Deduplicate by URL
         deduplicated = self._deduplicate_by_url(all_listings)

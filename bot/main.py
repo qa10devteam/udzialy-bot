@@ -144,6 +144,16 @@ async def run_bot() -> None:
 
     logger.info("Starting polling...")
     logger.info("Tip: Keep this window open. Bot stops when you close it.")
+
+    # Check Tor connectivity (non-blocking)
+    import socket
+    _sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    _sock.settimeout(2)
+    if _sock.connect_ex(("127.0.0.1", 9050)) == 0:
+        logger.info("✓ Tor connected (port 9050)")
+    else:
+        logger.warning("⚠ Tor not running — scrapers will use direct connection (some portals may block)")
+    _sock.close()
     try:
         try:
             await bot.delete_webhook(drop_pending_updates=True)

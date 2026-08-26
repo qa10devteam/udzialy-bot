@@ -33,24 +33,28 @@ router = Router(name="ai_chat")
 # Conversation memory (per-user, last 10 messages)
 # ---------------------------------------------------------------------------
 
+import threading
 _conversations: Dict[int, List[Dict[str, str]]] = {}
+_conv_lock = threading.Lock()
 MAX_HISTORY = 10
 MAX_USERS = 100  # Evict oldest when exceeded
 
 
 def _get_history(user_id: int) -> List[Dict[str, str]]:
-    """Get conversation history for user."""
-    return _conversations.get(user_id, [])
+    """Get conversation history for user (thread-safe copy)."""
+    with _conv_lock:
+        return list(_conversations.get(user_id, []))
 
 
 def _add_message(user_id: int, role: str, content: str) -> None:
-    """Add message to conversation history."""
-    if user_id not in _conversations:
-        # Evict oldest user if at capacity
-        if len(_conversations) >= MAX_USERS:
-            oldest_key = next(iter(_conversations))
-            del _conversations[oldest_key]
-        _conversations[user_id] = []
+    """Add message to conversation history (thread-safe)."""
+    with _conv_lock:
+        if user_id not in _conversations:
+            # Evict oldest user if at capacity
+            if len(_conversations) >= MAX_USERS:
+                oldest_key = next(iter(_conversations))
+                del _conversations[oldest_key]
+            _conversations[user_id] = []
     _conversations[user_id].append({"role": role, "content": content})
     # Trim to last N
     if len(_conversations[user_id]) > MAX_HISTORY:
@@ -157,7 +161,7 @@ async def call_ai(
     system = SYSTEM_PROMPT.format(filters_info=filters_info or "brak (szukam wszędzie)")
 
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=30.0, limits=httpx.Limits(max_connections=10)) as client:
             if provider == "claude":
                 return await _call_claude(client, system, history, user_message, api_key)
             elif provider in ("openai", "deepseek"):
@@ -452,6 +456,12 @@ async def handle_ai_chat(message: Message, state: FSMContext) -> None:
     fsm_data = await state.get_data()
     filters_info = _format_filters(fsm_data)
     history = _get_history(user_id)
+
+    # Rough token cap: if history too large, trim oldest
+    total_chars = sum(len(m.get("content", "")) for m in history)
+    while total_chars > 8000 and len(history) > 2:
+        removed = history.pop(0)
+        total_chars -= len(removed.get("content", ""))
 
     # Guard against re-entrancy (search → AI → search loop)
     fsm_data_check = await state.get_data()

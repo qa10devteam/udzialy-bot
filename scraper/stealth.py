@@ -21,6 +21,9 @@ from scraper.utils.headers import get_chrome_headers, get_random_ua
 logger = logging.getLogger(__name__)
 
 # Block detection patterns
+# Cookie consent / GDPR patterns that indicate no real content loaded
+GDPR_PATTERNS = ["cookie consent", "zgoda na cookies", "akceptuję cookies", "polityka prywatności"]
+
 BLOCK_PATTERNS = [
     "just a moment",
     "access denied",
@@ -162,7 +165,10 @@ async def _layer4_primp(url: str, proxy: Optional[str] = None, timeout: float = 
     
     try:
         # primp is sync, run in executor
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
         
         def _fetch():
             client = primp.Client(
@@ -232,6 +238,15 @@ async def _layer5_nodriver(url: str, proxy: Optional[str] = None, timeout: float
                 browser.stop()
             except Exception:
                 pass
+            # Kill any orphan chrome processes on Windows
+            import sys
+            if sys.platform == "win32":
+                try:
+                    import subprocess as _sp
+                    _sp.run(["taskkill", "/F", "/IM", "chrome.exe", "/FI", "WINDOWTITLE eq about:blank"],
+                            capture_output=True, timeout=5)
+                except Exception:
+                    pass
 
 
 async def _layer6_patchright(url: str, proxy: Optional[str] = None, timeout: float = 20.0) -> Optional[str]:
