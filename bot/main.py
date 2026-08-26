@@ -141,6 +141,10 @@ async def run_bot() -> None:
 
     logger.info("Starting polling...")
     try:
+        try:
+            await bot.delete_webhook(drop_pending_updates=True)
+        except Exception:
+            pass
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     finally:
         await bot.session.close()

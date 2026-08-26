@@ -278,6 +278,11 @@ async def _layer6_patchright(url: str, proxy: Optional[str] = None, timeout: flo
             return html
     except Exception as e:
         logger.warning(f"Layer 6 error for {url}: {e}")
+        try:
+            if 'browser' in dir() and browser:
+                await browser.close()
+        except Exception:
+            pass
         return None
 
 

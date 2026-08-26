@@ -254,7 +254,10 @@ async def _call_openai(
         return AIResponse(error=f"API error {response.status_code}")
 
     data = response.json()
-    choice = data["choices"][0]["message"]
+    choices = data.get("choices", [])
+    if not choices:
+        return AIResponse(error="Empty response from API")
+    choice = choices[0].get("message", {})
     result = AIResponse(text=choice.get("content"))
 
     if fc := choice.get("function_call"):
@@ -347,11 +350,20 @@ async def execute_tool(
         if voiv := tool_input.get("voivodeship"):
             data["filter_voivodeship"] = voiv
         if price_min := tool_input.get("price_min"):
-            data["filter_price_min"] = int(price_min)
+            try:
+                data["filter_price_min"] = int(float(str(price_min).replace(" ", "").replace("k", "000")))
+            except (ValueError, TypeError):
+                pass
         if price_max := tool_input.get("price_max"):
-            data["filter_price_max"] = int(price_max)
+            try:
+                data["filter_price_max"] = int(float(str(price_max).replace(" ", "").replace("k", "000")))
+            except (ValueError, TypeError):
+                pass
         if radius := tool_input.get("radius_km"):
-            data["filter_radius"] = int(radius)
+            try:
+                data["filter_radius"] = int(float(str(radius)))
+            except (ValueError, TypeError):
+                pass
         await state.update_data(**data)
 
         parts = []
@@ -436,47 +448,59 @@ async def handle_ai_chat(message: Message, state: FSMContext) -> None:
     filters_info = _format_filters(fsm_data)
     history = _get_history(user_id)
 
-    # Show typing
-    await message.bot.send_chat_action(message.chat.id, "typing")  # type: ignore
-
-    # Call AI
-    ai_response = await call_ai(
-        user_message=message.text,
-        history=history,
-        filters_info=filters_info,
-        provider=llm_config.provider,
-        api_key=llm_config.api_key,
-    )
-
-    if ai_response.error:
-        if ai_response.error == "no_api_key":
-            await message.answer("⚠️ Brak klucza API. Uruchom `udzialy setup`.")
-        else:
-            await message.answer(f"⚠️ Błąd AI: {ai_response.error[:100]}")
+    # Guard against re-entrancy (search → AI → search loop)
+    fsm_data_check = await state.get_data()
+    if fsm_data_check.get("_ai_processing"):
         return
+    await state.update_data(_ai_processing=True)
 
-    # Save to history
-    _add_message(user_id, "user", message.text)
+    try:
+        # Show typing
+        try:
+            await message.bot.send_chat_action(message.chat.id, "typing")  # type: ignore
+        except Exception:
+            pass
 
-    # Execute tool calls
-    tool_executed = False
-    for tool_call in ai_response.tool_calls:
-        tool_result = await execute_tool(
-            tool_call["name"], tool_call.get("input", {}), message, state
+        # Call AI
+        ai_response = await call_ai(
+            user_message=message.text,
+            history=history,
+            filters_info=filters_info,
+            provider=llm_config.provider,
+            api_key=llm_config.api_key,
         )
-        if tool_result:
-            tool_executed = True
-            # If AI also has text, send it before tool execution
-            if ai_response.text and not tool_executed:
-                await message.answer(ai_response.text)
 
-    # Send text response (if no tool was executed, or tool + text)
-    if ai_response.text and not tool_executed:
-        await message.answer(ai_response.text)
-        _add_message(user_id, "assistant", ai_response.text)
-    elif ai_response.text and tool_executed:
-        # Tool ran + AI has commentary
-        _add_message(user_id, "assistant", ai_response.text)
-    elif not ai_response.text and not tool_executed:
-        # No response at all — shouldn't happen
-        await message.answer("🤔 Nie zrozumiałem. Spróbuj: \"szukaj udziałów w Gdyni do 200k\"")
+        if ai_response.error:
+            if ai_response.error == "no_api_key":
+                await message.answer("⚠️ Brak klucza API. Uruchom `udzialy setup`.")
+            else:
+                await message.answer(f"⚠️ Błąd AI: {ai_response.error[:100]}")
+            return
+
+        # Save to history
+        _add_message(user_id, "user", message.text)
+
+        # Execute tool calls
+        tool_executed = False
+        for tool_call in ai_response.tool_calls:
+            tool_result = await execute_tool(
+                tool_call["name"], tool_call.get("input", {}), message, state
+            )
+            if tool_result:
+                tool_executed = True
+                # If AI also has text, send it before tool execution
+                if ai_response.text and not tool_executed:
+                    await message.answer(ai_response.text)
+
+        # Send text response (if no tool was executed, or tool + text)
+        if ai_response.text and not tool_executed:
+            await message.answer(ai_response.text)
+            _add_message(user_id, "assistant", ai_response.text)
+        elif ai_response.text and tool_executed:
+            # Tool ran + AI has commentary
+            _add_message(user_id, "assistant", ai_response.text)
+        elif not ai_response.text and not tool_executed:
+            # No response at all — shouldn't happen
+            await message.answer("🤔 Nie zrozumiałem. Spróbuj: \"szukaj udziałów w Gdyni do 200k\"")
+    finally:
+        await state.update_data(_ai_processing=False)

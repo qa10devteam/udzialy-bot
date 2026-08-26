@@ -42,7 +42,7 @@ class ScraperManager:
     def __init__(
         self,
         portals: Optional[List[str]] = None,
-        timeout_per_portal: float = 25.0,
+        timeout_per_portal: float = 20.0,
     ):
         """
         Initialize the ScraperManager.

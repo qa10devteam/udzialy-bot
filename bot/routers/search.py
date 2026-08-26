@@ -111,6 +111,13 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
     if not message.from_user or not _is_owner(message.from_user.id):
         return
 
+    # Prevent concurrent searches
+    data_pre: Dict[str, Any] = await state.get_data()
+    if data_pre.get("_search_running"):
+        await message.answer("⏳ Wyszukiwanie już trwa, poczekaj na wyniki...")
+        return
+    await state.update_data(_search_running=True)
+
     settings = get_settings()
 
     # Get current filters from FSM state
@@ -251,6 +258,9 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         f"Search completed: {len(results)} raw → {len(classified)} classified shares "
         f"across {len(enabled)} portals"
     )
+
+    # Release search lock
+    await state.update_data(_search_running=False)
 
 
 @router.callback_query(F.data == "search_cancel")

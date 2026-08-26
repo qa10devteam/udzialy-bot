@@ -136,6 +136,8 @@ def _classify_fraction_size(fraction: Optional[str]) -> Optional[FractionSize]:
     if not m:
         return None
     num, den = int(m.group(1)), int(m.group(2))
+    if den == 0:
+        return None
     ratio = num / den
     if ratio >= 0.5:
         return FractionSize.DUZY
@@ -365,10 +367,15 @@ def format_listing_card(listing: ClassifiedListing, index: int = 1) -> str:
     tier_icon = {"pewny": "🔥", "prawdopodobny": "⭐", "mozliwy": "❓"}
     icon = tier_icon.get(listing.tier.value, "")
     
-    parts = [f"{icon} <b>{index}. {listing.title[:60]}</b>"]
+    from html import escape
+    safe_title = escape(listing.title[:60])
+    parts = [f"{icon} <b>{index}. {safe_title}</b>"]
     
     if listing.price:
-        parts.append(f"💰 {listing.price:,.0f} PLN")
+        try:
+            parts.append(f"💰 {float(listing.price):,.0f} PLN")
+        except (ValueError, TypeError):
+            parts.append(f"💰 {listing.price} PLN")
     
     if listing.fraction:
         parts.append(f"📐 Udział: {listing.fraction}")
@@ -412,4 +419,8 @@ def format_results_page(
         lines.append(format_listing_card(listing, i))
         lines.append("")  # spacing
     
-    return "\n".join(lines), total_pages
+    text = "\n".join(lines)
+    # Telegram message limit is 4096 chars
+    if len(text) > 4000:
+        text = text[:3950] + "\n\n… (skrócono, użyj ▶ aby zobaczyć więcej)"
+    return text, total_pages

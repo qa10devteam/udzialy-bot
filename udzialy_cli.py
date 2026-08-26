@@ -139,6 +139,7 @@ def cmd_run(args):
     # Set config path env for bot
     os.environ["UDZIALY_CONFIG"] = str(CONFIG_PATH)
     os.environ["PYTHONUNBUFFERED"] = "1"
+    os.environ["PYTHONIOENCODING"] = "utf-8"
 
     print()
     print("  Udziały Bot — uruchamianie...")
@@ -147,6 +148,12 @@ def cmd_run(args):
 
     # Import and run bot
     sys.path.insert(0, str(Path(__file__).parent))
+    # Fix Windows asyncio issues (ProactorEventLoop bugs with subprocess+SSL)
+    import platform
+    if platform.system() == "Windows":
+        import asyncio
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
     from bot.main import main as bot_main
     bot_main()
 
