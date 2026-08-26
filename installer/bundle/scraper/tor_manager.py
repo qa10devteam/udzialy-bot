@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Default Tor config
 TOR_SOCKS_PORT = 9050
 TOR_CONTROL_PORT = 9051
-TOR_CONTROL_PASSWORD = "udzialy_bot_tor"
+TOR_CONTROL_PASSWORD = "udzialy2026"
 TOR_SOCKS_HOST = "127.0.0.1"
 
 

@@ -38,11 +38,19 @@ echo.
 
 python\pythonw.exe launcher.pyw
 if errorlevel 1 (
-    echo Proba uruchomienia z konsola...
+    echo.
+    echo Launcher GUI nie uruchomil sie poprawnie.
+    echo Proba uruchomienia z konsola (pokaze bledy)...
+    echo.
     python\python.exe launcher.pyw
+    pause
+    exit /b 1
 )
 
 echo.
-echo Instalacja zakonczona!
-echo Uzyj start_bot.bat aby uruchomic bota.
+echo ============================================
+echo   Instalacja zakonczona pomyslnie!
+echo   Uzywaj skrotu "Bot Udzialy" na pulpicie.
+echo ============================================
+echo.
 pause

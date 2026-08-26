@@ -114,13 +114,13 @@ Section "-Post" SecPost
     
     ; --- Start Menu ---
     CreateDirectory "$SMPROGRAMS\Bot Udziały"
-    CreateShortCut "$SMPROGRAMS\Bot Udziały\Uruchom Bota.lnk" "$INSTDIR\launcher.pyw" "" "$INSTDIR\launcher.pyw" 0
+    CreateShortCut "$SMPROGRAMS\Bot Udziały\Uruchom Bota.lnk" "$INSTDIR\python\pythonw.exe" '"$INSTDIR\launcher.pyw"' "$INSTDIR\python\pythonw.exe" 0
     CreateShortCut "$SMPROGRAMS\Bot Udziały\Konfiguracja.lnk" "$INSTDIR\python\pythonw.exe" '"$INSTDIR\config_wizard.pyw"' "$INSTDIR\python\pythonw.exe" 0
     CreateShortCut "$SMPROGRAMS\Bot Udziały\Zatrzymaj.lnk" "$INSTDIR\stop_bot.bat" "" "$INSTDIR\stop_bot.bat" 0
     CreateShortCut "$SMPROGRAMS\Bot Udziały\Odinstaluj.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
     
     ; --- Desktop Shortcut ---
-    CreateShortCut "$DESKTOP\Bot Udziały.lnk" "$INSTDIR\launcher.pyw" "" "$INSTDIR\launcher.pyw" 0
+    CreateShortCut "$DESKTOP\Bot Udziały.lnk" "$INSTDIR\python\pythonw.exe" '"$INSTDIR\launcher.pyw"' "$INSTDIR\python\pythonw.exe" 0
     
     ; --- Uninstaller ---
     WriteUninstaller "$INSTDIR\uninstall.exe"

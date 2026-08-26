@@ -265,6 +265,7 @@ class ProcessManager:
         self._tor_proc = None
         self._bot_proc = None
         self._log_queue = queue.Queue()
+        self.log_queue = self._log_queue  # Public alias for Dashboard access
         self._stop_event = threading.Event()
         self._starting = False
         atexit.register(self.stop_all)  # Gap #7: atexit cleanup
@@ -310,12 +311,22 @@ class ProcessManager:
             self._log_queue.put(("ERROR", f"Nie znaleziono Tor: {TOR_PATH}"))
             return False
         try:
+            # Generate torrc with absolute DataDirectory to avoid CWD issues
+            tor_data_dir = os.path.join(SCRIPT_DIR, "tor", "data")
+            os.makedirs(tor_data_dir, exist_ok=True)
+            runtime_torrc = os.path.join(SCRIPT_DIR, "tor", "torrc_runtime")
+            with open(runtime_torrc, "w") as f:
+                f.write(f"SocksPort 9050\n")
+                f.write(f"ControlPort 9051\n")
+                f.write(f"HashedControlPassword 16:51220AED48F03CC560B040196B159C48309BAF28CF374709876DB24959\n")
+                f.write(f"DataDirectory {tor_data_dir}\n")
+
             self._tor_proc = subprocess.Popen(
-                [TOR_PATH, "-f", TORRC_PATH],
+                [TOR_PATH, "-f", runtime_torrc],
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 stdin=subprocess.DEVNULL,
                 creationflags=CREATE_NO_WINDOW,
-                cwd=os.path.dirname(TOR_PATH),
+                cwd=SCRIPT_DIR,
             )
             # Tor stdout reader
             threading.Thread(
@@ -822,7 +833,6 @@ class Dashboard(tk.Frame):
         super().__init__(master, bg=C_BG)
         self.pm = process_manager
         self.on_settings = on_settings
-        self._log_queue = queue.Queue()
         self._build_ui()
         self._poll_logs()
 
@@ -904,17 +914,33 @@ class Dashboard(tk.Frame):
         self.log_text.configure(state="disabled")
 
     def _poll_logs(self):
-        """Poll process manager for new log lines."""
+        """Poll process manager for new log lines (tuples: level, msg)."""
         if self.pm:
-            while not self.pm.log_queue.empty():
+            for _ in range(50):  # Max 50 per tick to avoid blocking UI
                 try:
-                    line = self.pm.log_queue.get_nowait()
+                    item = self.pm.log_queue.get_nowait()
+                    if isinstance(item, tuple) and len(item) == 2:
+                        level, msg = item
+                    else:
+                        level, msg = "INFO", str(item)
+
+                    # Handle status signals
+                    if level == "[STATUS]":
+                        if msg == "bot_started":
+                            self._on_started(True)
+                        elif msg == "tor_ready" or msg == "tor_already":
+                            self._log("Tor połączony", "success")
+                        continue
+
+                    # Map level to tag
                     tag = "info"
-                    if "ERROR" in line or "error" in line.lower():
+                    if level in ("ERROR",):
                         tag = "error"
-                    elif "INFO" in line and "Bot" in line:
+                    elif level in ("SUCCESS",):
+                        tag = "success"
+                    elif "BOT" in msg:
                         tag = "bot"
-                    self._log(line.strip(), tag)
+                    self._log(msg.strip(), tag)
                 except queue.Empty:
                     break
         self.after(100, self._poll_logs)
@@ -925,12 +951,7 @@ class Dashboard(tk.Frame):
         self.status_canvas.itemconfig(self.status_dot, fill="#eab308")  # Yellow
         self.status_label.configure(text="  Uruchamianie...")
         self.start_btn.configure(state="disabled")
-
-        def _do_start():
-            success = self.pm.start_all()
-            self.after(0, lambda: self._on_started(success))
-
-        threading.Thread(target=_do_start, daemon=True).start()
+        self.pm.start_all()  # Fires background thread, status via log_queue
 
     def _on_started(self, success):
         if success:
@@ -1030,7 +1051,8 @@ class Application:
 
     def _on_close(self):
         """Handle window close."""
-        if self.pm.is_running():
+        status = self.pm.is_running()
+        if status.get('bot') or status.get('tor'):
             if messagebox.askyesno("Zamknij", "Bot jest uruchomiony. Zatrzymać i zamknąć?"):
                 self.pm.stop_all()
                 self.root.destroy()
