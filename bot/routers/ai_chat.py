@@ -192,7 +192,7 @@ async def _call_claude(
             "content-type": "application/json",
         },
         json={
-            "model": llm_config.get("model", "claude-haiku-4-5-20251001") if isinstance(llm_config, dict) else getattr(llm_config, "model", "claude-haiku-4-5-20251001"),
+            "model": "claude-haiku-4-5-20251001",
             "max_tokens": 1024,
             "system": system,
             "messages": messages,
