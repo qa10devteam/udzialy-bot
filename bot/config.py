@@ -18,13 +18,31 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # --- Project root detection ---
 
 def _find_project_root() -> Path:
-    """Find project root by looking for config.yaml upward from this file."""
+    """Find project root by looking for config.yaml in standard locations."""
+    import os
+    
+    # 1. Environment variable (set by CLI)
+    env_config = os.environ.get("UDZIALY_CONFIG")
+    if env_config and Path(env_config).exists():
+        return Path(env_config).parent
+    
+    # 2. User home directory (~/.udzialy-bot/)
+    home_config = Path.home() / ".udzialy-bot"
+    if (home_config / "config.yaml").exists():
+        return home_config
+    
+    # 3. Relative to this file (development mode)
     current = Path(__file__).resolve().parent  # bot/
-    for parent in [current.parent, current.parent.parent, Path.cwd()]:
+    for parent in [current.parent, current.parent.parent]:
         if (parent / "config.yaml").exists():
             return parent
-    # Fallback: assume CWD is project root
-    return Path.cwd()
+    
+    # 4. CWD
+    if (Path.cwd() / "config.yaml").exists():
+        return Path.cwd()
+    
+    # Fallback: user home config dir (will be created by setup)
+    return home_config
 
 
 PROJECT_ROOT = _find_project_root()
@@ -138,6 +156,7 @@ class Settings(BaseSettings):
         env_prefix="UDZIALY_",
         env_nested_delimiter="__",
         case_sensitive=False,
+        extra="ignore",
     )
 
     telegram: TelegramConfig = TelegramConfig()

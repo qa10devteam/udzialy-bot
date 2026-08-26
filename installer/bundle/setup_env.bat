@@ -70,6 +70,10 @@ if not exist "!BASE!\python-3.11.9-amd64.exe" (
 )
 
 :: Run Python installer silently to local folder
+:: First: remove "Mark of the Web" (downloaded from internet block)
+powershell -Command "Unblock-File '!BASE!\python-3.11.9-amd64.exe'" 2>nul
+powershell -Command "Get-ChildItem '!BASE!' -Recurse | Unblock-File" 2>nul
+
 "!BASE!\python-3.11.9-amd64.exe" /quiet InstallAllUsers=0 TargetDir="!BASE!\python" Include_pip=1 Include_tcltk=1 Include_test=0 Include_doc=0 Include_launcher=0 AssociateFiles=0 Shortcuts=0 PrependPath=0 CompileAll=0
 
 :: Wait for installer to finish writing

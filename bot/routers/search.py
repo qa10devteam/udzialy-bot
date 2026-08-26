@@ -38,23 +38,42 @@ def _is_owner(user_id: int | None) -> bool:
 
 
 @router.message(CommandStart())
-async def cmd_start(message: Message) -> None:
-    """Handle /start command — welcome message and main menu."""
+async def cmd_start(message: Message, state: FSMContext) -> None:
+    """Handle /start command — conversational onboarding."""
     if not message.from_user or not _is_owner(message.from_user.id):
         await message.answer("⛔ Bot jest prywatny. Brak dostępu.")
         return
 
-    await message.answer(
-        "🏠 <b>Udziały Bot</b>\n\n"
-        "Witaj! Przeszukuję portale nieruchomości w poszukiwaniu "
-        "ofert sprzedaży udziałów w nieruchomościach.\n\n"
-        "🔍 <b>Szukaj</b> — rozpocznij wyszukiwanie\n"
-        "⚙️ <b>Filtry</b> — ustaw województwo, miasto, cenę\n"
-        "📋 <b>Zapisane</b> — przeglądaj zapisane ogłoszenia\n"
-        "❓ <b>Pomoc</b> — dostępne komendy\n\n"
-        "Użyj przycisków poniżej lub wpisz /search",
-        reply_markup=main_menu_keyboard(),
-    )
+    settings = get_settings()
+    has_ai = settings.llm.enabled and settings.llm.api_key
+
+    if has_ai:
+        await message.answer(
+            "👋 <b>Cześć! Jestem Udziały Bot.</b>\n\n"
+            "Przeszukuję 8 portali nieruchomości w poszukiwaniu "
+            "ofert sprzedaży udziałów — spadkowych, z licytacji, "
+            "od współwłaścicieli.\n\n"
+            "Napisz mi po prostu czego szukasz, np.:\n"
+            "• <i>\"Szukaj w Gdyni do 200 tysięcy\"</i>\n"
+            "• <i>\"Co nowego w Trójmieście?\"</i>\n"
+            "• <i>\"Pokaż najtańsze udziały\"</i>\n\n"
+            "Mogę też odpowiedzieć na pytania o udziały, "
+            "ryzyka zakupu, procedury prawne.\n\n"
+            "Od czego zaczynamy? 🏠",
+            reply_markup=main_menu_keyboard(),
+        )
+    else:
+        await message.answer(
+            "🏠 <b>Udziały Bot</b>\n\n"
+            "Przeszukuję portale nieruchomości w poszukiwaniu "
+            "ofert sprzedaży udziałów.\n\n"
+            "Komendy:\n"
+            "/search — szukaj udziałów\n"
+            "/filters — ustaw miasto i cenę\n"
+            "/saved — zapisane ogłoszenia\n"
+            "/help — pomoc",
+            reply_markup=main_menu_keyboard(),
+        )
 
 
 @router.message(Command("help"))
