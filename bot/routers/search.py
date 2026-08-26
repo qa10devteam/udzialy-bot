@@ -166,10 +166,43 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         )
         return
 
-    # Classify and rank results using smart scoring pipeline
+    # === STAGE 2: DEEP FETCH candidates ===
+    # Only deep-fetch listings that have SOME signal (score > 0)
+    from detector.scorer import PropertyShareScorer
+    scorer = PropertyShareScorer()
+    
+    candidates = []
+    noise = []
+    for listing in results:
+        r = scorer.score(listing.get("title", ""), listing.get("raw_description", ""))
+        listing["score"] = r.score
+        listing["is_share"] = r.is_share
+        listing["fraction_detected"] = r.fraction_detected
+        if r.score > 0:
+            candidates.append(listing)
+        else:
+            noise.append(listing)
+
+    if candidates:
+        try:
+            await progress_msg.edit_text(
+                f"🔬 <b>Deep scan: {len(candidates)} kandydatów...</b>\n\n"
+                f"Pobieram pełne opisy ogłoszeń\n"
+                f"(odrzucono {len(noise)} szumu)\n\n"
+                f"⏳ Proszę czekać...",
+            )
+        except Exception:
+            pass
+        
+        from scraper.deep_parser import deep_fetch_batch, rescore_with_deep_data
+        candidates = await deep_fetch_batch(candidates, max_concurrent=5)
+        candidates = rescore_with_deep_data(candidates)
+
+    # === STAGE 3: CLASSIFY + RANK ===
     from detector.ranking import classify_and_rank, format_summary, format_results_page as fmt_page
 
-    classified = classify_and_rank(results, min_score=25)
+    # Use candidates (deep-fetched + re-scored) for classification
+    classified = classify_and_rank(candidates, min_score=25)
 
     # Store classified results for pagination
     # Convert to serializable format for FSM
