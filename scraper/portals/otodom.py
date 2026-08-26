@@ -23,9 +23,11 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = "https://www.otodom.pl"
 SEARCH_URL_TEMPLATE = (
-    "https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/cala-polska?page={page}"
+    "https://www.otodom.pl/pl/wyniki/sprzedaz/mieszkanie/cala-polska"
+    "?page={page}&limit=72&by=DEFAULT&direction=DESC&viewType=listing"
+    "&description=udział"
 )
-MAX_PAGES = 2
+MAX_PAGES = 3
 
 
 class OtodomScraper(BaseScraper):
@@ -117,7 +119,7 @@ class OtodomScraper(BaseScraper):
             Tuple of (list_of_dicts, total_pages)
         """
         match = re.search(
-            r'<script\s+id="__NEXT_DATA__"\s+type="application/json">(.*?)</script>',
+            r'<script\s+id="__NEXT_DATA__"\s+type="application/json"[^>]*>(.*?)</script>',
             html,
             re.DOTALL,
         )
@@ -136,10 +138,13 @@ class OtodomScraper(BaseScraper):
 
         try:
             page_props = data["props"]["pageProps"]["data"]
-            search_ads = page_props.get("searchAds", [])
+            search_ads = page_props.get("searchAds", {})
 
-            # Get pagination info
-            pagination = page_props.get("pagination", {})
+            # Get pagination info — lives inside searchAds dict
+            if isinstance(search_ads, dict):
+                pagination = search_ads.get("pagination", {})
+            else:
+                pagination = page_props.get("pagination", {})
             total_pages = pagination.get("totalPages", 1)
 
             if isinstance(search_ads, dict):
@@ -202,8 +207,10 @@ class OtodomScraper(BaseScraper):
                     )
 
             # Area and rooms
-            area = item.get("areaInM2", item.get("area"))
-            rooms = item.get("roomsNumber", item.get("rooms"))
+            area = item.get("areaInSquareMeters", item.get("areaInM2", item.get("area")))
+            rooms_raw = item.get("roomsNumber", item.get("rooms"))
+            # roomsNumber may be a word like 'TWO', 'THREE' etc.
+            rooms = self._parse_rooms(rooms_raw)
 
             # Description (may be absent in list view)
             description = item.get("description", "") or title
@@ -223,6 +230,28 @@ class OtodomScraper(BaseScraper):
         except Exception as e:
             logger.warning(f"[Otodom] Error parsing item: {e}")
             return None
+
+    @staticmethod
+    def _parse_rooms(value) -> Optional[int]:
+        """Convert roomsNumber which may be int, str-digit, or word like 'TWO'."""
+        if value is None:
+            return None
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float):
+            return int(value)
+        if isinstance(value, str):
+            # Try numeric string first
+            if value.isdigit():
+                return int(value)
+            # Map English words to ints
+            word_map = {
+                "ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4,
+                "FIVE": 5, "SIX": 6, "SEVEN": 7, "EIGHT": 8,
+                "NINE": 9, "TEN": 10, "ELEVEN": 11, "TWELVE": 12,
+            }
+            return word_map.get(value.upper())
+        return None
 
     def _filter_by_keywords(
         self, listings: List[dict], keywords: List[str]

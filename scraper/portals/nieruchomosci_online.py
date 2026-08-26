@@ -78,12 +78,8 @@ class NieruchomosciOnlineScraper(BaseScraper):
         soup = BeautifulSoup(html, "html.parser")
         listings: List[RawListing] = []
         
-        # NieruchomosciOnline listing selectors
-        cards = soup.select(
-            ".tile-offer, .listing-item, "
-            "[data-type='offer'], .offer-box, "
-            ".column-container .offer"
-        )
+        # NieruchomosciOnline listing selectors (verified 2026-08)
+        cards = soup.select("div.tile")
         
         for card in cards:
             listing = self.parse_listing(str(card))
@@ -101,62 +97,41 @@ class NieruchomosciOnlineScraper(BaseScraper):
         
         soup = BeautifulSoup(html, "html.parser")
         
-        # Title
-        title_el = soup.select_one(
-            ".tile-offer__title, .offer-title, "
-            "h2 a, .listing-item__title, .name a"
-        )
+        # Title (verified 2026-08: h2.name a)
+        title_el = soup.select_one("h2.name a")
         title = title_el.get_text(strip=True) if title_el else None
         if not title:
             return None
         
         # URL
-        link_el = soup.select_one(
-            ".tile-offer__title a, a.offer-link, "
-            "h2 a[href], a[href*='nieruchomosci-online.pl']"
-        )
-        if not link_el:
-            link_el = soup.select_one("a[href]")
-        href = link_el.get("href", "") if link_el else ""
+        href = title_el.get("href", "") if title_el else ""
         source_url = urljoin(BASE_URL, href) if href else ""
         if not source_url:
             return None
         
-        # Price
-        price_el = soup.select_one(
-            ".tile-offer__price, .offer-price, "
-            ".price, .listing-item__price"
-        )
+        # Price (verified 2026-08: .primary-display span:first-child)
+        price_el = soup.select_one(".primary-display span:first-child")
         price_text = price_el.get_text(strip=True) if price_el else None
         price = self._parse_price(price_text)
         
-        # Location
-        location_el = soup.select_one(
-            ".tile-offer__location, .offer-location, "
-            ".location, .listing-item__location"
-        )
+        # Location (verified 2026-08: p.province)
+        location_el = soup.select_one("p.province")
         location = location_el.get_text(strip=True) if location_el else None
         
-        # Area
+        # Area (verified 2026-08: span.area)
         area = None
-        area_el = soup.select_one(
-            ".tile-offer__area, .offer-area, "
-            ".area, [data-param='area']"
-        )
+        area_el = soup.select_one("span.area")
         if area_el:
             area = self._parse_area(area_el.get_text(strip=True))
         
         # Rooms
         rooms = None
-        rooms_el = soup.select_one(
-            ".tile-offer__rooms, .offer-rooms, "
-            ".rooms, [data-param='rooms']"
-        )
+        rooms_el = soup.select_one("span.rooms, [data-param='rooms']")
         if rooms_el:
             rooms = self._parse_rooms(rooms_el.get_text(strip=True))
         
         # Thumbnail
-        img_el = soup.select_one("img.tile-offer__img, img.offer-img, img")
+        img_el = soup.select_one("img")
         thumbnail = None
         if img_el:
             thumbnail = img_el.get("data-src") or img_el.get("src")

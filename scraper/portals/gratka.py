@@ -31,7 +31,7 @@ class GratkaScraper(BaseScraper):
     """Gratka.pl real estate portal scraper."""
 
     def __init__(self, **kwargs):
-        super().__init__(stealth_layer=1, use_tor=False, **kwargs)
+        super().__init__(stealth_layer=3, use_tor=False, **kwargs)
 
     def get_portal_name(self) -> str:
         return "Gratka"

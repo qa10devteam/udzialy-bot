@@ -8,6 +8,7 @@ nodriver>=0.35
 patchright>=1.43
 stem>=1.8.2
 PySocks>=1.7.1
+brotli>=1.1.0
 beautifulsoup4>=4.12.0
 pydantic>=2.7.0
 pydantic-settings>=2.3.0

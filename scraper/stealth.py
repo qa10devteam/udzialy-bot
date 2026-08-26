@@ -49,10 +49,17 @@ def _is_blocked(html: str, status_code: int = 200) -> bool:
     if not html:
         return True
     html_lower = html.lower()
-    # Short responses with block keywords are suspect
+
+    # Hard block indicators — flag regardless of page length
+    # Only match when it's clearly a block PAGE (in title), not a passive JS snippet
+    if "<title>just a moment</title>" in html_lower:
+        return True
+    if "verify you are human" in html_lower and len(html) < 50000:
+        return True
+
     for pattern in BLOCK_PATTERNS:
         if pattern in html_lower:
-            # Only flag if page is suspiciously short (block page)
+            # Only flag if page is suspiciously short (real block page)
             if len(html) < 15000:
                 return True
     return False
@@ -157,7 +164,6 @@ async def _layer4_primp(url: str, proxy: Optional[str] = None, timeout: float = 
             client = primp.Client(
                 impersonate="chrome_131",
                 timeout=timeout,
-                proxy=proxy,
                 follow_redirects=True,
             )
             return client.get(url)

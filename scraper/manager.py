@@ -36,7 +36,8 @@ class ScraperManager:
 
     # Main verified portals (Gratka removed: same Ringier Axel Springer DB as Morizon)
     # otodom uses nodriver Layer 5, no Tor
-    MAIN_PORTALS = ["otodom", "morizon", "domiporta", "olx"]
+    # szybko/trojmiasto removed: CF blocked from datacenter, not bypassable
+    MAIN_PORTALS = ["otodom", "morizon", "domiporta", "olx", "nieruchomosci_online"]
 
     def __init__(
         self,
@@ -97,6 +98,9 @@ class ScraperManager:
             elif portal_name == "olx":
                 from scraper.portals.olx import OlxScraper
                 scrapers.append(OlxScraper(use_tor=True))
+            elif portal_name == "nieruchomosci_online":
+                from scraper.portals.nieruchomosci_online import NieruchomosciOnlineScraper
+                scrapers.append(NieruchomosciOnlineScraper())
             else:
                 logger.warning(f"Unknown portal: {portal_name}, skipping")
 
