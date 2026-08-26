@@ -153,6 +153,7 @@ async def call_ai(
     filters_info: str,
     provider: str,
     api_key: str,
+    model: str = "",
 ) -> AIResponse:
     """Call LLM with conversation history and tools."""
     if not api_key:
@@ -160,12 +161,22 @@ async def call_ai(
 
     system = SYSTEM_PROMPT.format(filters_info=filters_info or "brak (szukam wszędzie)")
 
+    # Default models per provider
+    if not model:
+        model = {
+            "claude": "claude-haiku-4-5-20251001",
+            "openai": "gpt-4o-mini",
+            "deepseek": "deepseek-chat",
+            "gemini": "gemini-2.0-flash",
+            "ollama": "llama3",
+        }.get(provider, "gpt-4o-mini")
+
     try:
         async with httpx.AsyncClient(timeout=30.0, limits=httpx.Limits(max_connections=10)) as client:
             if provider == "claude":
-                return await _call_claude(client, system, history, user_message, api_key)
+                return await _call_claude(client, system, history, user_message, api_key, model)
             elif provider in ("openai", "deepseek"):
-                return await _call_openai(client, system, history, user_message, api_key, provider)
+                return await _call_openai(client, system, history, user_message, api_key, provider, model)
             else:
                 # Fallback: simple completion without tools
                 return await _call_simple(client, system, history, user_message, api_key, provider)
@@ -180,6 +191,7 @@ async def _call_claude(
     history: List[Dict[str, str]],
     user_message: str,
     api_key: str,
+    model: str = "claude-haiku-4-5-20251001",
 ) -> AIResponse:
     """Call Claude with tool use."""
     messages = [*history, {"role": "user", "content": user_message}]
@@ -192,7 +204,7 @@ async def _call_claude(
             "content-type": "application/json",
         },
         json={
-            "model": "claude-haiku-4-5-20251001",
+            "model": model,
             "max_tokens": 1024,
             "system": system,
             "messages": messages,
@@ -226,10 +238,10 @@ async def _call_openai(
     user_message: str,
     api_key: str,
     provider: str,
+    model: str = "gpt-4o-mini",
 ) -> AIResponse:
     """Call OpenAI/DeepSeek with function calling."""
     base_url = "https://api.deepseek.com/v1" if provider == "deepseek" else "https://api.openai.com/v1"
-    model = "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini"
 
     # Convert tools to OpenAI format
     functions = [
@@ -483,6 +495,7 @@ async def handle_ai_chat(message: Message, state: FSMContext) -> None:
             filters_info=filters_info,
             provider=llm_config.provider,
             api_key=llm_config.api_key,
+            model=getattr(llm_config, "model", ""),
         )
 
         if ai_response.error:
