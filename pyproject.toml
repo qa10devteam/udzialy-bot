@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "udzialy-bot"
-version = "2.6.0"
+version = "3.0.0"
 description = "Bot do wyszukiwania ogłoszeń sprzedaży udziałów w nieruchomościach"
 readme = "README.md"
 license = {text = "MIT"}
@@ -47,7 +47,7 @@ udzialy = "udzialy_cli:main"
 udzialy-gui = "launcher:main"
 
 [tool.setuptools.packages.find]
-include = ["bot*", "scraper*", "detector*", "storage*", "geo*"]
+include = ["bot*", "scraper*", "detector*", "storage*", "geo*", "data*"]
 
 [tool.setuptools]
 py-modules = ["udzialy_cli", "launcher"]
