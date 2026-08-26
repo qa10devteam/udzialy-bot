@@ -142,7 +142,11 @@ async def _layer3_curl_cffi(url: str, proxy: Optional[str] = None, timeout: floa
             if _is_blocked(response.text, response.status_code):
                 logger.info(f"Layer 3 blocked for {url} (status={response.status_code})")
                 return None
-            return response.text
+            # Cap response to 5MB to prevent memory issues
+            text = response.text
+            if len(text) > 5_000_000:
+                text = text[:5_000_000]
+            return text
     except Exception as e:
         logger.warning(f"Layer 3 error for {url}: {e}")
         return None

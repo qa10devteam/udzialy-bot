@@ -164,12 +164,20 @@ class ScraperManager:
 
         # Collect all listings
         all_listings: List[dict] = []
+        failed_portals: List[str] = []
         for portal_name, listings, error in results:
             if listings:
                 all_listings.extend(listings)
                 logger.info(f"Portal {portal_name}: {len(listings)} results")
             elif error:
+                failed_portals.append(f"{portal_name} ({error})")
                 logger.warning(f"Portal {portal_name}: {error}")
+
+        if failed_portals and not all_listings:
+            logger.error(
+                f"ALL portals failed: {failed_portals}. "
+                "Check: internet connection, firewall, antivirus blocking python.exe"
+            )
 
         # Deduplicate by URL
         deduplicated = self._deduplicate_by_url(all_listings)

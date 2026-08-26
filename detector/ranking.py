@@ -390,7 +390,7 @@ def format_listing_card(listing: ClassifiedListing, index: int = 1) -> str:
     if meta:
         parts.append(f"📍 {' • '.join(meta)}")
     
-    parts.append(f"🔗 <a href=\"{listing.url}\">Otwórz ogłoszenie</a>")
+    parts.append(f"🔗 <a href=\"{listing.url}\">Otwórz ogłoszenie</a> (live)")
     
     return "\n".join(parts)
 

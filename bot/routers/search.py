@@ -18,7 +18,8 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from bot.config import get_settings
+from bot.config import get_settings, PROJECT_ROOT
+import json
 from bot.keyboards.inline import build_search_progress_keyboard, build_results_keyboard
 from bot.keyboards.reply import main_menu_keyboard
 
@@ -43,6 +44,9 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
     if not message.from_user or not _is_owner(message.from_user.id):
         await message.answer("⛔ Bot jest prywatny. Brak dostępu.")
         return
+
+    # Reset state on fresh start
+    await state.clear()
 
     settings = get_settings()
     has_ai = settings.llm.enabled and settings.llm.api_key
@@ -117,6 +121,14 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         await message.answer("⏳ Wyszukiwanie już trwa, poczekaj na wyniki...")
         return
     await state.update_data(_search_running=True)
+
+    # Persist filters for restart recovery
+    try:
+        filters_file = PROJECT_ROOT / "filters.json"
+        filter_data = {k: v for k, v in data_pre.items() if k.startswith("filter_")}
+        filters_file.write_text(json.dumps(filter_data, ensure_ascii=False))
+    except Exception:
+        pass
 
     settings = get_settings()
 
@@ -211,14 +223,14 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
     # Use candidates (deep-fetched + re-scored) for classification
     classified = classify_and_rank(candidates, min_score=25)
 
-    # Store classified results for pagination
-    # Convert to serializable format for FSM
+    # Store classified results for pagination (compact: no raw HTML/descriptions)
     await state.update_data(
         classified_results=[{
-            "raw": c.raw, "score": c.score, "tier": c.tier.value,
+            "score": c.score, "tier": c.tier.value,
             "source": c.source.value, "property_type": c.property_type.value,
             "fraction": c.fraction, "attractiveness": c.attractiveness,
-            "url": c.url, "title": c.title, "price": c.price,
+            "url": c.url, "title": c.title[:80], "price": c.price,
+            "city": c.city, "portal": c.portal,
         } for c in classified],
         classified_page=0,
     )
@@ -259,8 +271,11 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         f"across {len(enabled)} portals"
     )
 
-    # Release search lock
-    await state.update_data(_search_running=False)
+    # Release search lock (also handles cancellation)
+    try:
+        await state.update_data(_search_running=False)
+    except Exception:
+        pass
 
 
 @router.callback_query(F.data == "search_cancel")

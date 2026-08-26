@@ -15,7 +15,7 @@ Config: start_layer=3, use_tor=True, tor_proxy=socks5://127.0.0.1:9050
 import logging
 import re
 from typing import Any, Dict, List, Optional
-from urllib.parse import quote_plus, urljoin
+from urllib.parse import quote_plus, urljoin, quote
 
 from bs4 import BeautifulSoup
 
@@ -92,7 +92,12 @@ class OlxScraper(BaseScraper):
         listings: List[dict] = []
 
         # Strategy 1: [data-testid=ad-card-title] a — verified primary selector
-        title_links = soup.select("[data-testid='ad-card-title'] a")
+        # Multiple selectors for resilience against portal CSS changes
+        title_links = (
+            soup.select("[data-testid='ad-card-title'] a") or
+            soup.select("h6 a[href*='/d/oferta/']") or
+            soup.select(".css-rc5s2u a, .css-1bbgabe a")
+        )
         
         if title_links:
             for link in title_links:
