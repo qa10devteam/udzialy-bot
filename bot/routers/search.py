@@ -166,33 +166,58 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         )
         return
 
-    # Run LLM analysis if enabled and configured
-    if settings.llm.enabled and settings.llm.api_key:
+    # Classify and rank results using smart scoring pipeline
+    from detector.ranking import classify_and_rank, format_summary, format_results_page as fmt_page
+
+    classified = classify_and_rank(results, min_score=25)
+
+    # Store classified results for pagination
+    # Convert to serializable format for FSM
+    await state.update_data(
+        classified_results=[{
+            "raw": c.raw, "score": c.score, "tier": c.tier.value,
+            "source": c.source.value, "property_type": c.property_type.value,
+            "fraction": c.fraction, "attractiveness": c.attractiveness,
+            "url": c.url, "title": c.title, "price": c.price,
+        } for c in classified],
+        classified_page=0,
+    )
+
+    # Run LLM analysis on top tier if enabled
+    if settings.llm.enabled and settings.llm.api_key and classified:
         try:
             await progress_msg.edit_text(
-                f"🤖 <b>Analizuję {len(results)} ofert...</b>\n\n"
-                f"Uruchamiam AI do oceny atrakcyjności.\n"
+                f"🤖 <b>Analizuję {len(classified)} udziałów z AI...</b>\n\n"
                 f"⏳ Proszę czekać...",
             )
         except Exception:
             pass
         results = await _run_llm_analysis(results)
-        # Re-store with analysis data
-        await state.update_data(search_results=results)
 
-    # Show first page of results
-    page_size = 5
-    total_pages = (len(results) + page_size - 1) // page_size
-    page_results = results[:page_size]
+    # Show summary + first page
+    summary = format_summary(classified)
+    
+    if classified:
+        page_text, total_pages = fmt_page(classified, page=0, page_size=5)
+        full_text = f"{summary}\n\n{'─' * 30}\n\n{page_text}"
+    else:
+        full_text = (
+            f"🔍 Przeszukano {len(enabled)} portali, znaleziono {len(results)} ogłoszeń.\n\n"
+            f"📭 Żadne nie wygląda na prawdziwy udział w nieruchomości.\n"
+            f"Spróbuj rozszerzyć filtry lub poczekaj — nowe ogłoszenia pojawiają się codziennie."
+        )
+        total_pages = 1
 
-    text = _format_results_page(page_results, 0, total_pages, len(results))
     await progress_msg.edit_text(
-        text,
-        reply_markup=build_results_keyboard(0, total_pages, page_results),
+        full_text,
+        reply_markup=build_results_keyboard(0, total_pages, results[:5] if results else []),
         disable_web_page_preview=True,
     )
 
-    logger.info(f"Search completed: {len(results)} listings found across {len(enabled)} portals")
+    logger.info(
+        f"Search completed: {len(results)} raw → {len(classified)} classified shares "
+        f"across {len(enabled)} portals"
+    )
 
 
 @router.callback_query(F.data == "search_cancel")
