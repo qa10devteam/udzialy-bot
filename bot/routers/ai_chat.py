@@ -23,7 +23,7 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from bot.config import get_settings
+from bot.config import CLAUDE_DEFAULT_MODEL, get_settings, normalize_llm_model
 
 logger = logging.getLogger(__name__)
 
@@ -161,15 +161,8 @@ async def call_ai(
 
     system = SYSTEM_PROMPT.format(filters_info=filters_info or "brak (szukam wszędzie)")
 
-    # Default models per provider
-    if not model:
-        model = {
-            "claude": "claude-haiku-4-5-20251001",
-            "openai": "gpt-4o-mini",
-            "deepseek": "deepseek-chat",
-            "gemini": "gemini-2.0-flash",
-            "ollama": "llama3",
-        }.get(provider, "gpt-4o-mini")
+    # Default models per provider (Claude → claude-sonnet-4-6); also upgrades superseded defaults
+    model = normalize_llm_model(provider, model)
 
     try:
         async with httpx.AsyncClient(timeout=30.0, limits=httpx.Limits(max_connections=10)) as client:
@@ -191,7 +184,7 @@ async def _call_claude(
     history: List[Dict[str, str]],
     user_message: str,
     api_key: str,
-    model: str = "claude-haiku-4-5-20251001",
+    model: str = CLAUDE_DEFAULT_MODEL,
 ) -> AIResponse:
     """Call Claude with tool use."""
     messages = [*history, {"role": "user", "content": user_message}]
@@ -213,7 +206,7 @@ async def _call_claude(
     )
 
     if response.status_code != 200:
-        logger.warning(f"Gemini API error {response.status_code}")
+        logger.warning(f"Claude API error {response.status_code}: {response.text[:300]}")
         return AIResponse(error=f"API error {response.status_code}")
 
     data = response.json()

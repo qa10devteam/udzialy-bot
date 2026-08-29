@@ -128,10 +128,42 @@ class DatabaseConfig(BaseModel):
     path: str = "data/udzialy.db"
 
 
+# --- LLM model defaults (single source of truth for setup, AI chat and analysis) ---
+
+# Claude default: Sonnet 4.6. Exact Anthropic model ID — no date suffix.
+CLAUDE_DEFAULT_MODEL = "claude-sonnet-4-6"
+
+DEFAULT_LLM_MODELS: Dict[str, str] = {
+    "claude": CLAUDE_DEFAULT_MODEL,
+    "anthropic": CLAUDE_DEFAULT_MODEL,
+    "openai": "gpt-4o-mini",
+    "gemini": "gemini-2.0-flash",
+    "deepseek": "deepseek-chat",
+    "ollama": "llama3",
+}
+
+# Models that earlier versions wrote into config.yaml as the *default* for Claude.
+# A config still carrying one of these gets the current default at load time.
+SUPERSEDED_CLAUDE_DEFAULTS = {"claude-haiku-4-5-20251001", "claude-haiku-4-5"}
+
+
+def default_model_for(provider: str) -> str:
+    """Default model ID for a provider name as used in config.yaml."""
+    return DEFAULT_LLM_MODELS.get((provider or "openai").lower(), "gpt-4o-mini")
+
+
+def normalize_llm_model(provider: str, model: str | None) -> str:
+    """Resolve empty/superseded defaults to the current default for the provider."""
+    prov = (provider or "openai").lower()
+    if prov in ("claude", "anthropic") and (not model or model in SUPERSEDED_CLAUDE_DEFAULTS):
+        return CLAUDE_DEFAULT_MODEL
+    return model or default_model_for(prov)
+
+
 class LLMConfig(BaseModel):
     """LLM analysis settings (optional)."""
     enabled: bool = False
-    provider: str = "openai"  # openai, anthropic, local
+    provider: str = "openai"  # openai, claude/anthropic, gemini, deepseek, ollama
     api_key: str = ""
     model: str = "gpt-4o-mini"
     base_url: str = "https://api.openai.com/v1"
@@ -170,6 +202,9 @@ class Settings(BaseSettings):
             if "token" in data["telegram"]:
                 data["telegram"]["token"] = str(data["telegram"]["token"]).strip()
         super().__init__(**data)
+        # Resolve empty / superseded default model IDs (e.g. configs written by
+        # older `udzialy setup` with the previous Claude default).
+        self.llm.model = normalize_llm_model(self.llm.provider, self.llm.model)
     portals: PortalsConfig = PortalsConfig()
     scraping: ScrapingConfig = ScrapingConfig()
     tor: TorConfig = TorConfig()

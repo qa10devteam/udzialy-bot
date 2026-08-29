@@ -79,10 +79,19 @@ def cmd_setup(args):
         owner_id = int(input("  Twoje ID Telegram (z @userinfobot): ").strip() or "0")
 
     # LLM (optional)
+    sys.path.insert(0, str(Path(__file__).parent))
+    from bot.config import default_model_for, normalize_llm_model
+
+    existing_llm = config.get("llm", {}) or {}
+    existing_key = existing_llm.get("api_key", "") or ""
     print()
     print("  [Opcjonalnie] Klucz API do analizy AI:")
-    print("  (Enter = pomiń, bot działa bez AI)")
-    llm_key = input("  API key: ").strip()
+    if existing_key:
+        print(f"  Obecny klucz: ...{existing_key[-6:]}  (Enter = zostaw)")
+        llm_key = input("  API key: ").strip() or existing_key
+    else:
+        print("  (Enter = pomiń, bot działa bez AI)")
+        llm_key = input("  API key: ").strip()
     llm_provider = "openai"
     llm_model = ""
     if llm_key:
@@ -95,18 +104,13 @@ def cmd_setup(args):
         providers = {"1": "claude", "2": "openai", "3": "gemini", "4": "deepseek"}
         llm_provider = providers.get(choice, "claude")
 
-        # Set default model per provider
-        default_models = {
-            "claude": "claude-haiku-4-5-20251001",
-            "openai": "gpt-4o-mini",
-            "gemini": "gemini-2.0-flash",
-            "deepseek": "deepseek-chat",
-        }
-        llm_model = default_models.get(llm_provider, "gpt-4o-mini")
+        # Default model per provider (Claude → claude-sonnet-4-6)
+        llm_model = default_model_for(llm_provider)
         print(f"  Model: {llm_model}")
         custom = input("  Inny model? (Enter = domyślny): ").strip()
         if custom:
             llm_model = custom
+        llm_model = normalize_llm_model(llm_provider, llm_model)
 
     # Save config
     config = {

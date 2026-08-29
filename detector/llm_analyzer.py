@@ -263,6 +263,7 @@ COST_PER_1M: Dict[str, tuple[float, float]] = {
     "gemini-3.7-flash": (0.75, 3.75),
     "gemini-3.5-flash-lite": (0.30, 2.50),
     "claude-haiku-4-5": (1.00, 5.00),
+    "claude-sonnet-4-6": (3.00, 15.00),
     "claude-sonnet-5": (2.00, 10.00),
 }
 

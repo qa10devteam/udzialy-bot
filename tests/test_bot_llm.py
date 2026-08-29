@@ -31,7 +31,7 @@ def _enable_llm(settings, monkeypatch):
     settings.llm.enabled = True
     settings.llm.api_key = "sk-test"
     settings.llm.provider = "claude"
-    settings.llm.model = "claude-haiku-4-5-20251001"
+    settings.llm.model = "claude-sonnet-4-6"
 
 
 def _fake_result(**over) -> AnalysisResult:
@@ -128,7 +128,7 @@ async def test_provider_name_is_passed_to_analyzer_factory(fsm, settings, stub_p
     monkeypatch.setattr("detector.llm_analyzer.create_analyzer_from_config", factory)
     await search_mod.cmd_search(FakeMessage(), fsm)
     assert seen["providers"][0]["name"] == "anthropic"
-    assert seen["providers"][0]["model"] == "claude-haiku-4-5-20251001"
+    assert seen["providers"][0]["model"] == "claude-sonnet-4-6"
 
 
 # --- failure isolation ------------------------------------------------------
