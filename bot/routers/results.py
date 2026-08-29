@@ -23,6 +23,8 @@ router = Router(name="results")
 
 PAGE_SIZE = 5
 
+TIER_ICONS = {"pewny": "🔥", "prawdopodobny": "⭐", "mozliwy": "❓"}
+
 
 # --- Pagination handler ---
 
@@ -101,13 +103,36 @@ async def handle_listing_save(callback: CallbackQuery, state: FSMContext) -> Non
         db = DatabaseManager(settings.database.path)
         await db.initialize()
 
-        # Save the listing
+        # Make sure the listing row exists (saved_listings.listing_id → listings.id)
         await db.execute(
             """
-            INSERT OR IGNORE INTO saved_listings (listing_id, notes, saved_at)
-            VALUES (?, ?, datetime('now'))
+            INSERT OR IGNORE INTO listings
+                (id, source, url, title, description, price, area, city, voivodeship,
+                 score, is_share, fraction)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
             """,
-            (listing_id, listing.get("title", "")),
+            (
+                listing_id,
+                listing.get("source") or "unknown",
+                listing.get("url") or f"local://{listing_id}",
+                listing.get("title", "Bez tytułu"),
+                (listing.get("description") or "")[:2000],
+                listing.get("price"),
+                listing.get("area"),
+                listing.get("city") or None,
+                listing.get("voivodeship") or None,
+                int(listing.get("score", 0) or 0),
+                listing.get("fraction") or None,
+            ),
+        )
+        # Save the listing (once)
+        await db.execute(
+            """
+            INSERT INTO saved_listings (listing_id, notes, saved_at)
+            SELECT ?, ?, datetime('now')
+            WHERE NOT EXISTS (SELECT 1 FROM saved_listings WHERE listing_id = ?)
+            """,
+            (listing_id, listing.get("title", ""), listing_id),
         )
         await db.commit()
         await db.close()
@@ -217,13 +242,22 @@ def _format_results_page(
             if url:
                 line += f'   🔗 <a href="{url}">Link</a>'
         else:
-            # Basic format (no LLM)
+            # Basic format (no LLM): tier icon + score + fraction + portal
             source = listing.get("source", "")
             score = listing.get("score", 0)
+            tier_icon = TIER_ICONS.get(listing.get("tier", ""), "")
+            fraction = listing.get("fraction", "")
+            share_source = listing.get("share_source", "")
+            meta = f"📊 {score}/100"
+            if fraction:
+                meta += f" | 📐 {fraction}"
+            if share_source and share_source not in ("inne", "nieznane"):
+                meta += f" | {share_source}"
+            meta += f" | 🏷️ {source}"
             line = (
-                f"<b>{i}.</b> {title}\n"
-                f"   💰 {price_str} | 📍 {city}\n"
-                f"   📊 {score}/100 | 🏷️ {source}"
+                f"<b>{i}.</b> {tier_icon} {title}\n"
+                f"   💰 {price_str} | 📍 {city or '—'}\n"
+                f"   {meta}"
             )
             if url:
                 line += f'\n   🔗 <a href="{url}">Link</a>'
@@ -249,8 +283,9 @@ def _format_listing_detail(listing: Dict[str, Any]) -> str:
     price_str = f"{price:,.0f} PLN" if price else "—"
     area_str = f"{area} m²" if area else "—"
 
+    tier_icon = TIER_ICONS.get(listing.get("tier", ""), "🏠")
     text = (
-        f"🏠 <b>{title}</b>\n\n"
+        f"{tier_icon} <b>{title}</b>\n\n"
         f"💰 Cena: {price_str}\n"
         f"📍 Lokalizacja: {city}, {voivodeship}\n"
         f"📐 Powierzchnia: {area_str}\n"

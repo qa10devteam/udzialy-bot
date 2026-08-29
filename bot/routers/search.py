@@ -19,6 +19,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from bot.config import get_settings, PROJECT_ROOT
+from scraper.manager import ScraperManager
 import json
 from bot.keyboards.inline import build_search_progress_keyboard, build_results_keyboard
 from bot.keyboards.reply import main_menu_keyboard
@@ -65,7 +66,7 @@ async def cmd_start(message: Message, state: FSMContext) -> None:
     if has_ai:
         await message.answer(
             "👋 <b>Cześć! Jestem Udziały Bot.</b>\n\n"
-            "Przeszukuję 8 portali nieruchomości w poszukiwaniu "
+            f"Przeszukuję {len(ScraperManager.MAIN_PORTALS)} portali nieruchomości w poszukiwaniu "
             "ofert sprzedaży udziałów — spadkowych, z licytacji, "
             "od współwłaścicieli.\n\n"
             "Napisz mi po prostu czego szukasz, np.:\n"
@@ -116,16 +117,24 @@ async def cmd_help(message: Message) -> None:
 @router.message(F.text == "🔍 Szukaj")
 async def cmd_search(message: Message, state: FSMContext) -> None:
     """
-    Handle /search command and 🔍 button — initiate scraping.
+    Handle /search command and 🔍 button — run the 3-stage pipeline.
 
     1. Send 'Szukam...' message
-    2. Call ScraperManager.search_all() with active filters
-    3. Update message with progress
-    4. Show results with pagination
+    2. run_search_pipeline(): scan portals → deep fetch → classify & rank
+    3. Optional LLM analysis of the ranked shares
+    4. Store ONE list (`search_results`) used by page 1, pagination, save and detail
     """
     if not message.from_user or not _is_owner(message.from_user.id):
         return
+    await start_search(message, state)
 
+
+async def start_search(message: Message, state: FSMContext) -> None:
+    """Run a search in `message`'s chat. Caller has already checked ownership.
+
+    Used by /search, the 🔍 button, the AI tool call and the "search with filters"
+    inline button (whose `callback.message.from_user` is the bot, not the owner).
+    """
     # Prevent concurrent searches
     data_pre: Dict[str, Any] = await state.get_data()
     if data_pre.get("_search_running"):
@@ -133,20 +142,149 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         return
     await state.update_data(_search_running=True)
 
+    try:
+        await _do_search(message, state, data_pre)
+    finally:
+        # Always release the lock — error, empty result and cancel included.
+        try:
+            await state.update_data(_search_running=False)
+        except Exception:
+            pass
+
+
+async def _do_search(message: Message, state: FSMContext, data: Dict[str, Any]) -> None:
+    """Body of cmd_search (separated so the lock release lives in one finally)."""
+    from scraper.pipeline import run_search_pipeline, select_portals
+
+    settings = get_settings()
+
     # Persist filters for restart recovery
     try:
         filters_file = PROJECT_ROOT / "filters.json"
-        filter_data = {k: v for k, v in data_pre.items() if k.startswith("filter_")}
+        filter_data = {k: v for k, v in data.items() if k.startswith("filter_")}
         filters_file.write_text(json.dumps(filter_data, ensure_ascii=False))
     except Exception:
         pass
 
-    settings = get_settings()
+    filters = _build_filters(data)
+    filters_info = _format_active_filters(data)
+    portals = select_portals(settings.portals.enabled_portals())
 
-    # Get current filters from FSM state
-    data: Dict[str, Any] = await state.get_data()
+    progress_msg = await message.answer(
+        f"🔍 <b>Szukam...</b>\n\n"
+        f"Portale: {len(portals)}\n"
+        f"{filters_info}\n\n"
+        f"⏳ Proszę czekać...",
+        reply_markup=build_search_progress_keyboard(),
+    )
 
-    # Build filters dict for scraper
+    async def _edit(text: str) -> None:
+        try:
+            await progress_msg.edit_text(text)
+        except Exception:
+            pass  # rate limit / not modified — cosmetic only
+
+    async def _progress(stage: str, d: Dict[str, Any]) -> None:
+        if stage == "portal":
+            icon = "✅" if d["status"] == "done" else "⚠️"
+            await _edit(
+                f"🔍 <b>Szukam...</b>\n\n"
+                f"{icon} {d['portal']}: {d['status']} ({d['count']})\n"
+                f"Postęp: {d['done']}/{d['total']} portali\n\n"
+                f"⏳ Proszę czekać..."
+            )
+        elif stage == "deep":
+            await _edit(
+                f"🔬 <b>Deep scan: {d['candidates']} kandydatów...</b>\n\n"
+                f"Pobieram pełne opisy ogłoszeń\n"
+                f"(odrzucono {d['noise']} szumu)\n\n"
+                f"⏳ Proszę czekać..."
+            )
+
+    try:
+        result = await run_search_pipeline(
+            filters=filters,
+            portals=portals,
+            timeout_per_portal=float(settings.scraping.portal_timeout),
+            progress=_progress,
+        )
+    except Exception as e:
+        logger.error(f"Search failed: {e}", exc_info=True)
+        await _edit(
+            f"❌ <b>Błąd wyszukiwania</b>\n\n"
+            f"Szczegóły: {str(e)[:200]}\n\n"
+            f"Spróbuj ponownie za chwilę."
+        )
+        return
+
+    display = result.display
+
+    # Optional LLM analysis — only on the ranked shares, never on raw noise
+    if settings.llm.enabled and settings.llm.api_key and display:
+        await _edit(
+            f"🤖 <b>Analizuję {min(len(display), MAX_LLM_ANALYZED)} udziałów z AI...</b>\n\n"
+            f"⏳ Proszę czekać..."
+        )
+        display = await _run_llm_analysis(display)
+
+    # ONE source of truth for page 1, pagination, save and detail
+    await state.update_data(
+        search_results=display,
+        search_page=0,
+        search_stats={
+            "raw": result.raw_count,
+            "candidates": result.candidates_count,
+            "portals": result.portal_status,
+        },
+    )
+
+    if not display:
+        failed = [p for p, st in result.portal_status.items() if st["status"] != "done"]
+        hint = f"\n⚠️ Portale bez odpowiedzi: {', '.join(failed)}" if failed else ""
+        if result.raw_count == 0:
+            await _edit(
+                f"📭 <b>Brak wyników</b>\n\n"
+                f"Przeszukano portali: {len(portals)}\n"
+                f"{filters_info}{hint}\n\n"
+                f"Spróbuj zmienić filtry (/filters) i wyszukaj ponownie."
+            )
+        else:
+            await _edit(
+                f"🔍 Przeszukano {len(portals)} portali, znaleziono {result.raw_count} ogłoszeń.\n\n"
+                f"📭 Żadne nie wygląda na prawdziwy udział w nieruchomości.{hint}\n"
+                f"Spróbuj rozszerzyć filtry lub poczekaj — nowe ogłoszenia pojawiają się codziennie."
+            )
+        return
+
+    from bot.routers.results import PAGE_SIZE, _format_results_page
+    from detector.ranking import format_summary
+
+    total_pages = (len(display) + PAGE_SIZE - 1) // PAGE_SIZE
+    page_text = _format_results_page(display[:PAGE_SIZE], 0, total_pages, len(display))
+    full_text = f"{format_summary(result.classified)}\n\n{'─' * 30}\n\n{page_text}"
+
+    try:
+        await progress_msg.edit_text(
+            full_text,
+            reply_markup=build_results_keyboard(0, total_pages, display[:PAGE_SIZE]),
+            disable_web_page_preview=True,
+        )
+    except Exception as e:
+        logger.warning(f"Could not edit progress message ({e}); sending new one")
+        await message.answer(
+            full_text,
+            reply_markup=build_results_keyboard(0, total_pages, display[:PAGE_SIZE]),
+            disable_web_page_preview=True,
+        )
+
+    logger.info(
+        f"Search completed: {result.raw_count} raw → {result.candidates_count} candidates → "
+        f"{len(display)} shares across {len(portals)} portals"
+    )
+
+
+def _build_filters(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Translate FSM filter_* keys into the scraper filters dict."""
     filters: Dict[str, Any] = {}
     if voiv := data.get("filter_voivodeship"):
         filters["voivodeship"] = voiv
@@ -158,230 +296,39 @@ async def cmd_search(message: Message, state: FSMContext) -> None:
         filters["price_min"] = price_min
     if price_max := data.get("filter_price_max"):
         filters["price_max"] = price_max
+    return filters
 
-    filters_info = _format_active_filters(data)
-    enabled = settings.portals.enabled_portals()
 
-    # Send initial progress message
-    progress_msg = await message.answer(
-        f"🔍 <b>Szukam...</b>\n\n"
-        f"Portale: {len(enabled)}\n"
-        f"{filters_info}\n\n"
-        f"⏳ Proszę czekać...",
-        reply_markup=build_search_progress_keyboard(),
-    )
-
-    # Run the scraper
-    results: List[Dict[str, Any]] = []
-    try:
-        results = await _run_search(enabled, filters, progress_msg)
-    except Exception as e:
-        logger.error(f"Search failed: {e}", exc_info=True)
-        await progress_msg.edit_text(
-            f"❌ <b>Błąd wyszukiwania</b>\n\n"
-            f"Szczegóły: {str(e)[:200]}\n\n"
-            f"Spróbuj ponownie za chwilę.",
-        )
-        return
-
-    # Store results in FSM state for pagination
-    await state.update_data(search_results=results, search_page=0)
-
-    if not results:
-        await progress_msg.edit_text(
-            f"📭 <b>Brak wyników</b>\n\n"
-            f"Przeszukano portali: {len(enabled)}\n"
-            f"{filters_info}\n\n"
-            f"Spróbuj zmienić filtry (/filters) i wyszukaj ponownie.",
-        )
-        return
-
-    # === STAGE 2: DEEP FETCH candidates ===
-    # Only deep-fetch listings that have SOME signal (score > 0)
-    from detector.scorer import PropertyShareScorer
-    scorer = PropertyShareScorer()
-    
-    candidates = []
-    noise = []
-    for listing in results:
-        r = scorer.score(listing.get("title", ""), listing.get("raw_description", ""))
-        listing["score"] = r.score
-        listing["is_share"] = r.is_share
-        listing["fraction_detected"] = r.fraction_detected
-        if r.score > 0:
-            candidates.append(listing)
-        else:
-            noise.append(listing)
-
-    if candidates:
-        try:
-            await progress_msg.edit_text(
-                f"🔬 <b>Deep scan: {len(candidates)} kandydatów...</b>\n\n"
-                f"Pobieram pełne opisy ogłoszeń\n"
-                f"(odrzucono {len(noise)} szumu)\n\n"
-                f"⏳ Proszę czekać...",
-            )
-        except Exception:
-            pass
-        
-        from scraper.deep_parser import deep_fetch_batch, rescore_with_deep_data
-        candidates = await deep_fetch_batch(candidates, max_concurrent=5)
-        candidates = rescore_with_deep_data(candidates)
-
-    # === STAGE 3: CLASSIFY + RANK ===
-    from detector.ranking import classify_and_rank, format_summary, format_results_page as fmt_page
-
-    # Use candidates (deep-fetched + re-scored) for classification
-    classified = classify_and_rank(candidates, min_score=25)
-
-    # Store classified results for pagination (compact: no raw HTML/descriptions)
-    await state.update_data(
-        classified_results=[{
-            "score": c.score, "tier": c.tier.value,
-            "source": c.source.value, "property_type": c.property_type.value,
-            "fraction": c.fraction, "attractiveness": c.attractiveness,
-            "url": c.url, "title": c.title[:80], "price": c.price,
-            "city": c.city, "portal": c.portal,
-        } for c in classified],
-        classified_page=0,
-    )
-
-    # Run LLM analysis on top tier if enabled
-    if settings.llm.enabled and settings.llm.api_key and classified:
-        try:
-            await progress_msg.edit_text(
-                f"🤖 <b>Analizuję {len(classified)} udziałów z AI...</b>\n\n"
-                f"⏳ Proszę czekać...",
-            )
-        except Exception:
-            pass
-        results = await _run_llm_analysis(results)
-
-    # Show summary + first page
-    summary = format_summary(classified)
-    
-    if classified:
-        page_text, total_pages = fmt_page(classified, page=0, page_size=5)
-        full_text = f"{summary}\n\n{'─' * 30}\n\n{page_text}"
-    else:
-        full_text = (
-            f"🔍 Przeszukano {len(enabled)} portali, znaleziono {len(results)} ogłoszeń.\n\n"
-            f"📭 Żadne nie wygląda na prawdziwy udział w nieruchomości.\n"
-            f"Spróbuj rozszerzyć filtry lub poczekaj — nowe ogłoszenia pojawiają się codziennie."
-        )
-        total_pages = 1
-
-    await progress_msg.edit_text(
-        full_text,
-        reply_markup=build_results_keyboard(0, total_pages, results[:5] if results else []),
-        disable_web_page_preview=True,
-    )
-
-    logger.info(
-        f"Search completed: {len(results)} raw → {len(classified)} classified shares "
-        f"across {len(enabled)} portals"
-    )
-
-    # Release search lock (also handles cancellation)
+@router.callback_query(F.data == "search_cancel")
+async def handle_search_cancel(callback: CallbackQuery, state: FSMContext) -> None:
+    """Cancel ongoing search (releases the search lock)."""
+    await callback.answer("❌ Wyszukiwanie anulowane")
     try:
         await state.update_data(_search_running=False)
     except Exception:
         pass
-
-
-@router.callback_query(F.data == "search_cancel")
-async def handle_search_cancel(callback: CallbackQuery) -> None:
-    """Cancel ongoing search."""
-    await callback.answer("❌ Wyszukiwanie anulowane")
     if callback.message:
-        await callback.message.edit_text("❌ Wyszukiwanie anulowane.")  # type: ignore[union-attr]
+        try:
+            await callback.message.edit_text("❌ Wyszukiwanie anulowane.")  # type: ignore[union-attr]
+        except Exception:
+            pass
 
 
 @router.callback_query(F.data == "search_with_filters")
 async def handle_search_with_filters(callback: CallbackQuery, state: FSMContext) -> None:
     """Trigger search after filter setup (from filter summary keyboard)."""
     await callback.answer()
+    # callback.message.from_user is the BOT — check ownership on callback.from_user
+    if not callback.from_user or not _is_owner(callback.from_user.id):
+        return
     if callback.message:
-        # Create a fake message-like trigger for the search
-        await cmd_search(callback.message, state)  # type: ignore[arg-type]
+        await start_search(callback.message, state)  # type: ignore[arg-type]
 
 
-# --- Search execution ---
+# --- LLM analysis ---
 
-async def _run_search(
-    enabled_portals: List[str],
-    filters: Dict[str, Any],
-    progress_msg: Message,
-) -> List[Dict[str, Any]]:
-    """
-    Execute the search via ScraperManager.
-
-    Updates progress_msg as portals are scraped.
-    Returns list of result dicts suitable for display.
-    """
-    results: List[Dict[str, Any]] = []
-
-    try:
-        # Try to import and use the real ScraperManager
-        sys.path.insert(0, str(get_settings()._find_project_root() if hasattr(get_settings(), '_find_project_root') else ''))
-        from scraper.manager import ScraperManager
-
-        manager = ScraperManager()
-        manager.register_all_portals()
-
-        portals_done = 0
-        total_portals = len(enabled_portals)
-
-        async def progress_callback(portal_name: str, status: str) -> None:
-            nonlocal portals_done
-            portals_done += 1
-            try:
-                await progress_msg.edit_text(
-                    f"🔍 <b>Szukam...</b>\n\n"
-                    f"✅ {portal_name}: {status}\n"
-                    f"Postęp: {portals_done}/{total_portals} portali\n\n"
-                    f"⏳ Proszę czekać...",
-                )
-            except Exception:
-                pass  # Ignore edit errors (rate limit, etc.)
-
-        # Default keywords for share detection
-        keywords = ["udział", "udziały", "współwłasność", "1/2", "1/4", "1/3"]
-
-        raw_results = await manager.search_all(
-            keywords=keywords,
-            filters=filters,
-            progress_callback=progress_callback,
-        )
-
-        # Convert RawListing objects to dicts for display
-        for item in raw_results:
-            if hasattr(item, '__dict__'):
-                d = {
-                    "id": getattr(item, "id", ""),
-                    "title": getattr(item, "title", "Bez tytułu"),
-                    "price": getattr(item, "price", None),
-                    "city": getattr(item, "city", None) or getattr(item, "location", ""),
-                    "voivodeship": getattr(item, "voivodeship", ""),
-                    "url": getattr(item, "url", ""),
-                    "source": getattr(item, "source", ""),
-                    "score": getattr(item, "score", 0),
-                    "fraction": getattr(item, "fraction", ""),
-                    "area": getattr(item, "area", None),
-                }
-            elif isinstance(item, dict):
-                d = item
-            else:
-                continue
-            results.append(d)
-
-    except ImportError as e:
-        logger.warning(f"ScraperManager not available: {e}. Returning empty results.")
-    except Exception as e:
-        logger.error(f"Scraper error: {e}", exc_info=True)
-        raise
-
-    return results
+# Cap so a search never fires hundreds of paid API calls.
+MAX_LLM_ANALYZED = 15
 
 
 async def _run_llm_analysis(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -395,9 +342,12 @@ async def _run_llm_analysis(results: List[Dict[str, Any]]) -> List[Dict[str, Any
     settings = get_settings()
     llm_config = {
         "enabled": settings.llm.enabled,
-        "api_key": settings.llm.api_key,
-        "model": settings.llm.model,
-        "base_url": settings.llm.base_url,
+        "providers": [{
+            "name": _provider_name(settings.llm.provider),
+            "api_key": settings.llm.api_key,
+            "model": settings.llm.model,
+            "priority": 1,
+        }],
         "max_concurrent": settings.llm.max_concurrent,
         "timeout": settings.llm.timeout,
     }
@@ -442,8 +392,9 @@ async def _run_llm_analysis(results: List[Dict[str, Any]]) -> List[Dict[str, Any
             item["analysis"] = None
         return item
 
-    # Run all analyses concurrently (semaphore in analyzer limits parallelism)
-    analyzed = await asyncio.gather(*[_analyze_one(r) for r in results])
+    # Analyze only the top-ranked shares (cost cap); leave the rest untouched
+    head, tail = results[:MAX_LLM_ANALYZED], results[MAX_LLM_ANALYZED:]
+    analyzed = list(await asyncio.gather(*[_analyze_one(r) for r in head])) + tail
 
     # Sort by stars descending (items without analysis go to end)
     def sort_key(item: Dict[str, Any]) -> int:
@@ -453,13 +404,19 @@ async def _run_llm_analysis(results: List[Dict[str, Any]]) -> List[Dict[str, Any
         return 0
 
     analyzed_list = list(analyzed)
-    analyzed_list.sort(key=sort_key)
+    analyzed_list.sort(key=sort_key)  # stable: unanalyzed keep ranking order
 
     logger.info(
         f"LLM analysis complete: {sum(1 for r in analyzed_list if r.get('analysis'))}/"
         f"{len(analyzed_list)} analyzed, stats={analyzer.stats}"
     )
     return analyzed_list
+
+
+def _provider_name(provider: str) -> str:
+    """Map config provider names to detector.llm_analyzer PROVIDERS keys."""
+    p = (provider or "openai").lower()
+    return {"claude": "anthropic", "chatgpt": "openai"}.get(p, p)
 
 
 # --- Formatters ---

@@ -6,19 +6,107 @@ progress callbacks, timeout management, share scoring, and LLM analysis.
 """
 
 import asyncio
+import dataclasses
+import hashlib
+import inspect
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
-from scraper.base import BaseScraper
+from scraper.base import BaseScraper, RawListing
 from detector.scorer import PropertyShareScorer
 
 logger = logging.getLogger(__name__)
 
 # Type for progress callback: (portal_name, status, count) -> None
-ProgressCallback = Callable[[str, str, int], Any]
+# Sync or async; legacy 2-arg (portal_name, status) callbacks are also accepted.
+ProgressCallback = Callable[..., Any]
 
 # Minimum score threshold for LLM analysis (only analyze pre-filtered shares)
 LLM_ANALYSIS_SCORE_THRESHOLD = 25
+
+# Per-portal timeout. Otodom (browser layer, 3 pages) needs ~45-50s, OLX via Tor
+# with 6 keywords x 2 pages needs ~30-45s. 20s silently dropped both (bug #3).
+DEFAULT_PORTAL_TIMEOUT = 90.0
+
+
+def listing_id_for(url: str) -> str:
+    """Stable short id derived from the listing URL (used by save/detail buttons)."""
+    return hashlib.sha1((url or "").encode("utf-8")).hexdigest()[:12]
+
+
+def normalize_listing(listing: Any) -> Optional[Dict[str, Any]]:
+    """Coerce any scraper output (dict or RawListing) into the canonical dict shape.
+
+    Canonical keys: id, title, price, city, voivodeship, url, source_portal,
+    raw_description, area, fraction. Extra keys on dicts are preserved.
+    Returns None for objects that cannot be interpreted as a listing.
+    """
+    if isinstance(listing, dict):
+        d = dict(listing)
+    elif isinstance(listing, RawListing) or dataclasses.is_dataclass(listing):
+        raw = dataclasses.asdict(listing)
+        d = {
+            "title": raw.get("title") or "",
+            "price": raw.get("price"),
+            "city": raw.get("city") or raw.get("location") or "",
+            "voivodeship": raw.get("voivodeship") or "",
+            "url": raw.get("source_url") or raw.get("url") or "",
+            "source_portal": raw.get("portal") or raw.get("source_portal") or "",
+            "raw_description": raw.get("description") or raw.get("title") or "",
+            "area": raw.get("area_m2"),
+            "fraction": raw.get("share_fraction") or "",
+        }
+    elif hasattr(listing, "__dict__"):
+        d = dict(vars(listing))
+        d.setdefault("url", d.get("source_url", ""))
+        d.setdefault("source_portal", d.get("portal", ""))
+    else:
+        return None
+
+    d.setdefault("title", "")
+    d.setdefault("url", "")
+    d.setdefault("source_portal", d.get("source", ""))
+    d.setdefault("raw_description", d.get("description") or d.get("title") or "")
+    d.setdefault("city", "")
+    d.setdefault("voivodeship", "")
+    if not d.get("id"):
+        d["id"] = listing_id_for(d["url"] or d["title"])
+    return d
+
+
+def _accepts_three_args(callback: Callable[..., Any]) -> bool:
+    """True if callback can take (portal, status, count); False for legacy 2-arg form."""
+    try:
+        params = list(inspect.signature(callback).parameters.values())
+    except (TypeError, ValueError):
+        return True
+    positional = [
+        p for p in params
+        if p.kind in (p.POSITIONAL_ONLY, p.POSITIONAL_OR_KEYWORD)
+    ]
+    has_varargs = any(p.kind == p.VAR_POSITIONAL for p in params)
+    return has_varargs or len(positional) >= 3
+
+
+async def _notify(callback: Optional[ProgressCallback], portal_name: str, status: str, count: int) -> None:
+    """Invoke a progress callback safely.
+
+    Accepts sync or async callables with 3 args (portal, status, count) or the
+    legacy 2-arg form (portal, status). A failing callback must never affect
+    scraping results — it is logged and ignored.
+    """
+    if callback is None:
+        return
+    try:
+        result = (
+            callback(portal_name, status, count)
+            if _accepts_three_args(callback)
+            else callback(portal_name, status)
+        )
+        if inspect.isawaitable(result):
+            await result
+    except Exception as e:  # pragma: no cover - defensive
+        logger.warning(f"progress_callback failed for {portal_name}: {e}")
 
 
 class ScraperManager:
@@ -42,7 +130,8 @@ class ScraperManager:
     def __init__(
         self,
         portals: Optional[List[str]] = None,
-        timeout_per_portal: float = 20.0,
+        timeout_per_portal: float = DEFAULT_PORTAL_TIMEOUT,
+        llm_enabled: bool = False,
     ):
         """
         Initialize the ScraperManager.
@@ -50,9 +139,12 @@ class ScraperManager:
         Args:
             portals: List of portal names to enable. Defaults to MAIN_PORTALS.
             timeout_per_portal: Per-portal asyncio timeout in seconds.
+            llm_enabled: Run the manager's own LLM pass on high-scoring listings.
+                Off by default — the bot runs its own analysis on the ranked list.
         """
         self.enabled_portals = portals or self.MAIN_PORTALS
         self.timeout_per_portal = timeout_per_portal
+        self.llm_enabled = llm_enabled
         self._last_search_time: float = 0
         self._min_search_interval: float = 30.0  # Min 30s between full scans
         self.scorer = PropertyShareScorer()
@@ -137,26 +229,37 @@ class ScraperManager:
 
         # Create tasks for parallel execution with per-portal timeout
         async def _run_portal(scraper: BaseScraper) -> tuple:
-            """Run a single portal scraper with timeout."""
+            """Run a single portal scraper with timeout.
+
+            The progress callback is invoked OUTSIDE the scraping try-block so a
+            misbehaving callback can never turn a successful scrape into an error.
+            """
             portal_name = scraper.get_portal_name()
+            status, results, error = "done", [], None
             try:
                 results = await asyncio.wait_for(
                     scraper.search(keywords, filters),
                     timeout=self.timeout_per_portal,
                 )
-                if progress_callback:
-                    progress_callback(portal_name, "done", len(results))
-                return (portal_name, results, None)
             except asyncio.TimeoutError:
                 logger.warning(f"Portal {portal_name} timed out after {self.timeout_per_portal}s")
-                if progress_callback:
-                    progress_callback(portal_name, "timeout", 0)
-                return (portal_name, [], "timeout")
+                status, error = "timeout", "timeout"
             except Exception as e:
                 logger.error(f"Portal {portal_name} error: {e}")
-                if progress_callback:
-                    progress_callback(portal_name, "error", 0)
-                return (portal_name, [], str(e))
+                status, error = "error", str(e)
+
+            normalized: List[dict] = []
+            for item in results or []:
+                d = normalize_listing(item)
+                if d is None:
+                    logger.warning(f"Portal {portal_name}: skipping unparseable item {type(item).__name__}")
+                    continue
+                if not d.get("source_portal"):
+                    d["source_portal"] = portal_name.lower()
+                normalized.append(d)
+
+            await _notify(progress_callback, portal_name, status, len(normalized))
+            return (portal_name, normalized, error)
 
         # Execute all portals in parallel
         tasks = [_run_portal(scraper) for scraper in scrapers]
@@ -234,6 +337,8 @@ class ScraperManager:
         Runs analyses in parallel (limited by analyzer's semaphore).
         Attaches AnalysisResult to each listing dict under 'llm_analysis' key.
         """
+        if not self.llm_enabled:
+            return
         analyzer = self._get_llm_analyzer()
         if not analyzer:
             logger.debug("LLM analyzer not available, skipping analysis")

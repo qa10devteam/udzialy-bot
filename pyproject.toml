@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "udzialy-bot"
-version = "3.2.3"
+version = "3.2.4"
 description = "Bot do wyszukiwania ogłoszeń sprzedaży udziałów w nieruchomościach"
 readme = "README.md"
 license = {text = "MIT"}

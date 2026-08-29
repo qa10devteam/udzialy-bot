@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)]()
 
-**Telegram bot do wyszukiwania ogłoszeń sprzedaży udziałów w nieruchomościach** na 9 polskich portalach ogłoszeniowych.
+**Telegram bot do wyszukiwania ogłoszeń sprzedaży udziałów w nieruchomościach** na 5 polskich portalach ogłoszeniowych (OLX, Otodom, Morizon, Domiporta, Nieruchomości-online).
 
 Bot automatycznie przeszukuje portale nieruchomości w poszukiwaniu ofert sprzedaży udziałów (ułamkowych części własności) i prezentuje wyniki bezpośrednio w Telegramie.
 
@@ -13,7 +13,7 @@ Bot automatycznie przeszukuje portale nieruchomości w poszukiwaniu ofert sprzed
 
 ## ✨ Funkcje
 
-- 🔍 Przeszukiwanie 9 portali nieruchomości jednocześnie
+- 🔍 Przeszukiwanie 5 portali nieruchomości jednocześnie (3-etapowy pipeline: skan → pełne opisy → ranking)
 - 🗺️ Filtrowanie po województwie, mieście, promieniu i cenie
 - 📄 Paginacja wyników z klawiaturą inline
 - 💾 Zapisywanie interesujących ogłoszeń

@@ -141,16 +141,30 @@ class PropertyShareScorer:
         }
 
         for pattern in COMPILED_FRACTIONS:
-            match = pattern.search(text)
-            if match:
+            for match in pattern.finditer(text):
                 fraction = match.group(0)
                 # Normalize unicode fractions to slash form
                 if fraction in unicode_fraction_map:
                     return unicode_fraction_map[fraction]
                 # Clean up whitespace around slash
                 fraction = re.sub(r"\s*/\s*", "/", fraction)
-                return fraction
+                if self._is_plausible_fraction(fraction):
+                    return fraction
         return None
+
+    @staticmethod
+    def _is_plausible_fraction(fraction: str) -> bool:
+        """Reject 'fractions' that are really other numbers (190/2, 759/21, 1/2024).
+
+        An ownership share is a proper fraction 0 < num/den < 1 with a denominator
+        that a court or notary would actually write (<= 1000).
+        """
+        try:
+            num_s, den_s = fraction.split("/")
+            num, den = int(num_s), int(den_s)
+        except ValueError:
+            return False
+        return 0 < num < den <= 1000
 
     def _check_price_anomaly(
         self, price: Optional[float], area: Optional[float]

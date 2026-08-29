@@ -98,6 +98,9 @@ class PortalsConfig(BaseModel):
 class ScrapingConfig(BaseModel):
     """Scraping behavior settings."""
     timeout: int = 30
+    # Whole-portal budget (all keywords x pages). Browser-driven portals (Otodom)
+    # need ~50s, OLX via Tor ~45s. Must be well above `timeout` (single request).
+    portal_timeout: int = 90
     max_concurrent: int = 3
     retry_count: int = 2
     retry_delay: int = 5

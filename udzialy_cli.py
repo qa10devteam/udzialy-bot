@@ -6,7 +6,8 @@ Usage:
     udzialy run        — start Tor + bot (foreground)
     udzialy gui        — launch GUI dashboard
     udzialy tor-check  — verify Tor is working
-    udzialy scan       — run single scan (no Telegram, print results)
+    udzialy scan       — one-shot scan (no Telegram); same pipeline as the bot
+    udzialy autostart  — toggle Windows autostart
 """
 
 import argparse
@@ -181,7 +182,9 @@ def cmd_gui(args):
     ensure_dirs()
     gui_path = Path(__file__).parent / "launcher.pyw"
     if not gui_path.exists():
-        print("  [!] Nie znaleziono launcher.pyw")
+        gui_path = Path(__file__).parent / "launcher.py"  # pip install ships .py only
+    if not gui_path.exists():
+        print("  [!] Nie znaleziono launcher.py")
         return 1
 
     python = sys.executable
@@ -253,12 +256,77 @@ def cmd_scan(args):
         return 1
 
     os.environ["UDZIALY_CONFIG"] = str(CONFIG_PATH)
-    print("  Skanowanie portali...")
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+    return _run_scan(args)
+
+
+def _run_scan(args) -> int:
+    """One-shot scan: same 3-stage pipeline as the Telegram /search, printed to stdout.
+
+    Also the quickest way to verify an installation: if this prints shares, the bot will.
+    """
+    import logging
+    import platform
+    import time
+
+    if platform.system() == "Windows":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+    logging.basicConfig(
+        level=logging.DEBUG if getattr(args, "verbose", False) else logging.WARNING,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
+    sys.path.insert(0, str(Path(__file__).parent))
+    from bot.config import get_settings
+    from scraper.pipeline import format_text_report, run_search_pipeline, select_portals
+
+    settings = get_settings()
+    portals = select_portals(settings.portals.enabled_portals())
+    if getattr(args, "portals", None):
+        wanted = {p.strip().lower() for p in args.portals.split(",")}
+        portals = [p for p in portals if p in wanted] or portals
+
+    filters = {}
+    if getattr(args, "city", None):
+        filters["city"] = args.city
+    if getattr(args, "price_max", None):
+        filters["price_max"] = args.price_max
+    if getattr(args, "price_min", None):
+        filters["price_min"] = args.price_min
+
+    print(f"  Skanowanie portali: {', '.join(portals)}")
+    if filters:
+        print(f"  Filtry: {filters}")
+    print("  (to potrwa 1-2 minuty)")
     print()
 
-    # TODO: integrate with scraper manager for one-shot scan
-    print("  [info] Funkcja w rozwoju — użyj 'udzialy run' dla pełnego bota")
-    return 0
+    def _progress(stage, d):
+        if stage == "portal":
+            icon = "OK " if d["status"] == "done" else "!! "
+            print(f"  {icon}{d['portal']}: {d['status']} ({d['count']} ogłoszeń) [{d['done']}/{d['total']}]")
+        elif stage == "deep":
+            print(f"  -> pobieram pełne opisy {d['candidates']} kandydatów (odrzucono {d['noise']} szumu)")
+
+    t0 = time.time()
+    result = asyncio.run(run_search_pipeline(
+        filters=filters,
+        portals=portals,
+        timeout_per_portal=float(settings.scraping.portal_timeout),
+        deep_fetch=not getattr(args, "no_deep", False),
+        progress=_progress,
+    ))
+    print()
+    print(format_text_report(result, limit=getattr(args, "limit", 20) or 20))
+    print()
+    print(f"  Czas: {time.time() - t0:.0f}s")
+    if getattr(args, "json", None):
+        import json
+        Path(args.json).write_text(
+            json.dumps(result.display, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
+        print(f"  Zapisano JSON: {args.json}")
+    return 0 if result.raw_count > 0 else 2
 
 
 def main():
@@ -272,7 +340,15 @@ def main():
     sub.add_parser("run", help="Uruchom bota (Tor + Telegram)")
     sub.add_parser("gui", help="Uruchom GUI dashboard")
     sub.add_parser("tor-check", help="Sprawdź połączenie Tor")
-    sub.add_parser("scan", help="Jednorazowy skan (bez Telegram)")
+    scan_p = sub.add_parser("scan", help="Jednorazowy skan (bez Telegram)")
+    scan_p.add_argument("--city", help="Miasto (np. Gdynia)")
+    scan_p.add_argument("--price-max", dest="price_max", type=int, help="Cena maksymalna PLN")
+    scan_p.add_argument("--price-min", dest="price_min", type=int, help="Cena minimalna PLN")
+    scan_p.add_argument("--portals", help="Lista portali po przecinku (np. olx,morizon)")
+    scan_p.add_argument("--limit", type=int, default=20, help="Ile wyników wypisać (domyślnie 20)")
+    scan_p.add_argument("--no-deep", dest="no_deep", action="store_true", help="Pomiń pobieranie pełnych opisów")
+    scan_p.add_argument("--json", help="Zapisz wyniki do pliku JSON")
+    scan_p.add_argument("-v", "--verbose", action="store_true", help="Pełne logi")
     sub.add_parser("autostart", help="Włącz/wyłącz autostart z Windows")
 
     args = parser.parse_args()
