@@ -225,7 +225,12 @@ async def _do_search(message: Message, state: FSMContext, data: Dict[str, Any]) 
             f"🤖 <b>Analizuję {min(len(display), MAX_LLM_ANALYZED)} udziałów z AI...</b>\n\n"
             f"⏳ Proszę czekać..."
         )
-        display = await _run_llm_analysis(display)
+        try:
+            display = await _run_llm_analysis(display)
+        except Exception as e:
+            # AI is an enrichment — never let it hide the results we already have
+            logger.error(f"LLM analysis stage failed: {e}", exc_info=True)
+            await message.answer("⚠️ Analiza AI nie powiodła się — pokazuję wyniki bez oceny AI.")
 
     # ONE source of truth for page 1, pagination, save and detail
     await state.update_data(
@@ -363,33 +368,30 @@ async def _run_llm_analysis(results: List[Dict[str, Any]]) -> List[Dict[str, Any
         return results
 
     async def _analyze_one(item: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze a single listing and attach result."""
+        """Analyze a single listing and attach result (never raises)."""
         title = item.get("title", "")
-        description = item.get("description", "")
+        description = item.get("description", "") or ""
         price = item.get("price")
-        location = item.get("city", "") or item.get("location", "")
-        fraction = item.get("fraction", "")
+        area = item.get("area")
+        location = item.get("city", "") or item.get("location", "") or None
+        if item.get("fraction"):
+            # ListingAnalyzer.analyze() has no fraction param — pass it as context
+            description = f"[udział: {item['fraction']}] {description}"
 
-        result = await analyzer.analyze(
-            title=title,
-            description=description,
-            price=price,
-            location=location,
-            fraction=fraction,
-        )
+        try:
+            # Signature: analyze(title, description, price: str|None, location: str|None, area: str|None)
+            result = await analyzer.analyze(
+                title=title,
+                description=description,
+                price=f"{price:,.0f} PLN" if price else None,
+                location=location,
+                area=f"{area} m²" if area else None,
+            )
+        except Exception as e:
+            logger.warning(f"LLM analysis failed for {item.get('url', '?')}: {e}")
+            result = None
 
-        if result is not None:
-            item["analysis"] = {
-                "stars": result.stars,
-                "summary": result.summary,
-                "is_real_share": result.is_real_share,
-                "fraction": result.key_facts.get("fraction", ""),
-                "property_type": result.key_facts.get("property_type", ""),
-                "seller_motivation": result.key_facts.get("seller_motivation", ""),
-                "price_per_m2_estimate": result.key_facts.get("price_per_m2_estimate"),
-            }
-        else:
-            item["analysis"] = None
+        item["analysis"] = analysis_to_dict(result)
         return item
 
     # Analyze only the top-ranked shares (cost cap); leave the rest untouched
@@ -411,6 +413,25 @@ async def _run_llm_analysis(results: List[Dict[str, Any]]) -> List[Dict[str, Any
         f"{len(analyzed_list)} analyzed, stats={analyzer.stats}"
     )
     return analyzed_list
+
+
+def analysis_to_dict(result: Any) -> Optional[Dict[str, Any]]:
+    """Flatten detector.llm_analyzer.AnalysisResult into the dict results.py renders."""
+    if result is None:
+        return None
+    return {
+        "stars": int(getattr(result, "stars", 0) or 0),
+        "summary": getattr(result, "summary", "") or "",
+        "is_real_share": bool(getattr(result, "is_real_share", True)),
+        "confidence": getattr(result, "confidence", None),
+        "fraction": getattr(result, "fraction", None) or "",
+        "property_type": getattr(result, "property_type", None) or "",
+        "seller_motivation": getattr(result, "seller_motivation", None) or "",
+        "price_assessment": getattr(result, "price_assessment", None) or "",
+        "estimated_value_total": getattr(result, "estimated_value_total", None),
+        "risks": list(getattr(result, "risks", None) or []),
+        "price_per_m2_estimate": None,  # not produced by the analyzer
+    }
 
 
 def _provider_name(provider: str) -> str:

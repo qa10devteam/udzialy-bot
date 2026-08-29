@@ -364,13 +364,16 @@ class ScraperManager:
             voivodeship = listing.get("voivodeship", "")
             location = f"{city}, {voivodeship}" if city else voivodeship
             fraction = listing.get("fraction", "")
+            area = listing.get("area")
+            if fraction:
+                description = f"[udział: {fraction}] {description}"
 
             result = await analyzer.analyze(
                 title=title,
                 description=description,
-                price=price,
+                price=f"{price:,.0f} PLN" if price else None,
                 location=location or None,
-                fraction=fraction or None,
+                area=f"{area} m²" if area else None,
             )
 
             if result:

@@ -316,6 +316,10 @@ def _format_listing_detail(listing: Dict[str, Any]) -> str:
             text += f"💲 Szt. cena/m²: ~{price_m2:,.0f} PLN\n"
         if not is_real:
             text += "⚠️ <b>Uwaga:</b> Może nie być prawdziwym udziałem!\n"
+        if analysis.get("price_assessment"):
+            text += f"💲 Cena: {analysis['price_assessment']}\n"
+        for risk in (analysis.get("risks") or [])[:4]:
+            text += f"⚠️ {risk}\n"
         if summary:
             text += f"\n💡 <i>{summary}</i>\n"
     else:

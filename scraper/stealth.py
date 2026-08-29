@@ -250,7 +250,34 @@ async def _layer5_nodriver(url: str, proxy: Optional[str] = None, timeout: float
 
 
 async def _layer6_patchright(url: str, proxy: Optional[str] = None, timeout: float = 20.0) -> Optional[str]:
-    """Layer 6: patchright stealth Playwright (no Runtime.enable leak)."""
+    """Layer 6: patchright stealth Playwright (no Runtime.enable leak).
+
+    On Windows the bot runs on WindowsSelectorEventLoopPolicy (aiogram/SSL), but
+    Playwright needs a Proactor loop for subprocesses (NotImplementedError otherwise).
+    In that case the whole layer runs in a worker thread with its own Proactor loop.
+    """
+    import sys as _sys
+    if _sys.platform == "win32":
+        loop = asyncio.get_running_loop()
+        proactor_cls = getattr(asyncio, "ProactorEventLoop", None)
+        if proactor_cls is not None and not isinstance(loop, proactor_cls):
+            def _run_in_proactor() -> Optional[str]:
+                proactor = proactor_cls()
+                try:
+                    asyncio.set_event_loop(proactor)
+                    return proactor.run_until_complete(_layer6_patchright_impl(url, proxy, timeout))
+                finally:
+                    proactor.close()
+            try:
+                return await asyncio.to_thread(_run_in_proactor)
+            except Exception as e:
+                logger.warning(f"Layer 6 (proactor thread) error for {url}: {e}")
+                return None
+    return await _layer6_patchright_impl(url, proxy, timeout)
+
+
+async def _layer6_patchright_impl(url: str, proxy: Optional[str] = None, timeout: float = 20.0) -> Optional[str]:
+    """Layer 6 body — must run on a loop that supports subprocesses."""
     try:
         from patchright.async_api import async_playwright
     except ImportError:
