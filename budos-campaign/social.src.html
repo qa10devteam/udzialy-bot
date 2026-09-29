@@ -1,0 +1,194 @@
+<title>BudOS Tła Sociali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --ink:#060E19; --ink-2:#0C1521; --line:#1C2A3B;
+  --cream:#E8DDD4; --cream-2:#A9A29C; --cream-3:#6E6A6A;
+  --green:#75B975; --red:#A63621; --paper:#F1F3F2;
+  --grot:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+  --cond:"Archivo","Arial Narrow",Arial,sans-serif;
+  --mono:"Space Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ink);color:var(--cream)}
+body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:22px 0;flex-wrap:wrap}
+.brandmark{display:flex;align-items:center;gap:14px}
+.brandmark svg{height:34px;width:auto}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--cream-2)}
+.eyebrow b{color:var(--green);font-weight:400}
+.pg-h{font-size:clamp(34px,5vw,60px);line-height:1;letter-spacing:-.03em;font-weight:700;margin:0;text-wrap:balance}
+.pg-h em{font-style:normal;font-family:var(--cond);font-stretch:80%;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:0}
+.lede{margin:0;color:var(--cream-2);max-width:66ch;font-size:16px}
+.chk{display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--cream-2);cursor:pointer}
+.chk input{accent-color:var(--green);width:16px;height:16px}
+.chk input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+.item{display:flex;flex-direction:column;gap:10px}
+.item header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.item h2{margin:0;font-size:20px;letter-spacing:-.01em}
+.item h2 span{font:400 13px var(--mono);color:var(--cream-3);margin-left:10px}
+.item>p{margin:0;font-size:13px;color:var(--cream-3);max-width:80ch}
+.fit{position:relative;width:100%;overflow:hidden;border-radius:10px;box-shadow:0 0 0 1px var(--line)}
+.fit>.bn{position:absolute;left:0;top:0;transform-origin:0 0}
+.avatars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.avatars .fit{border-radius:50%;max-width:320px}
+
+/* ================= banners (render at 1:1) ================= */
+.bn{position:relative;overflow:hidden;background:var(--ink);color:var(--cream);font-family:var(--grot)}
+.bn .grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1.5px,transparent 1.5px),linear-gradient(90deg,rgba(255,255,255,.04) 1.5px,transparent 1.5px);background-size:var(--g,44px) var(--g,44px)}
+.bn .glow{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(117,185,117,.22),rgba(117,185,117,0) 65%)}
+.bn .lg{position:absolute}
+.bn .lg svg{display:block;width:100%;height:auto}
+.bn .qa{position:absolute}
+.bn .claim{position:absolute;white-space:nowrap;font-weight:700;letter-spacing:-.03em;line-height:1}
+.bn .claim b{font-family:var(--cond);font-stretch:80%;font-weight:800;color:var(--green);letter-spacing:0}
+.bn .claim.stack b{display:block}
+.sheet{position:absolute;background-color:var(--paper);background-image:linear-gradient(#D6D9DA 1.5px,transparent 1.5px),linear-gradient(90deg,#D6D9DA 1.5px,transparent 1.5px);background-size:1.3em 1.3em;box-shadow:0 1.2em 2.4em -.8em rgba(0,0,0,.8);color:#10151C;padding:2.6em 1.8em 1em}
+.sheet .holes{position:absolute;left:1em;right:1em;top:.8em;display:flex;justify-content:space-between}
+.sheet .holes i{width:.55em;height:.8em;border-radius:.3em;background:var(--ink)}
+.sheet p{margin:0;font-weight:500;line-height:1.5;letter-spacing:-.01em;white-space:nowrap}
+.sheet s{text-decoration:none;position:relative}
+.sheet s::after{content:"";position:absolute;left:-.6em;right:-.4em;top:54%;height:.12em;background:var(--red);border-radius:.06em;transform:rotate(-1.5deg)}
+.sheet .res{font-weight:700;color:#2F7A31;margin-top:.25em}
+.pill{position:absolute;background:var(--green);color:var(--ink);font-family:var(--cond);font-stretch:80%;font-weight:800;border-radius:.45em;display:grid;place-items:center;box-shadow:0 0 1.2em rgba(117,185,117,.55);white-space:nowrap}
+.cur{position:absolute}
+.band{position:absolute;left:0;right:0;top:0;background:var(--green);display:flex;align-items:center;justify-content:center;font:900 1em/1 var(--cond);font-stretch:78%;color:var(--ink);text-transform:uppercase}
+/* platform safe-zone overlay (preview only) */
+.zone{position:absolute;pointer-events:none;display:none;border:3px dashed rgba(229,96,79,.95);background:rgba(229,96,79,.18)}
+.zone.keep{border-color:rgba(117,185,117,.95);background:transparent}
+.zone b{position:absolute;left:8px;top:6px;font:700 18px var(--mono);color:#fff;background:rgba(229,96,79,.9);padding:2px 8px;border-radius:4px;white-space:nowrap}
+.zone.keep b{background:rgba(60,120,60,.95)}
+body.zones .zone{display:block}
+
+body.export{padding:0;margin:0;background:#000}
+body.export .wrap{max-width:none;display:block}
+body.export .wrap>*:not(.item):not(.avatars){display:none}
+body.export .item>*:not(.fit){display:none}
+body.export .fit{width:auto!important;height:auto!important;border-radius:0!important;box-shadow:none;overflow:visible;max-width:none!important}
+body.export .fit>.bn{position:relative;transform:none!important}
+body.export .avatars{display:block}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brandmark"><svg viewBox="0 0 421 264" aria-label="BudOS" role="img"><use href="#logo"></use></svg><span class="eyebrow"><b>Social</b> · tła profili</span></div>
+    <label class="chk"><input type="checkbox" id="zonesT"> Pokaż strefy zasłaniane przez zdjęcie profilowe i przycinane na telefonie</label>
+  </header>
+  <h1 class="pg-h">Tła BudOS na <em>każdy profil.</em></h1>
+  <p class="lede">Okładki w stylu karty „Premiera”: ciemna siatka, logo z „by QA10”, hasło „Przetargi OPANOWANE.”, kartka w kratkę z przekreśleniami i zielony przycisk z kursorem. Każdy plik ma wymiary zalecane przez platformę, a logo i hasło leżą poza miejscem, które zasłania zdjęcie profilowe lub ucina telefon.</p>
+
+  <!-- FACEBOOK -->
+  <section class="item"><header><h2>Facebook, zdjęcie w tle<span>1640×624</span></h2></header>
+    <p>Komputer pokazuje całość. Telefon przycina boki do środkowych ok. 1110 px, więc logo, hasło i przycisk mieszczą się w tym pasie. Lewy dolny róg zostaje wolny pod zdjęcie profilowe.</p>
+    <div class="fit"><div class="bn" data-file="facebook-cover-1640x624" style="width:1640px;height:624px;--g:48px">
+      <div class="grid"></div><div class="glow" style="left:280px;top:-260px;width:900px;height:900px"></div>
+      <div class="lg" style="left:430px;top:62px;width:430px"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg></div>
+      <img class="qa" src="%%QA10%%" alt="" style="left:880px;top:76px;width:188px">
+      <div class="claim" style="left:430px;top:370px;font-size:58px">Przetargi <b style="font-size:68px">OPANOWANE.</b></div>
+      <div class="sheet" style="left:1150px;top:64px;width:440px;height:440px;transform:rotate(4deg);font-size:34px"><div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p><s>33 godziny</s></p><p><s>żmudny research</s></p><p><s>stres i zmęczenie</s></p><p class="res">→ 6 minut</p></div>
+      <div class="pill" style="left:430px;top:476px;width:320px;height:88px;font-size:48px">BUDOS.IO</div>
+      %%CURSOR:style="left:688px;top:524px;width:50px"%%
+      <div class="zone" style="left:0;top:360px;width:420px;height:264px"><b>zdjęcie profilowe</b></div>
+      <div class="zone keep" style="left:265px;top:0;width:1110px;height:624px"><b>widać na telefonie</b></div>
+    </div></div>
+  </section>
+
+  <!-- X -->
+  <section class="item"><header><h2>X (Twitter), nagłówek<span>1500×500</span></h2></header>
+    <p>Awatar nachodzi na lewy dół. Niektóre aplikacje ucinają ok. 60 px z góry i z dołu, więc treść trzyma się środka wysokości.</p>
+    <div class="fit"><div class="bn" data-file="x-header-1500x500" style="width:1500px;height:500px;--g:42px">
+      <div class="grid"></div><div class="glow" style="left:260px;top:-300px;width:800px;height:800px"></div>
+      <div class="lg" style="left:370px;top:70px;width:380px"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg></div>
+      <img class="qa" src="%%QA10%%" alt="" style="left:768px;top:82px;width:170px">
+      <div class="claim" style="left:370px;top:330px;font-size:50px">Przetargi <b style="font-size:58px">OPANOWANE.</b></div>
+      <div class="sheet" style="left:1020px;top:48px;width:420px;height:330px;transform:rotate(4deg);font-size:30px"><div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p><s>33 godziny</s></p><p><s>żmudny research</s></p><p><s>stres i zmęczenie</s></p><p class="res">→ 6 minut</p></div>
+      <div class="pill" style="left:1060px;top:334px;width:290px;height:80px;font-size:44px">BUDOS.IO</div>
+      %%CURSOR:style="left:1290px;top:378px;width:46px"%%
+      <div class="zone" style="left:0;top:330px;width:330px;height:170px"><b>awatar</b></div>
+      <div class="zone" style="left:0;top:0;width:1500px;height:60px"><b>może być ucięte</b></div>
+      <div class="zone" style="left:0;top:440px;width:1500px;height:60px"></div>
+    </div></div>
+  </section>
+
+  <!-- LINKEDIN PERSONAL -->
+  <section class="item"><header><h2>LinkedIn, profil osobisty<span>1584×396</span></h2></header>
+    <p>Zdjęcie profilowe zasłania lewy dół, na telefonie przesuwa się bliżej środka. Dlatego treść zaczyna się od ok. 470 px.</p>
+    <div class="fit"><div class="bn" data-file="linkedin-profile-1584x396" style="width:1584px;height:396px;--g:40px">
+      <div class="grid"></div><div class="glow" style="left:420px;top:-300px;width:700px;height:700px"></div>
+      <div class="lg" style="left:480px;top:48px;width:300px"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg></div>
+      <img class="qa" src="%%QA10%%" alt="" style="left:792px;top:58px;width:150px">
+      <div class="claim" style="left:480px;top:262px;font-size:46px">Przetargi <b style="font-size:54px">OPANOWANE.</b></div>
+      <div class="sheet" style="left:1110px;top:36px;width:360px;height:290px;transform:rotate(4deg);font-size:26px"><div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p><s>33 godziny</s></p><p><s>żmudny research</s></p><p><s>stres i zmęczenie</s></p><p class="res">→ 6 minut</p></div>
+      <div class="pill" style="left:1290px;top:282px;width:250px;height:70px;font-size:38px">BUDOS.IO</div>
+      %%CURSOR:style="left:1500px;top:320px;width:40px"%%
+      <div class="zone" style="left:0;top:170px;width:470px;height:226px"><b>zdjęcie profilowe</b></div>
+    </div></div>
+  </section>
+
+  <!-- LINKEDIN COMPANY -->
+  <section class="item"><header><h2>LinkedIn, strona firmy<span>1128×191</span></h2></header>
+    <p>Bardzo wąski pas, a logo strony nachodzi na lewy dół. Zostaje logo, hasło i adres.</p>
+    <div class="fit"><div class="bn" data-file="linkedin-company-1128x191" style="width:1128px;height:191px;--g:32px">
+      <div class="grid"></div><div class="glow" style="left:200px;top:-220px;width:500px;height:500px"></div>
+      <div class="lg" style="left:230px;top:30px;width:200px"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg></div>
+      <div class="claim stack" style="left:470px;top:40px;font-size:40px">Przetargi<b style="font-size:62px;margin-top:4px">OPANOWANE.</b></div>
+      <div class="pill" style="left:860px;top:62px;width:210px;height:62px;font-size:34px">BUDOS.IO</div>
+      %%CURSOR:style="left:1030px;top:96px;width:34px"%%
+      <img class="qa" src="%%QA10%%" alt="" style="left:870px;top:140px;width:120px">
+      <div class="zone" style="left:0;top:70px;width:200px;height:121px"><b>logo strony</b></div>
+    </div></div>
+  </section>
+
+  <!-- YOUTUBE -->
+  <section class="item"><header><h2>YouTube, grafika kanału<span>2560×1440</span></h2></header>
+    <p>Na każdym urządzeniu widać tylko środek 1546×423, więc tam jest cała treść. Telewizor pokazuje całość, dlatego reszta ma pełne tło z zielonym pasem u góry i kartką przy brzegu.</p>
+    <div class="fit"><div class="bn" data-file="youtube-banner-2560x1440" style="width:2560px;height:1440px;--g:64px">
+      <div class="grid"></div><div class="glow" style="left:500px;top:120px;width:1500px;height:1200px"></div>
+      <div class="band" style="height:250px;font-size:150px;border-radius:0 0 120px 120px">Przetargi opanowane</div>
+      <div class="sheet" style="left:2080px;top:620px;width:620px;height:760px;transform:rotate(-6deg);font-size:44px;opacity:.95"><div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p><s>33 godziny</s></p><p><s>żmudny research</s></p><p><s>stres i zmęczenie</s></p></div>
+      <div class="lg" style="left:570px;top:560px;width:440px"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg></div>
+      <img class="qa" src="%%QA10%%" alt="" style="left:1020px;top:572px;width:188px">
+      <div class="claim stack" style="left:1060px;top:652px;font-size:72px">Przetargi<b style="font-size:102px;margin-top:6px">OPANOWANE.</b></div>
+      <div class="pill" style="left:1780px;top:590px;width:260px;height:90px;font-size:48px">BUDOS.IO</div>
+      %%CURSOR:style="left:1980px;top:638px;width:50px"%%
+      <div class="claim" style="left:1780px;top:720px;font-size:40px;font-weight:500;color:var(--cream-2);line-height:1.3">33 godziny →<br><b style="font-size:64px">6 MINUT</b></div>
+      <div class="zone keep" style="left:507px;top:508px;width:1546px;height:423px"><b>widać wszędzie (1546×423)</b></div>
+      <div class="zone keep" style="left:0;top:508px;width:2560px;height:423px;border-style:dotted"><b style="left:auto;right:8px">komputer (2560×423)</b></div>
+    </div></div>
+  </section>
+
+  <!-- AVATARS -->
+  <section class="item"><header><h2>Zdjęcie profilowe<span>1080×1080</span></h2></header>
+    <p>Jeden plik na Instagram, TikTok, Facebook, LinkedIn, X i YouTube. Znak mieści się w kole, bo każda z tych platform przycina awatar do okręgu.</p>
+  </section>
+  <div class="avatars">
+    <section class="item"><div class="fit"><div class="bn" data-file="avatar-ciemny-1080" style="width:1080px;height:1080px;--g:60px">
+      <div class="grid"></div><div class="glow" style="left:90px;top:90px;width:900px;height:900px"></div>
+      <div class="lg" style="left:345px;top:268px;width:390px"><svg viewBox="0 0 215 264"><use href="#sygnet"></use></svg></div>
+    </div></div></section>
+    <section class="item"><div class="fit"><div class="bn" data-file="avatar-zielony-1080" style="width:1080px;height:1080px;background:var(--green)">
+      <div class="lg" style="left:345px;top:268px;width:390px"><svg viewBox="0 0 215 264"><use href="#sygnetInk"></use></svg></div>
+    </div></div></section>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="logo"><path fill="#75B975" fill-rule="evenodd" d="%%B%%"/><path fill="#75B975" fill-rule="evenodd" d="%%UD%%"/><path fill="#E8DDD4" fill-rule="evenodd" d="%%OS%%"/></g>
+  <g id="sygnet"><path fill="#75B975" fill-rule="evenodd" d="%%B%%"/></g>
+  <g id="sygnetInk"><path fill="#060E19" fill-rule="evenodd" d="%%B%%"/></g>
+</defs></svg>
+
+<script>
+(() => {
+  const fits = [...document.querySelectorAll('.fit')];
+  const size = () => fits.forEach(f => { const b = f.firstElementChild; const w = parseFloat(b.style.width), h = parseFloat(b.style.height); if (document.body.classList.contains('export')) return; const k = f.clientWidth / w; f.style.height = Math.round(h * k) + 'px'; b.style.transform = `scale(${k})`; });
+  new ResizeObserver(size).observe(document.querySelector('.wrap')); addEventListener('resize', size); size();
+  document.getElementById('zonesT').addEventListener('change', e => document.body.classList.toggle('zones', e.target.checked));
+  if (window.__BUDOS_EXPORT) document.body.classList.add('export');
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => { window.__budosReady = true; });
+})();
+</script>
