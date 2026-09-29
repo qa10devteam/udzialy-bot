@@ -3,7 +3,7 @@ import base64, io, pathlib
 from PIL import Image
 root = pathlib.Path(__file__).resolve().parent.parent
 paths = dict(l.split('=', 1) for l in (root / 'brand' / 'budos-logo-paths.txt').read_text().strip().split('\n') if '=' in l and not l.startswith('W='))
-buf = io.BytesIO(); Image.open(root / 'carousel' / '01-okladka.png').convert('RGB').save(buf, 'JPEG', quality=86)
+buf = io.BytesIO(); Image.open(root / 'carousel' / '9x16' / '01-okladka.png').convert('RGB').save(buf, 'JPEG', quality=86)
 cover = 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
 qa10 = 'data:image/png;base64,' + base64.b64encode((root / 'brand' / 'qa10-by.png').read_bytes()).decode()
 s = (root / 'carousel.src.html').read_text()

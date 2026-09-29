@@ -16,7 +16,7 @@ Spot 30 s do ogólnopolskiej kampanii BudOS: „Mniej szukania. Więcej budowani
 | `export/budos-short-B.mp4` | Spot B, „Flop-core”, 25,7 s, 1080×1920 |
 | `export/budos-short-C.mp4` | Spot C, „Tapnij, żeby odkryć”, 16 s, zapętlony, 1080×1920 |
 | `carousel.html` | Podgląd karuzeli premierowej z opisem posta. Budowany z `carousel.src.html` przez `tools/build-carousel.py` |
-| `carousel/` | 8 slajdów PNG 1080×1920: 01 okładka „Premiera” (od BudOS) + 02 Zwiad, 03 Filtry, 04 Termin, 05 Analiza SWZ, 06 Kosztorys, 07 Wynik, 08 Start. Render: `tools/render-carousel.cjs` |
+| `carousel/` | Karuzela premierowa w trzech formatach, po 8 slajdów PNG: `9x16/` 1080×1920 (Stories, TikTok; 01 to oryginalna okładka od BudOS), `4x5/` 1080×1350 (feed Instagrama i Facebooka, Threads, LinkedIn), `1x1/` 1080×1080 (LinkedIn, Facebook, X, YouTube). `BudOS_karuzela_LinkedIn_4x5.pdf` to karuzela dokumentowa na LinkedIn. Render: `tools/render-carousel.cjs` |
 | `social.html` | Podgląd teł profili z nakładką stref zasłanianych przez zdjęcie profilowe. Budowany z `social.src.html` przez `tools/build-social.py` |
 | `social/` | Tła profili PNG: Facebook 1640×624, X 1500×500, LinkedIn profil 1584×396, LinkedIn firma 1128×191, YouTube 2560×1440, awatar 1080×1080 (ciemny i zielony). Render: `tools/render-social.cjs` |
 | `brand/` | Logo BudOS zwektoryzowane z przekazanego pliku PNG (SVG i ścieżki) |

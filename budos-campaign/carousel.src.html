@@ -165,12 +165,94 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .save{position:absolute;left:80px;right:80px;top:1790px;text-align:center;font:500 34px/1.35 var(--grot);color:var(--cream-2)}
 .save b{color:var(--cream);font-weight:600}
 
+
+/* ===== format switcher ===== */
+.fmts{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--ink-2)}
+.fmts button{appearance:none;border:0;background:transparent;color:var(--cream-2);font:700 12px var(--mono);height:38px;padding:0 14px;cursor:pointer}
+.fmts button[aria-pressed="true"]{background:var(--cream);color:var(--ink)}
+.fmts button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+.strip:not(.f916) .frame.cover,.strip.f916 .frame.cover-html{display:none}
+
+/* ===== cover rebuilt for 4:5 and 1:1 ===== */
+.cvban{position:absolute;left:0;right:0;top:0;background:var(--green);display:grid;place-items:center;font:900 1px/1 var(--cond);font-stretch:80%;color:var(--ink)}
+.cvlogo{position:absolute}.cvlogo svg{display:block;width:100%;height:auto}
+.cvqa{position:absolute}
+.cvclaim{position:absolute;left:0;right:0;text-align:center;font-weight:700;letter-spacing:-.03em;white-space:nowrap}
+.cvclaim b{font-family:var(--cond);font-stretch:80%;font-weight:800;color:var(--green);letter-spacing:0}
+.cvpaper{position:absolute;background-color:var(--paper);background-image:linear-gradient(#D6D9DA 1.5px,transparent 1.5px),linear-gradient(90deg,#D6D9DA 1.5px,transparent 1.5px);background-size:34px 34px;transform:rotate(-4deg);box-shadow:0 30px 70px -20px rgba(0,0,0,.8);color:#10151C}
+.cvpaper .holes{position:absolute;left:30px;right:30px;top:24px;display:flex;justify-content:space-between}
+.cvpaper .holes i{width:20px;height:30px;border-radius:10px;background:var(--ink)}
+.cvpaper p,.cvres p{margin:0;font-weight:500;letter-spacing:-.01em;white-space:nowrap}
+.cvpaper s{text-decoration:none;position:relative}
+.cvpaper s::after{content:"";position:absolute;left:-.9em;right:-.5em;top:54%;height:.12em;background:var(--red);border-radius:3px;transform:rotate(-1.5deg)}
+.cvres{position:absolute;color:var(--cream)}
+.cvcta{position:absolute;background:var(--green);display:grid;place-items:center;font-family:var(--cond);font-stretch:80%;font-weight:800;color:var(--ink);box-shadow:0 0 70px rgba(117,185,117,.55)}
+.cvcur{position:absolute}
+
+/* ===== 4:5 (1080×1350) ===== */
+.f45 .frame{height:378px}
+.f45 .slide{height:1350px}
+.f45 .ban{height:150px;border-radius:0 0 70px 70px;padding:28px 70px 0}
+.f45 .ban b{font-size:64px}.f45 .ban span{font-size:30px}
+.f45 .hd{top:186px;left:70px;right:70px}
+.f45 .hd .a{font-size:62px}.f45 .hd .b{font-size:80px;margin-top:2px}
+.f45 .lead{font-size:30px;margin-top:14px}
+.f45 .vis{top:500px;transform:scale(.72);transform-origin:50% 0}
+.f45 .note{top:962px;height:170px}.f45 .note .paper{height:170px}
+.f45 .note .x{font-size:30px;top:34px;left:60px;width:430px}
+.f45 .note .ok{font-size:34px;top:40px}
+.f45 .route{top:1150px}.f45 .route .lb{font-size:22px;top:70px}
+.f45 .foot{bottom:28px;left:70px;right:70px}.f45 .foot svg{height:44px}.f45 .foot span{font-size:24px}.f45 .foot span svg{height:24px}
+.f45 .biglogo{left:350px;top:186px;width:380px}.f45 .qa{left:748px;top:198px;width:170px}
+.f45 .claim{top:452px;font-size:62px}.f45 .claim b{font-size:72px}
+.f45 .sheet{left:190px;top:562px;width:700px;height:420px;padding:78px 60px 0}.f45 .sheet .holes{top:20px}
+.f45 .sheet h4{font-size:32px;margin-bottom:10px}.f45 .sheet p{font-size:34px;gap:18px}.f45 .sheet p svg{width:36px;height:36px}
+.f45 .cta{left:190px;right:170px;top:946px;height:118px;font-size:52px;border-radius:36px}
+.f45 .cursor{left:720px;top:1016px;width:78px}
+.f45 .save{top:1092px;font-size:28px}
+.f45 .cvban{height:240px;border-radius:0 0 110px 110px;font-size:120px}
+.f45 .cvlogo{left:300px;top:290px;width:420px}.f45 .cvqa{left:740px;top:302px;width:188px}
+.f45 .cvclaim{top:588px;font-size:64px}.f45 .cvclaim b{font-size:74px}
+.f45 .cvpaper{left:-40px;top:700px;width:620px;height:560px;padding:120px 0 0 110px}.f45 .cvpaper p{font-size:40px;line-height:1.6}
+.f45 .cvres{left:640px;top:806px}.f45 .cvres p{font-size:44px;line-height:1.46}
+.f45 .cvcta{left:150px;right:150px;top:1092px;height:130px;font-size:62px;border-radius:40px}
+.f45 .cvcur{left:716px;top:1170px;width:80px}
+
+/* ===== 1:1 (1080×1080) ===== */
+.f11 .frame{height:302px}
+.f11 .slide{height:1080px}
+.f11 .ban{height:118px;border-radius:0 0 56px 56px;padding:20px 60px 0}
+.f11 .ban b{font-size:52px}.f11 .ban span{font-size:26px}
+.f11 .hd{top:146px;left:60px;right:60px}
+.f11 .hd .a{font-size:50px}.f11 .hd .b{font-size:64px;margin-top:0}
+.f11 .lead{display:none}
+.f11 .vis{top:292px;transform:scale(.6);transform-origin:50% 0}
+.f11 .note{top:678px;height:150px}.f11 .note .paper{height:150px}
+.f11 .note .x{font-size:26px;top:30px;left:60px;width:430px}
+.f11 .note .ok{font-size:30px;top:34px}
+.f11 .route{top:846px}.f11 .route .lb{font-size:20px;top:62px}
+.f11 .foot{bottom:22px;left:60px;right:60px}.f11 .foot svg{height:38px}.f11 .foot span{font-size:22px}.f11 .foot span svg{height:22px}
+.f11 .biglogo{left:390px;top:140px;width:300px}.f11 .qa{left:702px;top:150px;width:150px}
+.f11 .claim{top:346px;font-size:50px}.f11 .claim b{font-size:58px}
+.f11 .sheet{left:200px;top:432px;width:680px;height:300px;padding:60px 50px 0}.f11 .sheet .holes{top:16px}.f11 .sheet .holes i{width:16px;height:24px}
+.f11 .sheet h4{font-size:26px;margin-bottom:6px}.f11 .sheet p{font-size:27px;gap:14px;line-height:1.45}.f11 .sheet p svg{width:28px;height:28px}
+.f11 .cta{left:200px;right:180px;top:700px;height:100px;font-size:44px;border-radius:30px}
+.f11 .cursor{left:690px;top:758px;width:64px}
+.f11 .save{top:806px;font-size:24px}
+.f11 .cvban{height:190px;border-radius:0 0 90px 90px;font-size:96px}
+.f11 .cvlogo{left:350px;top:226px;width:340px}.f11 .cvqa{left:706px;top:236px;width:150px}
+.f11 .cvclaim{top:462px;font-size:52px}.f11 .cvclaim b{font-size:60px}
+.f11 .cvpaper{left:-40px;top:548px;width:560px;height:500px;padding:96px 0 0 100px}.f11 .cvpaper .holes i{width:16px;height:24px}.f11 .cvpaper p{font-size:34px;line-height:1.6}
+.f11 .cvres{left:580px;top:636px}.f11 .cvres p{font-size:38px;line-height:1.46}
+.f11 .cvcta{left:150px;right:150px;top:850px;height:110px;font-size:52px;border-radius:34px}
+.f11 .cvcur{left:690px;top:918px;width:68px}
+
 body.export{padding:0;margin:0;background:#000}
 body.export .wrap{max-width:none;display:block}
 body.export .wrap>*:not(.strip){display:none}
 body.export .strip{display:block;overflow:visible;padding:0}
-body.export .frame{width:1080px;height:1920px;border-radius:0;box-shadow:none;margin:0}
-body.export .frame>.slide{transform:none}
+body.export .frame{width:1080px;height:auto;border-radius:0;box-shadow:none;margin:0;overflow:visible}
+body.export .frame>.slide{position:relative;transform:none}
 body.export .frame .num,body.export .frame.cover{display:none}
 </style>
 
@@ -182,8 +264,20 @@ body.export .frame .num,body.export .frame.cover{display:none}
   <h1 class="pg-h">Karuzela premierowa. <em>Od Zwiadu do decyzji.</em></h1>
   <p class="lede">Pierwszy slajd to Wasza karta „Premiera”. Kolejne prowadzą przez BudOS w kolejności pracy nad przetargiem: Zwiad znajduje ogłoszenie, filtry zostawiają Twoje, potem termin, analiza SWZ i skład pozycji. Zielona linia na dole przechodzi przez wszystkie slajdy, więc przewijanie czyta się jak jedna droga.</p>
 
-  <div class="strip" id="strip" tabindex="0" aria-label="Slajdy karuzeli, przewiń w bok">
+  <div class="fmts" role="group" aria-label="Format"><button type="button" data-f="f916" aria-pressed="true">9:16 · Stories, TikTok</button><button type="button" data-f="f45" aria-pressed="false">4:5 · feed, LinkedIn</button><button type="button" data-f="f11" aria-pressed="false">1:1 · kwadrat</button></div>
+  <div class="strip f916" id="strip" tabindex="0" aria-label="Slajdy karuzeli, przewiń w bok">
     <div class="frame cover"><img src="%%COVER%%" alt="Slajd 1: Premiera BudOS, Przetargi opanowane"><span class="num">01</span></div>
+    <div class="frame cover-html"><div class="slide" data-n="01">
+      <div class="grid"></div>
+      <div class="cvban">PREMIERA</div>
+      <div class="cvlogo"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg></div>
+      <img class="cvqa" src="%%QA10%%" alt="by QA10">
+      <div class="cvclaim">Przetargi <b>OPANOWANE.</b></div>
+      <div class="cvpaper"><div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p><s>33 godziny</s></p><p><s>żmudny research</s></p><p><s>stres i zmęczenie</s></p></div>
+      <div class="cvres"><p>6 minut</p><p>szybki wynik</p><p>czas i spokój</p></div>
+      <div class="cvcta">W ZASIĘGU KLIKNIĘCIA</div>
+      <svg class="cvcur" viewBox="0 0 12 19" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0v16h1v-1h1v-1h1v-1h1v2h1v2h1v2h2v-1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#000"/><path d="M1 2v11h1v-1h1v-1h1v1h1v2h1v2h1v1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#fff"/></svg>
+    </div><span class="num">01</span></div>
 
     <!-- 02 ZWIAD -->
     <div class="frame"><div class="slide" data-n="02">
@@ -318,7 +412,7 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="nd"></i></div>
     </div><span class="num">08</span></div>
   </div>
-  <p class="hint">Przewiń w bok, żeby zobaczyć wszystkie slajdy. Pliki PNG 1080×1920 leżą w repozytorium, w katalogu <span class="mono">budos-campaign/carousel</span>.</p>
+  <p class="hint">Przewiń w bok, żeby zobaczyć wszystkie slajdy. Pliki PNG we wszystkich trzech formatach i PDF na LinkedIn leżą w repozytorium, w katalogu <span class="mono">budos-campaign/carousel</span>.</p>
 
   <section class="sh"><h2>Opis posta</h2><span class="eyebrow">do wklejenia pod karuzelą</span></section>
   <div class="cap-box"><pre id="capText">Premiera BudOS. Przetargi opanowane.
@@ -365,6 +459,10 @@ Przesuń, żeby zobaczyć, jak to działa. Zapisz, żeby wrócić przy następny
   };
   const copy = document.getElementById('copy');
   copy.addEventListener('click', () => { const t = document.getElementById('capText').textContent; navigator.clipboard.writeText(t).then(() => { copy.textContent = 'Skopiowano'; setTimeout(() => copy.textContent = 'Kopiuj opis', 1600); }).catch(() => { const r = document.createRange(); r.selectNodeContents(document.getElementById('capText')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); copy.textContent = 'Zaznaczono, skopiuj ręcznie'; }); });
+  const strip = document.getElementById('strip');
+  const setFmt = f => { strip.className = 'strip ' + f; document.querySelectorAll('.fmts button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === f))); };
+  document.querySelectorAll('.fmts button').forEach(b => b.addEventListener('click', () => setFmt(b.dataset.f)));
+  window.__setFmt = setFmt;
   if (window.__BUDOS_EXPORT) document.body.classList.add('export');
   const ready = () => { drawMap(); window.__budosReady = true; };
   (document.fonts && document.fonts.ready) ? document.fonts.ready.then(ready) : ready();
