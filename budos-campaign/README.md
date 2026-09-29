@@ -15,6 +15,8 @@ Spot 30 s do ogólnopolskiej kampanii BudOS: „Mniej szukania. Więcej budowani
 | `export/budos-short-A.mp4` | Spot A, „Staram się zachowywać normalnie”, 24 s, 1080×1920 |
 | `export/budos-short-B.mp4` | Spot B, „Flop-core”, 25,7 s, 1080×1920 |
 | `export/budos-short-C.mp4` | Spot C, „Tapnij, żeby odkryć”, 16 s, zapętlony, 1080×1920 |
+| `carousel.html` | Podgląd karuzeli premierowej z opisem posta. Budowany z `carousel.src.html` przez `tools/build-carousel.py` |
+| `carousel/` | 8 slajdów PNG 1080×1920: 01 okładka „Premiera” (od BudOS) + 02 Zwiad, 03 Filtry, 04 Termin, 05 Analiza SWZ, 06 Kosztorys, 07 Wynik, 08 Start. Render: `tools/render-carousel.cjs` |
 | `brand/` | Logo BudOS zwektoryzowane z przekazanego pliku PNG (SVG i ścieżki) |
 | `tools/render.cjs` | Renderer MP4: Playwright zapisuje klatki, OfflineAudioContext renderuje dźwięk, ffmpeg składa H.264 + AAC |
 | `tools/fetch-fonts.sh` | Pobiera fonty Onest i JetBrains Mono do lokalnego cache na potrzeby renderu |
