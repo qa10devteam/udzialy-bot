@@ -118,7 +118,7 @@ h1 em{font-style:normal;color:var(--green)}
 .toast.r i{background:var(--red)}
 .tabsn{position:absolute;left:28px;top:70px;font:500 22px var(--mono);color:var(--cream-3)}
 .tabsn b{color:var(--amber);font-weight:700}
-.mini{position:absolute;left:28px;right:28px;padding:20px 24px;display:flex;align-items:center;gap:22px}
+.mini{position:absolute;left:28px;right:28px;padding:13px 22px;display:flex;align-items:center;gap:20px}
 .mini .t{font-size:30px;font-weight:600;line-height:1.2}
 .mini .t small{display:block;font:500 22px var(--mono);color:var(--cream-2);letter-spacing:.06em;margin-bottom:4px}
 .mini .t b{color:var(--green)}
@@ -219,7 +219,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
 
   <div class="tabs" role="tablist" aria-label="Spot">
     <button class="tab" role="tab" id="tabA" data-s="A" aria-selected="true"><span class="k">Spot A · TikTok</span><b>„Staram się zachowywać normalnie”</b><span>Na zewnątrz spokój, w środku 39 plików dokumentacji</span></button>
-    <button class="tab" role="tab" id="tabB" data-s="B" aria-selected="false"><span class="k">Spot B · Reels</span><b>„Flop-core”</b><span>Cztery przetargowe wtopy i koniec wtop</span></button>
+    <button class="tab" role="tab" id="tabB" data-s="B" aria-selected="false"><span class="k">Spot B · Reels</span><b>„Flop-core”</b><span>Cztery wtopy, po jednej na każdy etap przetargu</span></button>
     <button class="tab" role="tab" id="tabC" data-s="C" aria-selected="false"><span class="k">Spot C · Reels i Shorts</span><b>„Tapnij, żeby odkryć”</b><span>Sześć rozmytych kafelków, zapętlony</span></button>
   </div>
 
@@ -240,12 +240,13 @@ body.export .viewport{border-radius:0;box-shadow:none}
             </div>
             <div class="panel" id="pIn" style="top:900px;height:620px">
               <div class="lab"><i></i>W ŚRODKU</div>
-              <div class="dtag" id="aDemo">Przykład z demo · przegląd dokumentów</div>
+              <div class="dtag" id="aDemo">Przykład z demo · przetarg z BZP</div>
               <div class="tabsn" id="aTabs">otwarte zakładki: <b>12</b></div>
               <div id="aToasts"></div>
-              <div class="mini card" id="aM1" style="top:110px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>TERMIN SKŁADANIA</small>5.10.2026, 9:00 · <b>39 plików</b> w teczce</div></div>
-              <div class="mini card" id="aM2" style="top:250px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>ANALIZA SWZ</small>13 wymagań · <b>5 czerwonych flag</b></div></div>
-              <div class="mini card" id="aM3" style="top:390px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>KOSZTORYS</small>276 613,84 zł netto · <b>29 pozycji</b></div></div>
+              <div class="mini card" id="aM1" style="top:100px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>ZWIAD · TERMIN 5.10.2026, 9:00</small><b>39 plików</b> dokumentacji</div></div>
+              <div class="mini card" id="aM2" style="top:202px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>ANALIZA SWZ</small>13 wymagań · <b>5 czerwonych flag</b></div></div>
+              <div class="mini card" id="aM3" style="top:304px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>KOSZTORYS · STAWKI DEMO</small>276 613,84 zł netto · <b>29 pozycji</b></div></div>
+              <div class="mini card" id="aM4" style="top:406px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>OFERTA</small>340 235,02 zł brutto · <b>lista braków</b></div></div>
               <div class="bpm" id="aBpm" style="top:548px">88<small>BPM</small></div>
             </div>
             <canvas id="aEcg"></canvas>
@@ -257,7 +258,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
           <!-- ================= SPOT B ================= -->
           <div class="spot" id="spB">
             <div class="cap" id="bCap" style="top:180px"><span>Moje przetargowe flopy, zanim ogarnąłem BudOS</span></div>
-            <div class="cap dark" id="bCap2" style="top:180px"><span>Teraz:</span></div>
+            <div class="cap dark" id="bCap2" style="top:180px"><span>Te same kroki, mniej ręcznej roboty.</span></div>
             <div class="chip" id="bChip">FLOP 1/4</div>
             <div class="fv" id="bF1">
               <div class="clock" id="bClock">09:58<small id="bClockL">TERMIN 10:00</small></div>
@@ -266,20 +267,20 @@ body.export .viewport{border-radius:0;box-shadow:none}
             <div class="fv" id="bF2"><div id="bPages"></div><div class="pcount" id="bPc">str. 1 / 19</div></div>
             <div class="fv" id="bF3"><div class="price bad" id="bBad">25,30 zł</div><i class="strike" id="bStrike"></i><div class="price good" id="bGood">253,00 zł</div></div>
             <div class="fv" id="bF4"><div class="lst"><div class="in" id="bList"></div></div></div>
-            <div class="stamp" id="bSt1" style="top:760px">Odrzucona</div>
-            <div class="stamp am" id="bSt2" style="top:760px">Wykluczony</div>
-            <div class="stamp" id="bSt3" style="top:760px">Strata</div>
-            <div class="stamp am" id="bSt4" style="top:760px">2 h w plecy</div>
+            <div class="stamp am" id="bSt1" style="top:760px">2 h w plecy</div>
+            <div class="stamp" id="bSt2" style="top:760px">Wykluczony</div>
+            <div class="stamp am" id="bSt3" style="top:760px">Strata</div>
+            <div class="stamp" id="bSt4" style="top:760px">Odrzucona</div>
             <div class="kar" id="bK1" style="top:1210px"></div>
             <div class="kar" id="bK2" style="top:1360px"></div>
             <div class="frz" id="bTurn">Aż w końcu<br><span class="g">ogarnąłem.</span></div>
             <div class="fixes" id="bFixes">
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Termin widzę od razu<small>Zwiad: 17.10.2026 · za 17 dni</small></div></div>
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Wyciąg i flagi z numerem strony<small>Analiza SWZ: warunki, wymagania, ryzyka</small></div></div>
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Przedmiar z PDF, ceny z bazy<small>Kod KNR i skład ceny · 784 685 cen</small></div></div>
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Na górze listy moja robota<small>BZP, TED i BIP w jednej kolejce</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Jedna kolejka, na górze Twoja robota<small>ZWIAD · 5 075 zamawiających w bazie</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Wyciąg i flagi z numerem strony<small>SWZ · 21 341 dokumentów przeczytanych</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Przedmiar z PDF, ceny z bazy<small>KOSZTORYS · 784 685 cen</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Dane firmy wpisane, lista braków<small>OFERTA · 4 966 formularzy przeczytanych</small></div></div>
             </div>
-            <div class="slots" id="bSlots"><div class="slot">Odrzucona<i></i></div><div class="slot am">Wykluczony<i></i></div><div class="slot">Strata<i></i></div><div class="slot am">2 h w plecy<i></i></div></div>
+            <div class="slots" id="bSlots"><div class="slot am">2 h w plecy<i></i></div><div class="slot">Wykluczony<i></i></div><div class="slot am">Strata<i></i></div><div class="slot">Odrzucona<i></i></div></div>
             <div class="end" id="bEnd"></div>
           </div>
 
@@ -289,10 +290,10 @@ body.export .viewport{border-radius:0;box-shadow:none}
             <div class="cap dark" id="cCap2" style="top:270px"><span id="cCap2t">Co kryje się pod blurem?</span></div>
             <div class="grid" id="cGrid">
               <div class="tile"><div class="in"><div class="h">ZNAJDŹ</div><div class="big" style="font-size:34px">Jedna lista z BZP, TED i BIP</div><div class="chips"><span class="m">BZP</span><span class="m">TED</span><span class="m">BIP</span></div></div></div>
-              <div class="tile"><div class="in"><div class="h">SPRAWDŹ · DEMO</div><div class="big" style="font-size:34px">SWZ z numerem strony</div><div class="fl">Czerwona flaga<span>str. 3</span></div></div></div>
+              <div class="tile"><div class="in"><div class="h">SPRAWDŹ · DEMO</div><div class="big" style="font-size:31px">SWZ przeczytana, z numerem strony</div><div class="fl">Czerwona flaga<span>str. 3</span></div></div></div>
               <div class="tile"><div class="in"><div class="h">DECYZJA · DEMO</div><div class="dcs"><span class="t">Tak</span><span class="a">Analiza</span><span class="n">Nie</span></div><div class="sm">Na tym etapie. Najpierw decyzja, potem oferta.</div></div></div>
-              <div class="tile"><div class="in"><div class="h">POLICZ · DEMO</div><div class="big">276 613,84 zł</div><div class="sm">netto, 29 pozycji z przedmiaru PDF</div></div></div>
-              <div class="tile"><div class="in"><div class="h">ZŁÓŻ · DEMO</div><div class="big g">340 235,02 zł</div><div class="sm">brutto w formularzu. Podpisujesz Ty.</div></div></div>
+              <div class="tile"><div class="in"><div class="h">POLICZ · DEMO</div><div class="big">276 613,84 zł</div><div class="sm">netto · 29 pozycji z przedmiaru, stawki demonstracyjne</div></div></div>
+              <div class="tile"><div class="in"><div class="h">ZŁÓŻ · DEMO</div><div class="big g">340 235,02 zł</div><div class="sm">brutto · szkic oferty z listą braków. Podpisujesz Ty.</div></div></div>
               <div class="tile"><div class="in" style="align-items:center"><svg class="lgt" viewBox="0 0 421 264"><use href="#logo"></use></svg></div></div>
             </div>
             <i class="ring" id="cRing"></i><i class="tap" id="cTap"></i>
@@ -628,8 +629,8 @@ const A = (() => {
   const flat = t => t >= 12 && t < 13.2;
   const TOASTS = [
     ['!', 'Dokumentacja: 39 plików'], ['?', 'Termin składania? Gdzieś w rozdziale XIV'], ['!', 'Warunki udziału: ???'],
-    ['?', 'BZP, TED czy BIP gminy?'], ['!', 'Przedmiar do wklepania: 29 pozycji'], ['?', 'Zostało 5 dni czy 15?'], ['!', 'Pismo z 22.09 zmienia terminy?!'],
-    ['!', 'Wadium?!'], ['?', 'Gdzie jest załącznik nr 7?'], ['!', 'Kosztorys_v12.xlsx'], ['?', 'Formularz oferty znowu ręcznie?'], ['!', 'Termin: JUTRO?']
+    ['?', 'BZP, TED i BIP-y gmin po kolei?'], ['!', 'Przedmiar do wklepania: 29 pozycji'], ['?', 'Ceny z pamięci?'], ['!', 'Pismo z 22.09 zmienia terminy?!'],
+    ['!', 'Wadium?!'], ['?', 'Gdzie jest załącznik nr 7?'], ['!', 'Kosztorys_v12.xlsx'], ['?', 'Formularze znowu przepisywać ręcznie?'], ['!', 'Termin: JUTRO?']
   ];
   const TT = [4, 5.5, 7, 8.5, 10, 11, 12, 13, 14, 14.75, 15.5, 16.25, 16.75, 17.25, 17.75, 18.25, 18.6, 18.9, 19.2, 19.5];
   let built = false;
@@ -663,7 +664,7 @@ const A = (() => {
       fx(el, seg(b, at, at + .05) * (1 - out), x + (1 - p) * 60, y, lerp(.7, 1, p) + out * .1, out * 26 + (b >= 20 && b < 22 ? 2 : 0), r);
     });
     fx($('aDemo'), seg(b, 22.3, 22.8));
-    ['aM1', 'aM2', 'aM3'].forEach((id, i) => { const at = 22.5 + i * 1.5; const p = eoExpo(seg(b, at, at + .6)); fx($(id), p, 0, (1 - p) * 70, 1, (1 - p) * 20); });
+    ['aM1', 'aM2', 'aM3', 'aM4'].forEach((id, i) => { const at = 22.5 + i * 1.1; const p = eoExpo(seg(b, at, at + .6)); fx($(id), p, 0, (1 - p) * 70, 1, (1 - p) * 20); });
     // BPM readouts synced to the ECG
     const r = rate(t); const bpmIn = $('aBpm');
     bpmIn.innerHTML = (flat(t) ? '---' : Math.round(r)) + '<small>BPM</small>';
@@ -713,7 +714,7 @@ const A = (() => {
       K.ep(B(b0), n, B(3.8), .06); K.ep(B(b0 + 2.5), n.slice(1), B(1.4), .04);
       [0, .75, 1.5, 2.25, 3].forEach((o, i) => K.pluck(B(b0 + o), n[(i + bar) % n.length] + 12, .035, 2600, .3));
     });
-    [22.5, 24, 25.5].forEach((bb, i) => K.ding(B(bb), 79 + i * 2, .07));
+    [22.5, 23.6, 24.7, 25.8].forEach((bb, i) => K.ding(B(bb), 79 + i * 2, .07));
     K.ding(B(27), 84, .09);
     // end card: impact + sonic logo C–Es–F
     K.impact(B(34), .6); K.pad(B(34), [53, 56, 60, 65, 72], B(6), .04, 2200);
@@ -724,7 +725,7 @@ const A = (() => {
     [0, 'Hak', '„Staram się zachowywać normalnie, kiedy szef pyta o przetarg”', 'Tykanie zegara, spokojne serce 72 BPM'],
     [2.4, 'Na zewnątrz spokój', '„Jasne, pod kontrolą.” Pod spodem: 39 plików dokumentacji, 47 zakładek, pytania bez odpowiedzi', 'Serce przyspiesza do 180, powiadomienia'],
     [12, 'Stop', 'Wszystko zamiera: „…a potem otwierasz BudOS.”', 'Tape stop, płaska linia'],
-    [13.2, 'Ulga', 'Termin, analiza SWZ i kosztorys z demo wskakują na miejsce, puls spada do 72', 'Drop: luźny trap, Rhodes, 808'],
+    [13.2, 'Ulga', 'Zwiad, analiza SWZ, kosztorys i oferta z demo wskakują na miejsce, puls spada do 72', 'Drop: luźny trap, Rhodes, 808'],
     [16.2, 'Puenta', '„Teraz to nawet prawda.”', 'Dzwonek przy ✓'],
     [20.4, 'Packshot', 'Przetargi opanowane. · Zobacz demo bez konta', 'Dźwiękowe logo C–Es–F']
   ];
@@ -740,10 +741,11 @@ const A = (() => {
 const Bs = (() => {
   const BPM = 140, BT = 60 / BPM, BEATS = 60, DUR = BEATS * BT; // 25.7 s
   const LIST = ['Termomodernizacja budynku Szkoły Podstawowej nr 3', 'Budowa sieci wodociągowej w Starej Wsi', 'Remont elewacji Urzędu Gminy', 'Budowa hali sportowej przy ZS nr 2', 'Rozbudowa oczyszczalni ścieków', 'Modernizacja oświetlenia LED', 'Remont dachu szpitala powiatowego', 'Budowa boiska wielofunkcyjnego', 'Budowa kanalizacji w ul. Leśnej', 'Przebudowa targowiska miejskiego', 'Budowa ścieżki rowerowej wzdłuż DW 780', 'Rozbudowa przedszkola w Jabłonnie'];
-  const K1 = [['Oferta wysłana o 10:03.', 4.5], ['Termin był do 10:00.', 8]];
+  // four flops in the order of the landing's stages: Zwiad, SWZ, Kosztorys, Oferta
+  const K1 = [['2 godziny w BZP, TED i BIP-ach gmin.', 4.5], ['Przetarg był na pierwszej stronie.', 7.8]];
   const K2 = [['Przeczytałem całą SWZ.', 12.5], ['Warunek, który mnie wykluczył, był w załączniku.', 15.6]];
-  const K3 = [['Pozycja 34 wyceniona na 25,30 zł.', 20.5], ['Powinno być 253 zł. Przecinek.', 23.6]];
-  const K4 = [['2 godziny szukania przetargu na drogę.', 28.5], ['Był na pierwszej stronie.', 31.8]];
+  const K3 = [['Przedmiar wklepywałem ręcznie.', 20.5], ['Pozycja 34: 25,30 zł zamiast 253 zł.', 23.4]];
+  const K4 = [['Formularz przepisywałem do 9:58.', 28.5], ['Oferta poszła o 10:03.', 33.4]];
   let built = false;
   function build() {
     if (built) return; built = true;
@@ -764,11 +766,11 @@ const Bs = (() => {
     chip.style.opacity = b < 36 ? 1 : 0; chip.style.transform = `translateX(-50%) scale(${lerp(.6, 1, cp)})`;
     chip.style.visibility = b < 36 ? 'visible' : 'hidden';
     // flop views
-    const views = [$('bF1'), $('bF2'), $('bF3'), $('bF4')];
+    const views = [$('bF4'), $('bF2'), $('bF3'), $('bF1')]; // list, SWZ, price, clock
     views.forEach((v, i) => { const a = 4 + i * 8; const p = eo3(seg(b, a, a + .5)), o = seg(b, a + 7.6, a + 8); show(v, b >= a && b < a + 8); fx(v, p * (1 - o), 0, (1 - p) * 60, 1, (1 - p) * 20 + o * 20); });
     // hook view: show the four stamp slots as a teaser
-    // F1: clock 09:58 → 10:03, upload stuck at 99%
-    { const lb = b - 4; const mins = [58, 59, 0, 1, 2, 3]; const k = clamp(Math.floor(lb) - 1, 0, 5); const hh = k >= 2 ? '10' : '09';
+    // flop 4 · Oferta: clock 09:58 → 10:03, upload stuck at 99%
+    { const lb = b - 28; const mins = [58, 59, 0, 1, 2, 3]; const k = clamp(Math.floor(lb) - 1, 0, 5); const hh = k >= 2 ? '10' : '09';
       $('bClock').firstChild.nodeValue = `${hh}:${String(mins[k]).padStart(2, '0')}`; $('bClock').style.color = k >= 2 ? 'var(--red)' : 'var(--cream)';
       $('bClockL').style.opacity = k >= 2 ? (Math.floor(t * 4) % 2 ? 1 : .3) : 1;
       const up = eo3(seg(lb, .5, 3)) * .99; $('bUp').style.width = up * 100 + '%'; $('bUpP').textContent = up >= .985 ? 'wysyłanie… 99% (od 3 minut)' : `wysyłanie… ${Math.round(up * 100)}%`; }
@@ -781,8 +783,8 @@ const Bs = (() => {
       $('bBad').style.color = lb > 3.3 ? 'var(--cream-3)' : 'var(--cream)';
       $('bStrike').style.transform = `scaleX(${eo3(seg(lb, 3.4, 3.8))})`;
       const g = eoBack(seg(lb, 3.8, 4.3)); fx($('bGood'), seg(lb, 3.8, 3.9), 0, (1 - g) * 40, lerp(.7, 1, g)); }
-    // F4: frantic scroll, then snap to the first row
-    { const lb = b - 28; const sp = lb < 3.6 ? 110 * 34 * eio(seg(lb, .2, 3.6)) : 110 * 34 * (1 - eo5(seg(lb, 3.6, 4.1))); $('bList').style.transform = `translateY(${-sp}px)`;
+    // flop 1 · Zwiad: frantic scroll, then snap to the first row
+    { const lb = b - 4; const sp = lb < 3.6 ? 110 * 34 * eio(seg(lb, .2, 3.6)) : 110 * 34 * (1 - eo5(seg(lb, 3.6, 4.1))); $('bList').style.transform = `translateY(${-sp}px)`;
       $('bList').style.filter = lb > .5 && lb < 3.6 ? 'blur(3px)' : 'none'; $('bList').firstChild.classList.toggle('hit', lb > 4.1); }
     // karaoke narration
     const K = [K1, K2, K3, K4];
@@ -830,14 +832,14 @@ const Bs = (() => {
     K.busLP(0, 1400); K.busLP(B(4), 20000, true);
     for (let b0 = 0; b0 < 36; b0 += 4) bar(b0, b0 / 4, false);
     [10, 18, 26, 34].forEach(a => K.mute(B(a), B(a + 2)));
-    K.stamp(B(10)); K.trombone(B(10) + .12);
+    K.stamp(B(10)); K.scratch(B(10) + .05); K.trombone(B(10) + .35, .15, true);
     K.stamp(B(18)); K.boom(B(18) + .05, .9);
     K.stamp(B(26)); K.bwomp(B(26) + .1); for (let i = 0; i < 6; i++) K.tick(B(26.3 + i * .12), 400 + i * 300, .05);
-    K.stamp(B(34)); K.scratch(B(34) + .05); K.trombone(B(34) + .35, .15, true);
+    K.stamp(B(34)); K.trombone(B(34) + .12);
     // F1 clock ticks, F2 page flips, F3 glitch, F4 scroll
-    for (let k = 1; k <= 6; k++) K.tick(B(4 + k), k >= 3 ? 1200 : 1800, .06);
+    for (let k = 1; k <= 6; k++) K.tick(B(28 + k), k >= 3 ? 1200 : 1800, .06);
     [12.4, 13.4, 14.4, 15.4].forEach(bb => K.whoosh(B(bb), .22, .1));
-    K.whoosh(B(28.2), 1.2, .12); K.pop(B(33.6), 72, .2);
+    K.whoosh(B(4.2), 1.2, .12); K.pop(B(9.6), 72, .2);
     // turn
     K.mute(B(36), B(38)); K.squeak(B(36.5), .09); K.riser(B(36), B(2), .22); K.sweep(B(37.5), B(.5), .25);
     // resolution
@@ -853,16 +855,16 @@ const Bs = (() => {
   }
   const beats = [
     [0, 'Hak', '„Moje przetargowe flopy, zanim ogarnąłem BudOS”', 'Jersey club od pierwszej klatki'],
-    [1.7, 'Flop 1', 'Oferta wysłana o 10:03, termin do 10:00 → ODRZUCONA', 'Muzyka się urywa, smutny puzon'],
-    [5.1, 'Flop 2', 'Cała SWZ przeczytana, warunek w załączniku → WYKLUCZONY', 'Głuche „boom”'],
-    [8.6, 'Flop 3', '25,30 zł zamiast 253 zł → STRATA', '„Bwomp” i glitch'],
-    [12, 'Flop 4', '2 godziny szukania, przetarg na 1. stronie → 2 H W PLECY', 'Scratch i krótki puzon'],
-    [15.4, 'Zwrot', '„Aż w końcu ogarnąłem.” Cztery rozwiązania skreślają cztery flopy', 'Pełny bit, arpeggio'],
+    [1.7, 'Flop 1 · Zwiad', '2 godziny w BZP, TED i BIP-ach gmin, przetarg na 1. stronie → 2 H W PLECY', 'Muzyka się urywa, scratch i krótki puzon'],
+    [5.1, 'Flop 2 · SWZ', 'Cała SWZ przeczytana, warunek w załączniku → WYKLUCZONY', 'Głuche „boom”'],
+    [8.6, 'Flop 3 · Kosztorys', 'Przedmiar wklepany ręcznie, 25,30 zł zamiast 253 zł → STRATA', '„Bwomp” i glitch'],
+    [12, 'Flop 4 · Oferta', 'Formularz przepisywany do 9:58, oferta o 10:03 → ODRZUCONA', 'Smutny puzon'],
+    [15.4, 'Zwrot', '„Te same kroki, mniej ręcznej roboty.” Pary „dziś → z BudOS” z landingu skreślają cztery flopy', 'Pełny bit, arpeggio'],
     [22.3, 'Packshot', 'Mniej flopów. Przetargi opanowane. · Zobacz demo bez konta', 'Dźwiękowe logo C–Es–F']
   ];
   return { BPM, BT, DUR, build, update, score, poster: 4.55, beats,
     k: 'Spot B · Reels', h: '„Flop-core”',
-    why: 'W Reels rośnie flop-core: zamiast sukcesów twórcy wrzucają swoje wpadki. Każdy wykonawca zna te cztery: spóźniona oferta, przeoczony warunek, zgubiony przecinek i dwie godziny przewijania. Humor robi zasięg, a druga połowa pokazuje, jak BudOS zamyka każdą wpadkę. Na końcu hasło z landingu: „Przetargi opanowane.”',
+    why: 'W Reels rośnie flop-core: zamiast sukcesów twórcy wrzucają swoje wpadki. Tu są cztery, po jednej na każdy etap z landingu: dwie godziny przewijania ogłoszeń, przeoczony warunek w SWZ, przecinek w wklepanym przedmiarze i oferta spóźniona przez ręczne formularze. Druga połowa odpowiada parami „dziś → z BudOS” z landingu, razem z liczbami z bazy. Na końcu hasło z landingu: „Przetargi opanowane.”',
     facts: [['Długość', '25,7 s'], ['Tempo', '140 BPM, jersey club'], ['Struktura', '4 flopy → 4 rozwiązania'], ['Napisy', 'karaoke, słowo po słowie']] };
 })();
 
@@ -872,7 +874,7 @@ const Bs = (() => {
 const C = (() => {
   const BPM = 120, BT = 60 / BPM, BEATS = 32, DUR = BEATS * BT; // 16 s
   const REV = [4, 7, 10, 13, 16, 19];
-  const LINES = ['Jedna lista z BZP, TED i BIP', 'SWZ z numerem strony', 'Najpierw decyzja', 'Przedmiar z PDF w kosztorysie', 'Formularze z danymi firmy', 'A pod ostatnim…'];
+  const LINES = ['Jedna lista z BZP, TED i BIP.', 'SWZ przeczytana, z numerem strony.', 'Najpierw decyzja. Potem oferta.', 'Przedmiar z PDF w wierszu kosztorysu.', 'Formularze z danymi Twojej firmy.', 'A pod ostatnim…'];
   let built = false;
   function build() {
     if (built) return; built = true;
@@ -885,7 +887,7 @@ const C = (() => {
     // second caption line: changes per reveal
     let line = 'Co kryje się pod blurem?', la = 0;
     REV.forEach((r, i) => { if (b >= r) { line = LINES[i]; la = r; } });
-    if (b >= 22) { line = 'Od ogłoszenia do oferty.'; la = 22; }
+    if (b >= 22) { line = 'Od ogłoszenia do oferty w czterech krokach.'; la = 22; }
     if (b >= 31.2) { line = 'Co kryje się pod blurem?'; la = 31.2; }
     $('cCap2t').textContent = line; capPop($('cCap2'), b, la === 0 ? -1 : la, la === 22 ? 23.8 : 999);
     // tiles
@@ -940,9 +942,9 @@ const C = (() => {
   }
   const beats = [
     [0, 'Hak', '„Tapnij, żeby odkryć” i sześć rozmytych kafelków', 'Cisza pokoju, miękki akord'],
-    [2, 'Odkrywanie', 'Znajdź → Sprawdź → decyzja → Policz → Złóż, kafelki z demo mają podpis', 'Pop i dzwonek na każdy tap, lo-fi house'],
+    [2, 'Odkrywanie', 'Znajdź → Sprawdź → decyzja → Policz → Złóż, podpisy zdaniami z landingu, kafelki z demo mają dopisek „demo”', 'Pop i dzwonek na każdy tap, lo-fi house'],
     [9.5, 'Ostatni kafelek', 'Pod ostatnim blurem: logo BudOS', 'Najwyższa nuta skali'],
-    [11, 'Podsumowanie', '„Od ogłoszenia do oferty.”', 'Filtr się otwiera'],
+    [11, 'Podsumowanie', '„Od ogłoszenia do oferty w czterech krokach.”', 'Filtr się otwiera'],
     [12.3, 'Packshot', 'Przetargi opanowane. · Zobacz demo bez konta', 'Dźwiękowe logo C–Es–F'],
     [15.5, 'Pętla', 'Kadr wraca do rozmytej siatki, więc film zapętla się bez szwu', 'Odwrócony szum domyka pętlę']
   ];

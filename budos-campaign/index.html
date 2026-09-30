@@ -142,20 +142,22 @@ body{font-family:var(--display);font-size:15px;line-height:1.5;padding-inline:16
 /* S0 */
 .s0 .count{position:absolute;left:0;right:0;top:50%;text-align:center;font:700 var(--big)/1 var(--mono);font-stretch:75%;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--cream);white-space:nowrap}
 .s0 .count .z{color:#233243}
-.s0 .typed{position:absolute;left:0;right:0;text-align:center;font:500 30px var(--mono);color:var(--cream-2);letter-spacing:.08em;text-transform:uppercase}
+.s0 .typed{position:absolute;left:0;right:0;text-align:center;font:500 28px var(--mono);color:var(--cream-2);letter-spacing:.08em;text-transform:uppercase}
 .s0 .typed .car{display:inline-block;width:.6em;height:.95em;background:var(--green);vertical-align:-.12em;margin-left:8px}
 .s0 .lab{position:absolute;left:0;right:0;text-align:center;font-size:46px;font-weight:500;color:var(--cream-2);letter-spacing:-.01em}
-.s0 .q{position:absolute;left:0;right:0;text-align:center;font-size:132px;font-weight:700;letter-spacing:-.045em;white-space:nowrap}
+.s0 .q{position:absolute;left:var(--pad);right:var(--pad);text-align:center;font-size:116px;font-weight:700;letter-spacing:-.045em;line-height:1;text-wrap:balance}
 .s0 .q .g{color:var(--green)}
-.f916 .s0 .q,.f45 .s0 .q{font-size:98px}
+.f916 .s0 .q,.f45 .s0 .q{font-size:104px}
 .s0 .note0{position:absolute;left:0;right:0;bottom:72px;text-align:center;font:500 15px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--cream-3)}
 .f916 .s0 .note0{bottom:150px}
 
 /* S1 */
-.s1 .slam{position:absolute;left:var(--pad);right:var(--pad);top:50%;transform:translateY(-50%);text-align:center;font-size:calc(var(--word)*.9);line-height:.95;font-weight:700;letter-spacing:-.055em}
-.f916 .s1 .slam{font-size:150px}
-.s1 .slam .w{display:inline-block;margin-inline:.1em}
+.s1 .slam{position:absolute;left:var(--pad);right:var(--pad);top:50%;transform:translateY(-50%);text-align:center;font-size:170px;line-height:.98;font-weight:700;letter-spacing:-.055em}
+.f916 .s1 .slam{font-size:128px}
+.f45 .s1 .slam{font-size:120px}
+.s1 .slam .w{display:inline-block;margin-inline:.1em;white-space:nowrap}
 .s1 .slam .row{display:block}
+.s1 .slam .row.o{font-size:.78em;margin-top:.14em;color:transparent;-webkit-text-stroke:3px var(--cream)}
 .s1 .hud{position:absolute;left:var(--pad);right:var(--pad);bottom:80px;display:flex;justify-content:space-between;font:500 21px var(--mono);color:var(--cream-2);letter-spacing:.06em;text-transform:uppercase}
 .s1 .hud b{color:var(--amber);font-weight:500}
 .s1 .shade{position:absolute;inset:0;background:radial-gradient(ellipse 60% 45% at 50% 50%,rgba(7,14,24,.92),rgba(7,14,24,.35) 70%,rgba(7,14,24,0))}
@@ -407,7 +409,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
         <div class="scene s0" data-a="0" data-b="8">
           <div class="typed" id="s0typed"><span id="s0t"></span><i class="car" id="s0car"></i></div>
           <div class="count" id="s0count">0 000</div>
-          <div class="lab" id="s0lab">nowych ogłoszeń w BudOS</div>
+          <div class="lab" id="s0lab">nowych ogłoszeń z ostatnich 7 dni</div>
           <div class="q" id="s0q"></div>
           <div class="note0" id="s0note">Stan bazy BudOS z 30.09.2026</div>
         </div>
@@ -415,7 +417,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
         <!-- S1 · chaos -->
         <div class="scene s1" data-a="8" data-b="16">
           <div class="shade" id="s1shade"></div>
-          <div class="slam" id="s1slam"><span class="row"><span class="w">Nie</span><span class="w">przekopuj</span></span><span class="row"><span class="w">całej</span><span class="w">listy.</span></span></div>
+          <div class="slam" id="s1slam"><span class="row"><span class="w" data-g="0">BZP,</span><span class="w" data-g="1">TED</span></span><span class="row"><span class="w" data-g="2">i BIP-y gmin,</span></span><span class="row o"><span class="w" data-g="3">codziennie</span><span class="w" data-g="3">po kolei.</span></span></div>
           <div class="hud"><span>przewijanie · strona <b id="s1page">1</b>/48</span><span id="s1rows">0 wierszy</span></div>
         </div>
 
@@ -560,7 +562,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
             <div class="v6" id="v6c"><i>03</i>Policz.</div>
             <div class="v6" id="v6d"><i>04</i>Złóż.</div>
           </div>
-          <div class="fin" id="s6fin"><span class="a" id="s6a">Od ogłoszenia<br><em>do oferty.</em></span><span class="b" id="s6b">BZP co 15 min · TED codziennie · radar BIP</span></div>
+          <div class="fin" id="s6fin"><span class="a" id="s6a">Od ogłoszenia<br><em>do oferty.</em></span><span class="b" id="s6b">BZP co 15 minut · TED codziennie · radar BIP</span></div>
         </div>
 
         <!-- S7 · logo -->
@@ -639,8 +641,8 @@ body.export .viewport{border-radius:0;box-shadow:none}
 const BPM = 128, BEAT = 60 / BPM, BAR = BEAT * 4, DUR = 16 * BAR; // 30.0 s
 const FORMATS = { f169: [1920, 1080], f916: [1080, 1920], f45: [1080, 1350] };
 const SCENES = [
-  { a: 0,  name: 'Intro',   tc: '00:00',   title: 'Licznik',         copy: '2 787 nowych ogłoszeń z ostatnich 7 dni. Który jest Twój?', sfx: 'Sub-boom, tykanie licznika, mapa Polski zapala się ogłoszeniami' },
-  { a: 8,  name: 'Chaos',   tc: '00:03.7', title: 'Ściana ogłoszeń', copy: 'Nie przekopuj całej listy.', sfx: 'Stopa przez filtr, werbel narasta, cisza przed dropem' },
+  { a: 0,  name: 'Intro',   tc: '00:00',   title: 'Licznik',         copy: 'System przetargowy dla firm budowlanych. 2 787 nowych ogłoszeń z ostatnich 7 dni. Co jest w Twojej branży?', sfx: 'Sub-boom, tykanie licznika, mapa Polski zapala się ogłoszeniami' },
+  { a: 8,  name: 'Chaos',   tc: '00:03.7', title: 'Ściana ogłoszeń', copy: 'BZP, TED i BIP-y gmin, codziennie po kolei.', sfx: 'Stopa przez filtr, słowo na każdy beat, werbel narasta, cisza przed dropem' },
   { a: 16, name: 'Znajdź',  tc: '00:07.5', title: '01 Znajdź',       copy: 'Jedna lista z BZP, TED i BIP. Na górze listy Twoja robota.', sfx: 'DROP: pełny bit, BZP, TED i BIP lądują na tomach i łączą się w Zwiad' },
   { a: 24, name: 'Sprawdź', tc: '00:11.2', title: '02 Sprawdź',      copy: 'SWZ przeczytana, z numerem strony. Najpierw decyzja. Potem oferta.', sfx: 'Szelest stron, czerwona flaga, klik w Analiza' },
   { a: 32, name: 'Policz',  tc: '00:15.0', title: '03 Policz',       copy: 'Przedmiar z PDF w wierszu kosztorysu. Kod KNR i skład ceny pozycji.', sfx: 'Skaner przedmiaru, hook C–Es–F, uderzenie na składzie pozycji' },
@@ -882,7 +884,7 @@ function drawMap(c, b) {
 }
 
 /* montage: the BudOS funnel from the landing hero, one ring per step */
-const FUNNEL = [[0, '01', 'ZWIAD', 'BZP · TED · BIP'], [.33, '02', 'ANALIZA SWZ', 'WARUNKI · RYZYKA · FLAGI'], [.62, '03', 'KOSZTORYS', 'KNR · 784 685 CEN'], [.88, '04', 'OFERTA', 'PDF · DOCX']];
+const FUNNEL = [[0, '01', 'ZWIAD', 'BZP · TED · BIP'], [.33, '02', 'ANALIZA SWZ', 'WARUNKI · WYMAGANIA · RYZYKA'], [.62, '03', 'KOSZTORYS', 'KNR · 784 685 CEN'], [.88, '04', 'OFERTA', 'PDF · DOCX']];
 function funnelGeo() {
   return FMT === 'f169' ? { cx: 1360, top: 150, bot: 930, R: 300, lab: 20 }
     : FMT === 'f916' ? { cx: 540, top: 250, bot: 1080, R: 350, lab: 21 }
@@ -987,8 +989,8 @@ function scramble(txt, p, seed) { let o = ''; const n = txt.length, k = Math.flo
 
 const U = {
   s0(lb, b, t) {
-    const typedTxt = 'Ostatnie 7 dni';
-    const tp = seg(lb, .3, 1.3); $('s0t').textContent = typedTxt.slice(0, Math.round(tp * typedTxt.length));
+    const typedTxt = 'System przetargowy dla firm budowlanych';
+    const tp = seg(lb, .2, 1.6); $('s0t').textContent = typedTxt.slice(0, Math.round(tp * typedTxt.length));
     $('s0car').style.opacity = (Math.floor(t * 4) % 2 === 0 || tp < 1) ? 1 : 0;
     const cp = seg(lb, 1, 5.5), cnt = Math.round(2787 * eo5(cp));
     $('s0count').innerHTML = fmtCount(cnt);
@@ -1007,8 +1009,8 @@ const U = {
     fx($('s0lab'), eo3(seg(lb, 2, 3)), 0, lerp(FMT === 'f169' ? 180 : 200, FMT === 'f169' ? -120 : -140, up) + (1 - eo3(seg(lb, 2, 3))) * 30, lerp(1, .85, up));
     const q = $('s0q'); q.style.top = big + 'px';
     const qp = seg(lb, 6, 6.9);
-    const txt = scramble('Który jest Twój?', eo3(qp), Math.floor(t * 30));
-    q.innerHTML = txt.replace('Twój?', '<span class="g">Twój?</span>');
+    const txt = scramble('Co jest w Twojej branży?', eo3(qp), Math.floor(t * 30));
+    q.innerHTML = txt.replace('Twojej branży?', '<span class="g">Twojej branży?</span>');
     fx(q, seg(lb, 6, 6.15), 0, 60, 1 + (lb > 6 ? Math.exp(-(lb - 6) * 6) * .08 : 0));
     $('s0note').style.opacity = seg(lb, 2.2, 3) * .9;
     // out glitch
@@ -1017,9 +1019,9 @@ const U = {
   s1(lb, b, t) {
     const ws = $('s1slam').querySelectorAll('.w');
     ws.forEach((w, i) => {
-      const p = seg(lb, i, i + .22); const e = eo5(p);
+      const g = +w.dataset.g, p = seg(lb, g, g + .22), e = eo5(p); // one group per beat
       const jit = lb > 6 && lb < 7.5 ? (hash(Math.floor(t * 40) + i) - .5) * 26 : 0;
-      fx(w, p > 0 ? 1 : 0, jit, 0, lerp(1.9, 1, e) * (1 + (lb >= i ? Math.exp(-(lb - i) * 7) * .05 : 0)), (1 - e) * 20);
+      fx(w, p > 0 ? 1 : 0, jit, 0, lerp(1.9, 1, e) * (1 + (lb >= g ? Math.exp(-(lb - g) * 7) * .05 : 0)), (1 - e) * 20);
     });
     $('s1slam').style.opacity = lb < 7.5 ? 1 : 0;
     $('s1shade').style.opacity = seg(lb, 0, .5) * (lb < 7.5 ? 1 : .6);

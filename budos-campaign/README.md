@@ -27,24 +27,24 @@ Spot 30 s do ogólnopolskiej kampanii BudOS: „Przetargi opanowane.” Wersja z
 
 | Czas | Scena | Na ekranie | Dźwięk |
 |---|---|---|---|
-| 00:00 | Licznik | „Ostatnie 7 dni”, licznik do 2 787 nowych ogłoszeń, mapa Polski zapala się ogłoszeniami, „Który jest Twój?” | Sub-boom, tykanie licznika, dzwon |
-| 00:03.7 | Chaos | Ściana ogłoszeń z BZP, TED i BIP, „Nie przekopuj całej listy.” | Stopa przez filtr, werbel narasta, pół beatu ciszy |
+| 00:00 | Licznik | Hero landingu w ruchu: „System przetargowy dla firm budowlanych”, licznik do 2 787 „nowych ogłoszeń z ostatnich 7 dni”, mapa Polski zapala się ogłoszeniami, „Co jest w Twojej branży?” | Sub-boom, tykanie licznika, dzwon |
+| 00:03.7 | Chaos | Ściana ogłoszeń i zdanie z kolumny „dziś” na landingu, słowo na każdy beat: „BZP, TED i BIP-y gmin, codziennie po kolei.” | Stopa przez filtr, werbel narasta, pół beatu ciszy |
 | 00:07.5 | 01 Znajdź | BZP (co 15 minut), TED (codziennie) i BIP (radar gmin) łączą się w Zwiad. „Jedna lista z BZP, TED i BIP.” „Na górze listy Twoja robota.” Wiersze z nagrania Zwiadu na landingu, dopasowanie 100 | Drop, tomy na każde źródło |
 | 00:11.2 | 02 Sprawdź | Strony SWZ przechodzą w raport z demo: 13 wymagań, 13 ryzyk, czerwona flaga ze stroną. Potem karta z Poznania i wybór „Analiza” z powodem. „SWZ przeczytana, z numerem strony.” „Najpierw decyzja. Potem oferta.” | Szelest stron, niski dźwięk flagi, klik |
 | 00:15.0 | 03 Policz | Skaner czyta przedmiar z PDF, pozycja 34 trafia do kosztorysu i rozkłada się na skład z kodem KNR, w tle 784 685 cen z bazy. „Przedmiar z PDF w wierszu kosztorysu.” „Kod KNR i skład ceny pozycji.” | Hook C–Es–F, uderzenie na składzie |
 | 00:18.7 | 04 Złóż | Dane firmy i kwota 340 235,02 zł brutto wchodzą do formularza, lista braków, podpis. „Formularze z danymi Twojej firmy.” „Decydujesz i podpisujesz Ty.” | Stukot pól, licznik kwoty, pióro |
-| 00:22.5 | Lejek | Znajdź. Sprawdź. Policz. Złóż. Każde słowo zapala pierścień lejka z hero landingu. „Od ogłoszenia do oferty.” | Tom na każdy krok |
+| 00:22.5 | Lejek | Znajdź. Sprawdź. Policz. Złóż. Każde słowo zapala pierścień lejka z hero landingu (Zwiad, Analiza SWZ, Kosztorys, Oferta). „Od ogłoszenia do oferty.” BZP co 15 minut, TED codziennie, radar BIP | Tom na każdy krok |
 | 00:26.2 | Packshot | Logo, „Przetargi opanowane.”, przycisk „Zobacz demo bez konta”, budos.io | Dźwiękowe logo C5–Es5–F5, wybrzmienie |
 
-Zasady prawdy z landingu v4: kadry z demo mają podpis „Przykład z demo · przegląd dokumentów” i adres `/demo` w pasku okna, decyzja jest opisana jako „Na tym etapie”, a nie rekomendacja. Spot nie mówi, że BudOS składa ofertę: przygotowuje dokumenty, a decyzję i podpis zostawia firmie.
+Każde zdanie na ekranie pochodzi z landingu v4 albo z aplikacji: hero, cztery kroki z „Jak to działa”, „Najpierw decyzja. Potem oferta.”, pary „dziś → z BudOS” i liczby z bazy. Zasady prawdy z landingu v4: kadry z demo mają podpis „Przykład z demo · przegląd dokumentów” i adres `/demo` w pasku okna, decyzja jest opisana jako „Na tym etapie”, a nie rekomendacja. Spot nie mówi, że BudOS składa ofertę: przygotowuje dokumenty, a decyzję i podpis zostawia firmie.
 
 ## Spoty pionowe (TikTok, Reels, YouTube Shorts)
 
 | Spot | Trend | Pomysł | Muzyka |
 |---|---|---|---|
-| A | „I Try to Act Normal” | Szef pyta o przetarg na remont urzędu w Poznaniu. Na zewnątrz „Jasne, pod kontrolą.”, w środku 39 plików dokumentacji i puls 180. Potem termin, analiza SWZ i kosztorys z demo (z podpisem) i puls spada do 72: „Teraz to nawet prawda.” | 100 BPM, napięcie → luźny trap z Rhodesem |
-| B | „Flop-core” | Cztery wtopy (spóźniona oferta, przeoczony warunek, zgubiony przecinek, 2 h przewijania), potem cztery rozwiązania słowami landingu: termin w Zwiadzie, wyciąg i flagi z numerem strony, przedmiar z PDF i ceny z bazy, na górze listy Twoja robota. Hasło: „Mniej flopów. Przetargi opanowane.” | 140 BPM, jersey club, muzyka urywa się na każdej wpadce |
-| C | „Tap to reveal” | Sześć rozmytych kafelków: Znajdź, Sprawdź, decyzja, Policz, Złóż, a pod ostatnim logo. Kafelki z liczbami z demo mają podpis „demo”. Ostatnia klatka = pierwsza, więc spot się zapętla | 120 BPM, lo-fi house, ASMR-owe popy |
+| A | „I Try to Act Normal” | Szef pyta o przetarg na remont urzędu w Poznaniu. Na zewnątrz „Jasne, pod kontrolą.”, w środku 39 plików dokumentacji i puls 180. Potem cztery etapy z teczki demo (Zwiad, Analiza SWZ, Kosztorys, Oferta, z podpisem „Przykład z demo”) i puls spada do 72: „Teraz to nawet prawda.” | 100 BPM, napięcie → luźny trap z Rhodesem |
+| B | „Flop-core” | Cztery wtopy w kolejności etapów z landingu: 2 h w BZP, TED i BIP-ach (Zwiad), przeoczony warunek (SWZ), przecinek w wklepanym przedmiarze (Kosztorys), oferta spóźniona przez ręczne formularze (Oferta). Potem „Te same kroki, mniej ręcznej roboty.” i pary „dziś → z BudOS” z landingu z liczbami z bazy. Hasło: „Mniej flopów. Przetargi opanowane.” | 140 BPM, jersey club, muzyka urywa się na każdej wpadce |
+| C | „Tap to reveal” | Sześć rozmytych kafelków: Znajdź, Sprawdź, decyzja, Policz, Złóż, a pod ostatnim logo. Podpisy to zdania z landingu, kafelki z liczbami z demo mają dopisek „demo”, na końcu „Od ogłoszenia do oferty w czterech krokach.” Ostatnia klatka = pierwsza, więc spot się zapętla | 120 BPM, lo-fi house, ASMR-owe popy |
 
 Wspólne zasady: napis-hak od pierwszej klatki, ważne treści poza strefami interfejsu (górne 150 px, prawe 140 px, dolne 380 px), dźwiękowe logo C–Es–F na końcu każdego spotu. Każdy kończy się hasłem „Przetargi opanowane.” i przyciskiem „Zobacz demo bez konta”, jak na landingu.
 
