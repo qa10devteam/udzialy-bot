@@ -78,13 +78,20 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .foot span{font:500 30px var(--grot);color:var(--cream-2);display:flex;align-items:center;gap:12px}
 .foot span svg{height:30px}
 
+/* labels that separate examples and schemas from real app screens */
+.lbl{display:inline-block;font:700 22px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#E3B45B;background:rgba(227,180,91,.12);border:2px solid rgba(227,180,91,.55);padding:4px 14px;border-radius:10px}
+.hd.sm .a{font-size:78px}.hd.sm .b{font-size:92px}
+.hd.xs .b{font-size:78px}
+.f45 .hd.xs .b{font-size:62px}.f11 .hd.xs .b{font-size:50px}
+.note .ok .fn{display:block;margin-top:10px;font:500 26px/1.3 var(--grot);color:var(--cream-2)}
+.note .ok .st{color:var(--green);font-weight:700}
 /* slide 2: zwiad */
 .map{position:absolute;right:0;top:0;width:640px;height:600px}
-.today{position:absolute;left:0;top:10px;font:700 30px var(--mono);padding:12px 22px;border-radius:14px;background:#150F0B;border:2px solid #5A3B22;color:#E3B45B}
+.today{position:absolute;left:0;top:10px;font:700 30px var(--mono);letter-spacing:.06em;padding:12px 22px;border-radius:14px;background:rgba(117,185,117,.1);border:2px solid rgba(117,185,117,.55);color:var(--green)}
 .alert{position:absolute;left:0;width:760px;padding:28px 32px;display:flex;flex-direction:column;gap:12px}
 .alert .hdr{display:flex;align-items:center;gap:14px;font:700 26px var(--mono);letter-spacing:.08em;color:var(--green)}
 .alert .hdr i{width:18px;height:18px;border-radius:50%;background:var(--green);box-shadow:0 0 0 8px rgba(117,185,117,.2)}
-.alert .hdr em{margin-left:auto;font-style:normal;color:var(--cream-3);letter-spacing:0}
+.alert .hdr .lbl{margin-left:auto}
 .alert .t{font:600 38px/1.2 var(--grot);letter-spacing:-.01em}
 .alert .t .k{color:var(--cream-2);font-weight:500;margin:0 8px}
 .alert .m{font:400 28px var(--grot);color:var(--cream-2)}
@@ -93,14 +100,14 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 /* slide 3: filters */
 .filt{position:absolute;inset:0;padding:26px 30px;display:flex;flex-direction:column;gap:12px}
 .filt .row1{display:flex;justify-content:space-between;align-items:center}
-.filt .row1 .d{font:700 28px var(--mono);color:#E3B45B}
+.filt .row1 .d{font:700 24px var(--mono);letter-spacing:.1em;color:var(--cream-3)}
 .filt .row1 .go{font:700 28px var(--grot);background:var(--green);color:var(--ink);padding:10px 24px;border-radius:12px}
 .filt h5{margin:0;font:700 22px var(--mono);letter-spacing:.12em;color:var(--cream-3)}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
 .chips span{font:500 25px var(--grot);padding:6px 18px;border-radius:999px;border:2px solid #2A3B52;background:#121D2B;color:var(--cream-2)}
 .chips span.on{border-color:var(--green);background:rgba(117,185,117,.14);color:var(--cream)}
 /* slide 4: termin */
-.big17{position:absolute;left:0;top:-20px;font:900 330px/.86 var(--cond);font-stretch:75%;color:var(--green);letter-spacing:-.02em}
+.big17{position:absolute;left:0;top:24px;width:440px;font:900 96px/.92 var(--cond);font-stretch:75%;color:var(--green);letter-spacing:-.01em;text-transform:uppercase}
 .big17 small{display:block;font:500 32px/1.2 var(--grot);color:var(--cream-2);letter-spacing:-.01em;margin-top:14px;width:360px}
 .cal{position:absolute;right:0;top:0;width:470px;padding:22px 26px}
 .cal h6{margin:0 0 16px;font:700 24px var(--mono);letter-spacing:.1em;color:var(--cream-2)}
@@ -114,6 +121,7 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .term .d{font:600 44px var(--grot);letter-spacing:-.01em}
 .term .z{font:500 34px var(--grot);color:var(--cream-2)}
 .term .z b{color:var(--green)}
+.exlbl{position:absolute;left:0;right:0;top:-62px}
 /* slide 5: SWZ */
 .acc{position:absolute;inset:0;display:flex;flex-direction:column;gap:12px}
 .acc .r{display:flex;align-items:center;gap:18px;padding:18px 26px;font:500 30px var(--grot);border-radius:16px;border:2px solid #22334A;background:#0E1823}
@@ -126,6 +134,18 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .crit .b{height:12px;border-radius:6px;background:#1E2C3D;overflow:hidden}
 .crit .b i{display:block;height:100%;background:var(--green)}
 .crit .p{font:700 27px var(--mono);color:var(--green);text-align:right}
+/* slide 5: schema warunek → dokument → strona */
+.schema{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px}
+.schema .top{display:flex;justify-content:space-between;align-items:center}
+.schema .st{display:grid;grid-template-columns:76px 1fr;gap:24px;align-items:center;padding:20px 28px;border-radius:18px;border:2px dashed #3A4E66;background:rgba(14,24,35,.8)}
+.schema .st i{width:76px;height:76px;border-radius:18px;display:grid;place-items:center;background:rgba(117,185,117,.12);color:var(--green)}
+.schema .st i svg{width:42px;height:42px}
+.schema .st b{display:block;font:700 40px/1.1 var(--grot);letter-spacing:-.01em}
+.schema .st span{font:400 27px var(--grot);color:var(--cream-2)}
+.schema .ar{align-self:center;width:4px;height:26px;background:var(--green);position:relative;margin:-4px 0}
+.schema .ar::after{content:"";position:absolute;left:-11px;bottom:-12px;border:13px solid transparent;border-top:14px solid var(--green)}
+.schema .ai{margin-top:8px;font:600 30px var(--grot);color:var(--cream);display:flex;gap:14px;align-items:center}
+.schema .ai svg{width:34px;height:34px;color:#E3B45B;flex:none}
 /* slide 6: kosztorys */
 .pos{position:absolute;left:0;right:0;top:0;padding:24px 30px;display:grid;grid-template-columns:1fr auto;gap:6px 20px;align-items:center}
 .pos .c{font:700 22px var(--mono);color:var(--cream-3);grid-column:1 / -1}
@@ -133,7 +153,8 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .pos .v{font:700 64px var(--mono);letter-spacing:-.04em;grid-column:2;grid-row:2;white-space:nowrap;color:var(--green)}
 .arrow{position:absolute;left:50%;top:176px;width:4px;height:44px;margin-left:-2px;background:var(--green)}
 .arrow::after{content:"";position:absolute;left:-12px;bottom:-14px;border:14px solid transparent;border-top:16px solid var(--green)}
-.sk{position:absolute;left:0;right:0;top:238px;display:flex;flex-direction:column;gap:8px}
+.sk{position:absolute;left:0;right:0;top:232px;display:flex;flex-direction:column;gap:7px}
+.skcap{position:absolute;left:0;right:0;top:180px;font:500 26px var(--grot);color:var(--cream-2);text-align:center}
 .sk .r{display:grid;grid-template-columns:52px 1fr 120px 64px;gap:16px;align-items:center;padding:10px 22px;border-radius:14px;border:2px solid #22334A;background:#0E1823;font:500 25px/1.2 var(--grot)}
 .sk .ty{font:700 20px var(--mono);color:var(--ink);background:var(--cream-2);border-radius:6px;text-align:center;padding:2px 0}
 .sk .ty.r{background:var(--green)}
@@ -148,6 +169,10 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .steps .s.fin{border-color:var(--green);background:linear-gradient(90deg,rgba(117,185,117,.18),#0E1823)}
 .steps .s.fin i{background:var(--green);color:var(--ink)}
 .steps .s em{font:700 22px var(--mono);font-style:normal;color:var(--cream-3);letter-spacing:.08em}
+.steps .s .dc{display:inline-flex;gap:8px;margin-left:6px;vertical-align:2px}
+.steps .s .dc u{text-decoration:none;font:700 18px var(--mono);letter-spacing:.06em;padding:2px 10px;border-radius:7px;border:2px solid #2A3B52}
+.steps .s .dc .t{color:var(--green);border-color:rgba(117,185,117,.6)}.steps .s .dc .a{background:#CFC8BF;border-color:#CFC8BF;color:var(--ink)}.steps .s .dc .n{color:#E5625C;border-color:rgba(229,98,92,.6)}
+.steps .s.of{border-style:dashed}
 /* slide 8: CTA */
 .biglogo{position:absolute;left:300px;top:300px;width:480px}
 .biglogo svg{width:100%;height:auto}
@@ -158,10 +183,11 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .sheet .holes{position:absolute;left:30px;right:30px;top:26px;display:flex;justify-content:space-between}
 .sheet .holes i{width:22px;height:32px;border-radius:11px;background:var(--ink)}
 .sheet h4{margin:0 0 18px;font:700 40px var(--grot);color:#10151C;letter-spacing:-.02em}
-.sheet p{margin:0;font:500 42px/1.55 var(--grot);color:#10151C;display:flex;align-items:center;gap:22px;letter-spacing:-.01em}
+.sheet p{margin:0;font:500 38px/1.5 var(--grot);color:#10151C;display:flex;align-items:center;gap:22px;letter-spacing:-.01em}
 .sheet p svg{width:44px;height:44px;flex:none}
 .cta{position:absolute;left:170px;right:150px;top:1480px;height:150px;border-radius:44px;background:var(--green);display:grid;place-items:center;font:800 64px var(--cond);font-stretch:80%;color:var(--ink);box-shadow:0 0 70px rgba(117,185,117,.55)}
-.cursor{position:absolute;left:740px;top:1570px;width:96px}
+.cursor{position:absolute;left:872px;top:1586px;width:90px}
+.url{position:absolute;left:0;right:0;top:1652px;text-align:center;font:700 34px var(--mono);letter-spacing:.06em;color:var(--green)}
 .save{position:absolute;left:80px;right:80px;top:1790px;text-align:center;font:500 34px/1.35 var(--grot);color:var(--cream-2)}
 .save b{color:var(--cream);font-weight:600}
 
@@ -171,9 +197,9 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .fmts button{appearance:none;border:0;background:transparent;color:var(--cream-2);font:700 12px var(--mono);height:38px;padding:0 14px;cursor:pointer}
 .fmts button[aria-pressed="true"]{background:var(--cream);color:var(--ink)}
 .fmts button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
-.strip:not(.f916) .frame.cover,.strip.f916 .frame.cover-html{display:none}
+.frame.cover{display:none}
 
-/* ===== cover rebuilt for 4:5 and 1:1 ===== */
+/* ===== cover rebuilt in HTML for every format (original raster kept in brand/premiera-okladka-oryginal.png) ===== */
 .cvban{position:absolute;left:0;right:0;top:0;background:var(--green);display:grid;place-items:center;font:900 1px/1 var(--cond);font-stretch:80%;color:var(--ink)}
 .cvlogo{position:absolute}.cvlogo svg{display:block;width:100%;height:auto}
 .cvqa{position:absolute}
@@ -188,6 +214,21 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .cvres{position:absolute;color:var(--cream)}
 .cvcta{position:absolute;background:var(--green);display:grid;place-items:center;font-family:var(--cond);font-stretch:80%;font-weight:800;color:var(--ink);box-shadow:0 0 70px rgba(117,185,117,.55)}
 .cvcur{position:absolute}
+.cvres .st{color:var(--green);font-weight:700;margin-left:.04em}
+.cvfn{position:absolute;font:500 26px/1.35 var(--grot);color:var(--cream-2);letter-spacing:-.005em}
+.cvfn b{color:var(--green);font-weight:700}
+.cvdec{position:absolute;display:flex;gap:12px;align-items:flex-start;font:600 32px/1.25 var(--grot);color:var(--cream);letter-spacing:-.01em}
+.cvdec svg{flex:none;width:1.05em;height:1.05em;color:var(--green);margin-top:.08em}
+/* 9:16 cover (matches the original Premiera card) */
+.f916 .cvban{height:336px;border-radius:0 0 110px 110px;font-size:118px;padding-top:104px}
+.f916 .cvlogo{left:302px;top:408px;width:478px}.f916 .cvqa{left:812px;top:418px;width:184px}
+.f916 .cvclaim{top:748px;font-size:66px}.f916 .cvclaim b{font-size:76px}
+.f916 .cvpaper{left:-30px;top:860px;width:720px;height:930px;padding:200px 0 0 150px;transform:rotate(6deg);transform-origin:0 0}.f916 .cvpaper p{font-size:42px;line-height:1.5}
+.f916 .cvres{left:715px;top:1062px}.f916 .cvres p{font-size:44px;line-height:1.42}
+.f916 .cvfn{left:715px;top:1262px;width:340px;font-size:28px}
+.f916 .cvdec{left:715px;top:1392px;width:340px}
+.f916 .cvcta{left:170px;right:150px;top:1520px;height:146px;font-size:56px;border-radius:44px}
+.f916 .cvcur{left:856px;top:1624px;width:84px}
 
 /* ===== 4:5 (1080×1350) ===== */
 .f45 .frame{height:378px}
@@ -205,18 +246,21 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .f45 .foot{bottom:28px;left:70px;right:70px}.f45 .foot svg{height:44px}.f45 .foot span{font-size:24px}.f45 .foot span svg{height:24px}
 .f45 .biglogo{left:350px;top:186px;width:380px}.f45 .qa{left:748px;top:198px;width:170px}
 .f45 .claim{top:452px;font-size:62px}.f45 .claim b{font-size:72px}
-.f45 .sheet{left:190px;top:562px;width:700px;height:420px;padding:78px 60px 0}.f45 .sheet .holes{top:20px}
-.f45 .sheet h4{font-size:32px;margin-bottom:10px}.f45 .sheet p{font-size:34px;gap:18px}.f45 .sheet p svg{width:36px;height:36px}
+.f45 .sheet{left:190px;top:548px;width:700px;height:400px;padding:64px 56px 0}.f45 .sheet .holes{top:20px}
+.f45 .sheet h4{font-size:28px;margin-bottom:6px}.f45 .sheet p{font-size:27px;gap:14px;line-height:1.42}.f45 .sheet p svg{width:36px;height:36px}
 .f45 .cta{left:190px;right:170px;top:946px;height:118px;font-size:52px;border-radius:36px}
-.f45 .cursor{left:720px;top:1016px;width:78px}
-.f45 .save{top:1092px;font-size:28px}
+.f45 .cursor{left:852px;top:1024px;width:72px}
+.f45 .save{top:1262px;font-size:26px}
+.f45 .url{top:1080px;font-size:28px}
+.f45 .note .ok .fn{font-size:24px}
 .f45 .cvban{height:240px;border-radius:0 0 110px 110px;font-size:120px}
 .f45 .cvlogo{left:300px;top:290px;width:420px}.f45 .cvqa{left:740px;top:302px;width:188px}
 .f45 .cvclaim{top:588px;font-size:64px}.f45 .cvclaim b{font-size:74px}
 .f45 .cvpaper{left:-40px;top:700px;width:620px;height:560px;padding:120px 0 0 110px}.f45 .cvpaper p{font-size:40px;line-height:1.6}
-.f45 .cvres{left:640px;top:806px}.f45 .cvres p{font-size:44px;line-height:1.46}
-.f45 .cvcta{left:150px;right:150px;top:1092px;height:130px;font-size:62px;border-radius:40px}
-.f45 .cvcur{left:716px;top:1170px;width:80px}
+.f45 .cvres{left:640px;top:772px}.f45 .cvres p{font-size:42px;line-height:1.4}
+.f45 .cvfn{left:640px;top:950px;width:420px;font-size:25px}.f45 .cvdec{left:640px;top:1024px;width:420px;font-size:28px}
+.f45 .cvcta{left:150px;right:150px;top:1104px;height:122px;font-size:52px;border-radius:40px}
+.f45 .cvcur{left:858px;top:1188px;width:72px}
 
 /* ===== 1:1 (1080×1080) ===== */
 .f11 .frame{height:302px}
@@ -225,8 +269,8 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .f11 .ban b{font-size:52px}.f11 .ban span{font-size:26px}
 .f11 .hd{top:146px;left:60px;right:60px}
 .f11 .hd .a{font-size:50px}.f11 .hd .b{font-size:64px;margin-top:0}
-.f11 .lead{display:none}
-.f11 .vis{top:292px;transform:scale(.6);transform-origin:50% 0}
+.f11 .lead{font-size:23px;line-height:1.3;margin-top:8px}
+.f11 .vis{top:352px;transform:scale(.53);transform-origin:50% 0}
 .f11 .note{top:678px;height:150px}.f11 .note .paper{height:150px}
 .f11 .note .x{font-size:26px;top:30px;left:60px;width:430px}
 .f11 .note .ok{font-size:30px;top:34px}
@@ -234,18 +278,21 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .f11 .foot{bottom:22px;left:60px;right:60px}.f11 .foot svg{height:38px}.f11 .foot span{font-size:22px}.f11 .foot span svg{height:22px}
 .f11 .biglogo{left:390px;top:140px;width:300px}.f11 .qa{left:702px;top:150px;width:150px}
 .f11 .claim{top:346px;font-size:50px}.f11 .claim b{font-size:58px}
-.f11 .sheet{left:200px;top:432px;width:680px;height:300px;padding:60px 50px 0}.f11 .sheet .holes{top:16px}.f11 .sheet .holes i{width:16px;height:24px}
-.f11 .sheet h4{font-size:26px;margin-bottom:6px}.f11 .sheet p{font-size:27px;gap:14px;line-height:1.45}.f11 .sheet p svg{width:28px;height:28px}
+.f11 .sheet{left:200px;top:420px;width:680px;height:270px;padding:48px 48px 0}.f11 .sheet .holes{top:16px}.f11 .sheet .holes i{width:16px;height:24px}
+.f11 .sheet h4{font-size:22px;margin-bottom:4px}.f11 .sheet p{font-size:21px;gap:10px;line-height:1.38}.f11 .sheet p svg{width:28px;height:28px}
 .f11 .cta{left:200px;right:180px;top:700px;height:100px;font-size:44px;border-radius:30px}
-.f11 .cursor{left:690px;top:758px;width:64px}
-.f11 .save{top:806px;font-size:24px}
+.f11 .cursor{left:852px;top:762px;width:58px}
+.f11 .save{top:950px;font-size:22px}
+.f11 .url{top:806px;font-size:24px}
+.f11 .note .ok .fn{font-size:21px;margin-top:4px}
 .f11 .cvban{height:190px;border-radius:0 0 90px 90px;font-size:96px}
 .f11 .cvlogo{left:350px;top:226px;width:340px}.f11 .cvqa{left:706px;top:236px;width:150px}
 .f11 .cvclaim{top:462px;font-size:52px}.f11 .cvclaim b{font-size:60px}
 .f11 .cvpaper{left:-40px;top:548px;width:560px;height:500px;padding:96px 0 0 100px}.f11 .cvpaper .holes i{width:16px;height:24px}.f11 .cvpaper p{font-size:34px;line-height:1.6}
-.f11 .cvres{left:580px;top:636px}.f11 .cvres p{font-size:38px;line-height:1.46}
-.f11 .cvcta{left:150px;right:150px;top:850px;height:110px;font-size:52px;border-radius:34px}
-.f11 .cvcur{left:690px;top:918px;width:68px}
+.f11 .cvres{left:580px;top:606px}.f11 .cvres p{font-size:36px;line-height:1.4}
+.f11 .cvfn{left:580px;top:762px;width:480px;font-size:23px}.f11 .cvdec{left:580px;top:830px;width:470px;font-size:25px}
+.f11 .cvcta{left:150px;right:150px;top:898px;height:100px;font-size:44px;border-radius:32px}
+.f11 .cvcur{left:868px;top:962px;width:58px}
 
 body.export{padding:0;margin:0;background:#000}
 body.export .wrap{max-width:none;display:block}
@@ -262,7 +309,7 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <span class="eyebrow">8 slajdów · 1080×1920 · Stories, TikTok photo mode</span>
   </header>
   <h1 class="pg-h">Karuzela premierowa. <em>Od Zwiadu do decyzji.</em></h1>
-  <p class="lede">Pierwszy slajd to Wasza karta „Premiera”. Kolejne prowadzą przez BudOS w kolejności pracy nad przetargiem: Zwiad znajduje ogłoszenie, filtry zostawiają Twoje, potem termin, analiza SWZ i skład pozycji. Zielona linia na dole przechodzi przez wszystkie slajdy, więc przewijanie czyta się jak jedna droga.</p>
+  <p class="lede">Wersja poprawiona pod landing i korektę QA10. Pierwszy slajd to Wasza karta „Premiera” odtworzona 1:1 w HTML, z dopiskiem o testach i przyciskiem do demo. Kolejne prowadzą przez BudOS w kolejności pracy nad przetargiem: Zwiad, dopasowanie, termin, analiza SWZ, kosztorys, decyzja i start. Przykłady i schematy są podpisane, żeby nie udawały ekranów aplikacji.</p>
 
   <div class="fmts" role="group" aria-label="Format"><button type="button" data-f="f916" aria-pressed="true">9:16 · Stories, TikTok</button><button type="button" data-f="f45" aria-pressed="false">4:5 · feed, LinkedIn</button><button type="button" data-f="f11" aria-pressed="false">1:1 · kwadrat</button></div>
   <div class="strip f916" id="strip" tabindex="0" aria-label="Slajdy karuzeli, przewiń w bok">
@@ -274,8 +321,10 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <img class="cvqa" src="data:image/png;base64,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" alt="by QA10">
       <div class="cvclaim">Przetargi <b>OPANOWANE.</b></div>
       <div class="cvpaper"><div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p><s>33 godziny</s></p><p><s>żmudny research</s></p><p><s>stres i zmęczenie</s></p></div>
-      <div class="cvres"><p>6 minut</p><p>szybki wynik</p><p>czas i spokój</p></div>
-      <div class="cvcta">W ZASIĘGU KLIKNIĘCIA</div>
+      <div class="cvres"><p>6 minut<span class="st">*</span></p><p>szybki wynik</p><p>czas i spokój</p></div>
+      <div class="cvfn"><b>*</b>Potwierdzone po testach w&nbsp;firmach budowlanych.</div>
+      <div class="cvdec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.6 3 8.2 7 10 4-1.8 7-5.4 7-10V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg><span>Decydujesz i&nbsp;podpisujesz Ty.</span></div>
+      <div class="cvcta">ZOBACZ DEMO BEZ KONTA</div>
       <svg class="cvcur" viewBox="0 0 12 19" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0v16h1v-1h1v-1h1v-1h1v2h1v2h1v2h2v-1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#000"/><path d="M1 2v11h1v-1h1v-1h1v1h1v2h1v2h1v1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#fff"/></svg>
     </div><span class="num">01</span></div>
 
@@ -284,12 +333,12 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <div class="grid"></div>
       <div class="ban"><b>Zwiad</b><span>02/08</span></div>
       <div class="hd"><span class="a">Zwiad szuka.</span><span class="b">Ty wybierasz.</span>
-      <p class="lead">Codziennie przegląda nowe przetargi budowlane z&nbsp;całej Polski i&nbsp;daje znać, kiedy pojawi się coś <b>dla Ciebie.</b></p></div>
+      <p class="lead">Jedna lista z&nbsp;BZP, TED i&nbsp;BIP. Na górze przetargi <b>dopasowane do Twojej firmy.</b></p></div>
       <div class="vis">
         <canvas class="map" id="map" width="640" height="600"></canvas>
-        <div class="today">Dziś: 171 nowych</div>
-        <div class="alert card ghost" style="top:200px"><div class="hdr"><i></i>ZWIAD · NOWY ALERT<em>2 min temu</em></div><div class="t"><span class="tag">Drogi</span><span class="k">Budowa</span>Ronda w Mławie</div></div>
-        <div class="alert card" style="top:330px"><div class="hdr"><i></i>ZWIAD · NOWY ALERT<em>teraz</em></div><div class="t"><span class="tag">Drogi</span><span class="k">Przebudowa</span>Ulicy Staffa w&nbsp;Kościerzynie</div><div class="m">Pomorskie · termin 12.10.2026 · <b>za 17 dni</b></div></div>
+        <div class="today">BZP · TED · BIP</div>
+        <div class="alert card ghost" style="top:200px"><div class="hdr"><i></i>ZWIAD · ALERT</div><div class="t"><span class="tag">Drogi</span><span class="k">Budowa</span>Ronda w Mławie</div></div>
+        <div class="alert card" style="top:330px"><div class="hdr"><i></i>ZWIAD · ALERT<span class="lbl">Przykładowy alert</span></div><div class="t"><span class="tag">Drogi</span><span class="k">Przebudowa</span>Ulicy Staffa w&nbsp;Kościerzynie</div><div class="m">Pomorskie · termin składania 12.10.2026</div></div>
       </div>
       <div class="note"><div class="paper"></div><div class="x"><s>przekopywanie portali</s><br><s>10 otwartych kart</s></div><div class="ok">alert, gdy<br><b>coś pasuje</b></div></div>
       <div class="route"><i class="ln past" style="left:540px;width:0"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Zwiad</span></div>
@@ -300,16 +349,15 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="03">
       <div class="grid"></div>
       <div class="ban"><b>Filtry</b><span>03/08</span></div>
-      <div class="hd"><span class="a">Tylko Twoje</span><span class="b">przetargi.</span>
-      <p class="lead">Branża, województwo, wartość i&nbsp;termin. <b>Ustawiasz raz,</b> a&nbsp;Zwiad pilnuje reszty.</p></div>
+      <div class="hd sm"><span class="a">Przetargi dopasowane</span><span class="b">do Twojej firmy.</span>
+      <p class="lead">Twoje <b>kody CPV, województwa i&nbsp;widełki wartości.</b></p></div>
       <div class="vis"><div class="card filt">
-        <div class="row1"><span class="d">Dziś 171</span><span class="go">Pokaż wyniki</span></div>
-        <h5>WOJEWÓDZTWO</h5><div class="chips"><span>Dolnośląskie</span><span class="on">Mazowieckie</span><span class="on">Pomorskie</span><span>Śląskie</span><span>Łódzkie</span></div>
-        <h5>BRANŻA</h5><div class="chips"><span class="on">Drogi</span><span class="on">Mosty</span><span>Wod-Kan</span><span>Kubatura</span><span>OZE</span></div>
-        <h5>MIN. WARTOŚĆ</h5><div class="chips"><span>100 tys</span><span>500 tys</span><span class="on">1 mln</span><span>5 mln</span><span>10 mln</span></div>
-        <h5>TERMIN</h5><div class="chips"><span>7 dni</span><span>14 dni</span><span class="on">30 dni</span><span>30+ dni</span></div>
+        <div class="row1"><span class="lbl">Schemat filtrów</span><span class="d">PROFIL FIRMY</span></div>
+        <h5>KODY CPV</h5><div class="chips"><span class="on">45233000 · drogi</span><span class="on">45221000 · mosty</span><span>45232000 · sieci</span><span>45210000 · budynki</span></div>
+        <h5>WOJEWÓDZTWA</h5><div class="chips"><span>Dolnośląskie</span><span class="on">Mazowieckie</span><span class="on">Pomorskie</span><span>Śląskie</span><span>Łódzkie</span></div>
+        <h5>WIDEŁKI WARTOŚCI</h5><div class="chips"><span>do 500 tys.</span><span class="on">500 tys. – 5 mln</span><span>5–20 mln</span><span>powyżej 20 mln</span></div>
       </div></div>
-      <div class="note"><div class="paper"></div><div class="x"><s>171 ogłoszeń dziennie</s><br><s>czytanie wszystkiego</s></div><div class="ok">tylko<br><b>Twoja branża</b></div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>czytanie wszystkich</s><br><s>ogłoszeń</s></div><div class="ok">na górze<br><b>Twoja robota</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Filtry</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">03</span></div>
@@ -319,11 +367,12 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <div class="grid"></div>
       <div class="ban"><b>Termin</b><span>04/08</span></div>
       <div class="hd"><span class="a">Termin widzisz</span><span class="b">od razu.</span>
-      <p class="lead">Data i&nbsp;godzina składania ofert są na karcie przetargu, razem z&nbsp;<b>licznikiem dni.</b></p></div>
+      <p class="lead">Data i&nbsp;godzina składania ofert <b>na karcie przetargu.</b></p></div>
       <div class="vis">
-        <div class="big17">17<small>dni do złożenia oferty</small></div>
+        <div class="big17">Data<br>i godzina</div>
+        <div class="exlbl"><span class="lbl">Przykład — nie jest aktualnym odliczaniem.</span></div>
         <div class="card cal"><h6>PAŹDZIERNIK 2026</h6><div class="g" id="calg"></div></div>
-        <div class="card term"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><div class="k">TERMIN SKŁADANIA</div><div class="d">12 października 2026, 10:00</div><div class="z">za <b>17 dni</b> · Ronda w Mławie</div></div>
+        <div class="card term"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><div class="k">TERMIN SKŁADANIA</div><div class="d">12 października 2026, 10:00</div><div class="z">Ronda w Mławie</div></div>
       </div>
       <div class="note"><div class="paper"></div><div class="x"><s>szukanie w rozdz. XIV</s><br><s>„na kiedy to było?”</s></div><div class="ok">data na karcie<br><b>12.10, 10:00</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Termin</span></div>
@@ -334,18 +383,18 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="05">
       <div class="grid"></div>
       <div class="ban"><b>Analiza SWZ</b><span>05/08</span></div>
-      <div class="hd"><span class="a">SWZ w pigułce.</span><span class="b">Bez 186 stron.</span>
-      <p class="lead">Warunki udziału, kryteria oceny, wymagania formalne i&nbsp;ryzyka <b>zebrane w&nbsp;jednym miejscu.</b></p></div>
-      <div class="vis"><div class="acc">
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h7v14H4zM13 5h7v14h-7z"/></svg>Podsumowanie wykonawcze</div>
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6"/></svg>Warunki udziału<em>7 warunków</em></div>
-        <div class="r kry"><div class="h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 8 21l4-2 4 2-1-7.5"/></svg>Kryteria oceny ofert</div>
-          <div class="crit"><span>Cena</span><span class="b"><i style="width:90%"></i></span><span class="p">90%</span></div>
-          <div class="crit"><span>Gwarancja i rękojmia</span><span class="b"><i style="width:10%"></i></span><span class="p">10%</span></div></div>
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Wymagania formalne<em>4 wymagania</em></div>
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>Ryzyka kontraktowe<em class="w">0 ryzyk</em></div>
+      <div class="hd sm"><span class="a">SWZ przeczytana.</span><span class="b">Z numerem strony.</span>
+      <p class="lead">Warunki, wadium, kary i&nbsp;terminy na jednej liście. Przy czerwonej fladze <b>sprawdzasz dokument i&nbsp;stronę.</b></p></div>
+      <div class="vis"><div class="schema">
+        <div class="top"><span class="lbl">Schemat · nie jest ekranem aplikacji</span></div>
+        <div class="st"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6"/></svg></i><div><b>Warunek</b><span>warunek udziału, wadium, kara, termin</span></div></div>
+        <i class="ar"></i>
+        <div class="st"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg></i><div><b>Dokument</b><span>SWZ, załącznik albo pismo</span></div></div>
+        <i class="ar"></i>
+        <div class="st"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></i><div><b>Strona</b><span>miejsce do sprawdzenia w źródle</span></div></div>
+        <div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>Analizę AI weryfikujesz w&nbsp;źródłach.</div>
       </div></div>
-      <div class="note"><div class="paper"></div><div class="x"><s>186 stron do czytania</s><br><s>ukryty warunek nr 7</s></div><div class="ok">wszystko<br><b>na jednym ekranie</b></div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>szukanie warunków</s><br><s>w dokumentach</s></div><div class="ok">wyciąg i źródła<br><b>do sprawdzenia</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Analiza SWZ</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">05</span></div>
@@ -354,12 +403,11 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="06">
       <div class="grid"></div>
       <div class="ban"><b>Kosztorys</b><span>06/08</span></div>
-      <div class="hd"><span class="a">Każda pozycja</span><span class="b">na części.</span>
-      <p class="lead">Klikasz w&nbsp;cenę i&nbsp;widzisz skład: <b>materiały, robociznę i&nbsp;ilości</b> z&nbsp;katalogu KNR.</p></div>
+      <div class="hd sm xs"><span class="a">Przedmiar z PDF</span><span class="b">w wiersze kosztorysu.</span>
+      <p class="lead">Stawki i&nbsp;narzuty ustawiasz sam. <b>Kosztorys zatwierdzasz Ty.</b></p></div>
       <div class="vis">
         <div class="card pos"><span class="c">POZ. 34 · KNR 4-01 0422-04</span><span class="n">Podstemplowanie zagrożonych stropów</span><span class="v">253 zł</span></div>
-        <i class="arrow"></i>
-        <div class="sk">
+                <div class="sk">
           <div class="r"><span class="ty">M</span><span>Bale iglaste obrzynane 50–100 mm</span><span class="q">0,011</span><span class="u">m³</span></div>
           <div class="r"><span class="ty">M</span><span>Deski iglaste obrzynane 28–45 mm</span><span class="q">0,008</span><span class="u">m³</span></div>
           <div class="r"><span class="ty">M</span><span>Drewno na stemple budowlane</span><span class="q">0,062</span><span class="u">m³</span></div>
@@ -367,8 +415,9 @@ body.export .frame .num,body.export .frame.cover{display:none}
           <div class="r"><span class="ty">M</span><span>Materiały pomocnicze</span><span class="q">2</span><span class="u">%</span></div>
           <div class="r"><span class="ty r">R</span><span>Roboty ogólnobudowlane – remontowe</span><span class="q">1,9855</span><span class="u">r-g</span></div>
         </div>
+        <div class="skcap">Przykładowa pozycja KNR — materiały, robocizna i&nbsp;ilości.</div>
       </div>
-      <div class="note"><div class="paper"></div><div class="x"><s>„co jest w tej cenie?”</s><br><s>liczenie od zera</s></div><div class="ok">skład pozycji<br><b>6 składników</b></div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>ręczne przepisywanie</s><br><s>przedmiaru</s></div><div class="ok">wiersze kosztorysu<br><b>do Twojej weryfikacji</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Kosztorys</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">06</span></div>
@@ -377,17 +426,17 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="07">
       <div class="grid"></div>
       <div class="ban"><b>Wynik</b><span>07/08</span></div>
-      <div class="hd"><span class="a">Od alertu</span><span class="b">do decyzji.</span>
-      <p class="lead">Cała droga w&nbsp;jednym miejscu. Na końcu wiesz, <b>czy startujesz,</b> zanim ktokolwiek otworzy Excela.</p></div>
+      <div class="hd"><span class="a">Najpierw decyzja.</span><span class="b">Potem oferta.</span>
+      <p class="lead">Tak, Analiza albo Nie — zawsze z&nbsp;powodem. <b>Decyzję „Tak” zapiszesz z&nbsp;zatwierdzonym kosztorysem.</b></p></div>
       <div class="vis"><div class="steps">
-        <div class="s"><i>1</i><div><b>Zwiad znajduje przetarg</b><span>alert z całej Polski</span></div><em>ZWIAD</em></div>
-        <div class="s"><i>2</i><div><b>Filtry zostawiają Twoje</b><span>branża, region, wartość</span></div><em>FILTRY</em></div>
-        <div class="s"><i>3</i><div><b>Termin na karcie</b><span>data, godzina, licznik dni</span></div><em>TERMIN</em></div>
-        <div class="s"><i>4</i><div><b>SWZ w pigułce</b><span>warunki, kryteria, ryzyka</span></div><em>SWZ</em></div>
-        <div class="s"><i>5</i><div><b>Skład każdej pozycji</b><span>materiały i robocizna</span></div><em>KOSZTORYS</em></div>
-        <div class="s fin"><i><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></i><div><b>Decyzja: startujesz czy odpuszczasz</b></div></div>
+        <div class="s"><i>1</i><div><b>Zwiad</b><span>znajdujesz przetarg</span></div><em>ZWIAD</em></div>
+        <div class="s"><i>2</i><div><b>SWZ</b><span>sprawdzasz warunki i źródła</span></div><em>SWZ</em></div>
+        <div class="s"><i>3</i><div><b>Kosztorys</b><span>ustawiasz stawki i zatwierdzasz</span></div><em>KOSZTORYS</em></div>
+        <div class="s"><i>4</i><div><b>Decyzja <span class="dc"><u class="t">TAK</u><u class="a">ANALIZA</u><u class="n">NIE</u></span></b><span>zawsze z powodem</span></div><em>DECYZJA</em></div>
+        <div class="s of"><i>5</i><div><b>Oferta, po decyzji „Tak”</b><span>formularze z danymi firmy i kwotami z zatwierdzonego kosztorysu</span></div></div>
+        <div class="s fin"><i><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></i><div><b>Decydujesz i podpisujesz Ty.</b></div></div>
       </div></div>
-      <div class="note"><div class="paper"></div><div class="x"><s>33 godziny</s><br><s>stres i zmęczenie</s></div><div class="ok"><b>6 minut</b><br>czas i spokój</div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>33 godziny</s><br><s>stres i zmęczenie</s></div><div class="ok"><b>6 minut</b><span class="st">*</span><br>czas i spokój<span class="fn"><span class="st">*</span>Potwierdzone po testach w&nbsp;firmach budowlanych.</span></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Wynik</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">07</span></div>
@@ -401,12 +450,14 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <div class="claim">Przetargi <b>OPANOWANE.</b></div>
       <div class="sheet"><div class="holes" id="holes"></div>
         <h4>Twoja lista na następny przetarg:</h4>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Zwiad i alerty</p>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Filtry pod Twoją branżę</p>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Termin od razu</p>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Analiza SWZ i kosztorys</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Zwiad i dopasowanie ogłoszeń.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Terminy na karcie przetargu.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Analiza SWZ ze źródłami.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Kosztorys do zatwierdzenia.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Przygotowanie oferty.</p>
       </div>
-      <div class="cta">SPRAWDŹ NA BUDOS.IO</div>
+      <div class="cta">ZOBACZ DEMO BEZ KONTA</div>
+      <div class="url">budos.io</div>
       <svg class="cursor" viewBox="0 0 12 19" shape-rendering="crispEdges"><path d="M0 0v16h1v-1h1v-1h1v-1h1v2h1v2h1v2h2v-1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#000"/><path d="M1 2v11h1v-1h1v-1h1v1h1v2h1v2h1v1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#fff"/></svg>
       <p class="save"><b>Zapisz ten post.</b> Przyda się przy następnym przetargu.</p>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="nd"></i></div>
@@ -417,9 +468,9 @@ body.export .frame .num,body.export .frame.cover{display:none}
   <section class="sh"><h2>Opis posta</h2><span class="eyebrow">do wklejenia pod karuzelą</span></section>
   <div class="cap-box"><pre id="capText">Premiera BudOS. Przetargi opanowane.
 
-Zwiad codziennie przegląda nowe przetargi budowlane z całej Polski i daje znać, kiedy pojawi się coś dla Ciebie. Dalej wszystko jest w jednym miejscu: filtry pod Twoją branżę, termin na karcie przetargu, analiza SWZ i skład każdej pozycji kosztorysu.
+Znajdziesz przetarg, sprawdzisz SWZ, policzysz przedmiar bez klepania i przygotujesz ofertę. Jedna lista z BZP, TED i BIP, analiza SWZ z odwołaniem do dokumentu i strony, przedmiar z PDF w wierszach kosztorysu. Decydujesz i podpisujesz Ty.
 
-Przesuń, żeby zobaczyć, jak to działa. Zapisz, żeby wrócić przy następnym przetargu.
+Przesuń, żeby zobaczyć, jak to działa. Całą drogę przejdziesz w demo bez konta.
 
 👉 budos.io
 
@@ -427,10 +478,10 @@ Przesuń, żeby zobaczyć, jak to działa. Zapisz, żeby wrócić przy następny
 
   <section class="sh"><h2>Kolejność slajdów</h2><span class="eyebrow">jedna funkcja na slajd</span></section>
   <div class="flow">
-    <div><b>01</b><span>Premiera (Wasza karta)</span></div><div><b>02 · ZWIAD</b><span>Alert o przetargu z całej Polski</span></div>
-    <div><b>03 · FILTRY</b><span>Branża, region, wartość, termin</span></div><div><b>04 · TERMIN</b><span>Data i licznik dni na karcie</span></div>
-    <div><b>05 · ANALIZA SWZ</b><span>Warunki, kryteria, ryzyka</span></div><div><b>06 · KOSZTORYS</b><span>Skład pozycji z KNR</span></div>
-    <div><b>07 · WYNIK</b><span>Od alertu do decyzji, 33 h → 6 min</span></div><div><b>08 · START</b><span>Budos.io i zachęta do zapisania</span></div>
+    <div><b>01 · PREMIERA</b><span>Przetargi opanowane, 33 h → 6 min* z dopiskiem, demo bez konta</span></div><div><b>02 · ZWIAD</b><span>Jedna lista z BZP, TED i BIP, przykładowy alert</span></div>
+    <div><b>03 · FILTRY</b><span>Kody CPV, województwa, widełki wartości (schemat)</span></div><div><b>04 · TERMIN</b><span>Data i godzina na karcie przetargu (przykład)</span></div>
+    <div><b>05 · ANALIZA SWZ</b><span>Warunek → dokument → strona (schemat)</span></div><div><b>06 · KOSZTORYS</b><span>Przedmiar z PDF w wiersze, stawki i zatwierdzenie po Twojej stronie</span></div>
+    <div><b>07 · WYNIK</b><span>Najpierw decyzja, potem oferta, 33 h → 6 min*</span></div><div><b>08 · START</b><span>Zobacz demo bez konta, budos.io</span></div>
   </div>
 </div>
 

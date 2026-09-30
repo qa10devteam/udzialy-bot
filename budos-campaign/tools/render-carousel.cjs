@@ -1,5 +1,5 @@
 // Renders the carousel in every format: carousel/9x16, carousel/4x5, carousel/1x1 (PNG, 1080 px wide).
-// In 9:16 slide 01 is the original cover supplied by BudOS (copied, not rendered).
+// Slide 01 is the Premiera card rebuilt in HTML (the original raster is kept in brand/premiera-okladka-oryginal.png).
 // usage: FONTCACHE=<dir from fetch-fonts.sh ... carousel> node render-carousel.cjs [outRoot]
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), crypto = require('crypto');

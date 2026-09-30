@@ -78,13 +78,20 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .foot span{font:500 30px var(--grot);color:var(--cream-2);display:flex;align-items:center;gap:12px}
 .foot span svg{height:30px}
 
+/* labels that separate examples and schemas from real app screens */
+.lbl{display:inline-block;font:700 22px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#E3B45B;background:rgba(227,180,91,.12);border:2px solid rgba(227,180,91,.55);padding:4px 14px;border-radius:10px}
+.hd.sm .a{font-size:78px}.hd.sm .b{font-size:92px}
+.hd.xs .b{font-size:78px}
+.f45 .hd.xs .b{font-size:62px}.f11 .hd.xs .b{font-size:50px}
+.note .ok .fn{display:block;margin-top:10px;font:500 26px/1.3 var(--grot);color:var(--cream-2)}
+.note .ok .st{color:var(--green);font-weight:700}
 /* slide 2: zwiad */
 .map{position:absolute;right:0;top:0;width:640px;height:600px}
-.today{position:absolute;left:0;top:10px;font:700 30px var(--mono);padding:12px 22px;border-radius:14px;background:#150F0B;border:2px solid #5A3B22;color:#E3B45B}
+.today{position:absolute;left:0;top:10px;font:700 30px var(--mono);letter-spacing:.06em;padding:12px 22px;border-radius:14px;background:rgba(117,185,117,.1);border:2px solid rgba(117,185,117,.55);color:var(--green)}
 .alert{position:absolute;left:0;width:760px;padding:28px 32px;display:flex;flex-direction:column;gap:12px}
 .alert .hdr{display:flex;align-items:center;gap:14px;font:700 26px var(--mono);letter-spacing:.08em;color:var(--green)}
 .alert .hdr i{width:18px;height:18px;border-radius:50%;background:var(--green);box-shadow:0 0 0 8px rgba(117,185,117,.2)}
-.alert .hdr em{margin-left:auto;font-style:normal;color:var(--cream-3);letter-spacing:0}
+.alert .hdr .lbl{margin-left:auto}
 .alert .t{font:600 38px/1.2 var(--grot);letter-spacing:-.01em}
 .alert .t .k{color:var(--cream-2);font-weight:500;margin:0 8px}
 .alert .m{font:400 28px var(--grot);color:var(--cream-2)}
@@ -93,14 +100,14 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 /* slide 3: filters */
 .filt{position:absolute;inset:0;padding:26px 30px;display:flex;flex-direction:column;gap:12px}
 .filt .row1{display:flex;justify-content:space-between;align-items:center}
-.filt .row1 .d{font:700 28px var(--mono);color:#E3B45B}
+.filt .row1 .d{font:700 24px var(--mono);letter-spacing:.1em;color:var(--cream-3)}
 .filt .row1 .go{font:700 28px var(--grot);background:var(--green);color:var(--ink);padding:10px 24px;border-radius:12px}
 .filt h5{margin:0;font:700 22px var(--mono);letter-spacing:.12em;color:var(--cream-3)}
 .chips{display:flex;flex-wrap:wrap;gap:10px}
 .chips span{font:500 25px var(--grot);padding:6px 18px;border-radius:999px;border:2px solid #2A3B52;background:#121D2B;color:var(--cream-2)}
 .chips span.on{border-color:var(--green);background:rgba(117,185,117,.14);color:var(--cream)}
 /* slide 4: termin */
-.big17{position:absolute;left:0;top:-20px;font:900 330px/.86 var(--cond);font-stretch:75%;color:var(--green);letter-spacing:-.02em}
+.big17{position:absolute;left:0;top:24px;width:440px;font:900 96px/.92 var(--cond);font-stretch:75%;color:var(--green);letter-spacing:-.01em;text-transform:uppercase}
 .big17 small{display:block;font:500 32px/1.2 var(--grot);color:var(--cream-2);letter-spacing:-.01em;margin-top:14px;width:360px}
 .cal{position:absolute;right:0;top:0;width:470px;padding:22px 26px}
 .cal h6{margin:0 0 16px;font:700 24px var(--mono);letter-spacing:.1em;color:var(--cream-2)}
@@ -114,6 +121,7 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .term .d{font:600 44px var(--grot);letter-spacing:-.01em}
 .term .z{font:500 34px var(--grot);color:var(--cream-2)}
 .term .z b{color:var(--green)}
+.exlbl{position:absolute;left:0;right:0;top:-62px}
 /* slide 5: SWZ */
 .acc{position:absolute;inset:0;display:flex;flex-direction:column;gap:12px}
 .acc .r{display:flex;align-items:center;gap:18px;padding:18px 26px;font:500 30px var(--grot);border-radius:16px;border:2px solid #22334A;background:#0E1823}
@@ -126,6 +134,18 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .crit .b{height:12px;border-radius:6px;background:#1E2C3D;overflow:hidden}
 .crit .b i{display:block;height:100%;background:var(--green)}
 .crit .p{font:700 27px var(--mono);color:var(--green);text-align:right}
+/* slide 5: schema warunek → dokument → strona */
+.schema{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px}
+.schema .top{display:flex;justify-content:space-between;align-items:center}
+.schema .st{display:grid;grid-template-columns:76px 1fr;gap:24px;align-items:center;padding:20px 28px;border-radius:18px;border:2px dashed #3A4E66;background:rgba(14,24,35,.8)}
+.schema .st i{width:76px;height:76px;border-radius:18px;display:grid;place-items:center;background:rgba(117,185,117,.12);color:var(--green)}
+.schema .st i svg{width:42px;height:42px}
+.schema .st b{display:block;font:700 40px/1.1 var(--grot);letter-spacing:-.01em}
+.schema .st span{font:400 27px var(--grot);color:var(--cream-2)}
+.schema .ar{align-self:center;width:4px;height:26px;background:var(--green);position:relative;margin:-4px 0}
+.schema .ar::after{content:"";position:absolute;left:-11px;bottom:-12px;border:13px solid transparent;border-top:14px solid var(--green)}
+.schema .ai{margin-top:8px;font:600 30px var(--grot);color:var(--cream);display:flex;gap:14px;align-items:center}
+.schema .ai svg{width:34px;height:34px;color:#E3B45B;flex:none}
 /* slide 6: kosztorys */
 .pos{position:absolute;left:0;right:0;top:0;padding:24px 30px;display:grid;grid-template-columns:1fr auto;gap:6px 20px;align-items:center}
 .pos .c{font:700 22px var(--mono);color:var(--cream-3);grid-column:1 / -1}
@@ -133,7 +153,8 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .pos .v{font:700 64px var(--mono);letter-spacing:-.04em;grid-column:2;grid-row:2;white-space:nowrap;color:var(--green)}
 .arrow{position:absolute;left:50%;top:176px;width:4px;height:44px;margin-left:-2px;background:var(--green)}
 .arrow::after{content:"";position:absolute;left:-12px;bottom:-14px;border:14px solid transparent;border-top:16px solid var(--green)}
-.sk{position:absolute;left:0;right:0;top:238px;display:flex;flex-direction:column;gap:8px}
+.sk{position:absolute;left:0;right:0;top:232px;display:flex;flex-direction:column;gap:7px}
+.skcap{position:absolute;left:0;right:0;top:180px;font:500 26px var(--grot);color:var(--cream-2);text-align:center}
 .sk .r{display:grid;grid-template-columns:52px 1fr 120px 64px;gap:16px;align-items:center;padding:10px 22px;border-radius:14px;border:2px solid #22334A;background:#0E1823;font:500 25px/1.2 var(--grot)}
 .sk .ty{font:700 20px var(--mono);color:var(--ink);background:var(--cream-2);border-radius:6px;text-align:center;padding:2px 0}
 .sk .ty.r{background:var(--green)}
@@ -148,6 +169,10 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .steps .s.fin{border-color:var(--green);background:linear-gradient(90deg,rgba(117,185,117,.18),#0E1823)}
 .steps .s.fin i{background:var(--green);color:var(--ink)}
 .steps .s em{font:700 22px var(--mono);font-style:normal;color:var(--cream-3);letter-spacing:.08em}
+.steps .s .dc{display:inline-flex;gap:8px;margin-left:6px;vertical-align:2px}
+.steps .s .dc u{text-decoration:none;font:700 18px var(--mono);letter-spacing:.06em;padding:2px 10px;border-radius:7px;border:2px solid #2A3B52}
+.steps .s .dc .t{color:var(--green);border-color:rgba(117,185,117,.6)}.steps .s .dc .a{background:#CFC8BF;border-color:#CFC8BF;color:var(--ink)}.steps .s .dc .n{color:#E5625C;border-color:rgba(229,98,92,.6)}
+.steps .s.of{border-style:dashed}
 /* slide 8: CTA */
 .biglogo{position:absolute;left:300px;top:300px;width:480px}
 .biglogo svg{width:100%;height:auto}
@@ -158,10 +183,11 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .sheet .holes{position:absolute;left:30px;right:30px;top:26px;display:flex;justify-content:space-between}
 .sheet .holes i{width:22px;height:32px;border-radius:11px;background:var(--ink)}
 .sheet h4{margin:0 0 18px;font:700 40px var(--grot);color:#10151C;letter-spacing:-.02em}
-.sheet p{margin:0;font:500 42px/1.55 var(--grot);color:#10151C;display:flex;align-items:center;gap:22px;letter-spacing:-.01em}
+.sheet p{margin:0;font:500 38px/1.5 var(--grot);color:#10151C;display:flex;align-items:center;gap:22px;letter-spacing:-.01em}
 .sheet p svg{width:44px;height:44px;flex:none}
 .cta{position:absolute;left:170px;right:150px;top:1480px;height:150px;border-radius:44px;background:var(--green);display:grid;place-items:center;font:800 64px var(--cond);font-stretch:80%;color:var(--ink);box-shadow:0 0 70px rgba(117,185,117,.55)}
-.cursor{position:absolute;left:740px;top:1570px;width:96px}
+.cursor{position:absolute;left:872px;top:1586px;width:90px}
+.url{position:absolute;left:0;right:0;top:1652px;text-align:center;font:700 34px var(--mono);letter-spacing:.06em;color:var(--green)}
 .save{position:absolute;left:80px;right:80px;top:1790px;text-align:center;font:500 34px/1.35 var(--grot);color:var(--cream-2)}
 .save b{color:var(--cream);font-weight:600}
 
@@ -171,9 +197,9 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .fmts button{appearance:none;border:0;background:transparent;color:var(--cream-2);font:700 12px var(--mono);height:38px;padding:0 14px;cursor:pointer}
 .fmts button[aria-pressed="true"]{background:var(--cream);color:var(--ink)}
 .fmts button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
-.strip:not(.f916) .frame.cover,.strip.f916 .frame.cover-html{display:none}
+.frame.cover{display:none}
 
-/* ===== cover rebuilt for 4:5 and 1:1 ===== */
+/* ===== cover rebuilt in HTML for every format (original raster kept in brand/premiera-okladka-oryginal.png) ===== */
 .cvban{position:absolute;left:0;right:0;top:0;background:var(--green);display:grid;place-items:center;font:900 1px/1 var(--cond);font-stretch:80%;color:var(--ink)}
 .cvlogo{position:absolute}.cvlogo svg{display:block;width:100%;height:auto}
 .cvqa{position:absolute}
@@ -188,6 +214,21 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .cvres{position:absolute;color:var(--cream)}
 .cvcta{position:absolute;background:var(--green);display:grid;place-items:center;font-family:var(--cond);font-stretch:80%;font-weight:800;color:var(--ink);box-shadow:0 0 70px rgba(117,185,117,.55)}
 .cvcur{position:absolute}
+.cvres .st{color:var(--green);font-weight:700;margin-left:.04em}
+.cvfn{position:absolute;font:500 26px/1.35 var(--grot);color:var(--cream-2);letter-spacing:-.005em}
+.cvfn b{color:var(--green);font-weight:700}
+.cvdec{position:absolute;display:flex;gap:12px;align-items:flex-start;font:600 32px/1.25 var(--grot);color:var(--cream);letter-spacing:-.01em}
+.cvdec svg{flex:none;width:1.05em;height:1.05em;color:var(--green);margin-top:.08em}
+/* 9:16 cover (matches the original Premiera card) */
+.f916 .cvban{height:336px;border-radius:0 0 110px 110px;font-size:118px;padding-top:104px}
+.f916 .cvlogo{left:302px;top:408px;width:478px}.f916 .cvqa{left:812px;top:418px;width:184px}
+.f916 .cvclaim{top:748px;font-size:66px}.f916 .cvclaim b{font-size:76px}
+.f916 .cvpaper{left:-30px;top:860px;width:720px;height:930px;padding:200px 0 0 150px;transform:rotate(6deg);transform-origin:0 0}.f916 .cvpaper p{font-size:42px;line-height:1.5}
+.f916 .cvres{left:715px;top:1062px}.f916 .cvres p{font-size:44px;line-height:1.42}
+.f916 .cvfn{left:715px;top:1262px;width:340px;font-size:28px}
+.f916 .cvdec{left:715px;top:1392px;width:340px}
+.f916 .cvcta{left:170px;right:150px;top:1520px;height:146px;font-size:56px;border-radius:44px}
+.f916 .cvcur{left:856px;top:1624px;width:84px}
 
 /* ===== 4:5 (1080×1350) ===== */
 .f45 .frame{height:378px}
@@ -205,18 +246,21 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .f45 .foot{bottom:28px;left:70px;right:70px}.f45 .foot svg{height:44px}.f45 .foot span{font-size:24px}.f45 .foot span svg{height:24px}
 .f45 .biglogo{left:350px;top:186px;width:380px}.f45 .qa{left:748px;top:198px;width:170px}
 .f45 .claim{top:452px;font-size:62px}.f45 .claim b{font-size:72px}
-.f45 .sheet{left:190px;top:562px;width:700px;height:420px;padding:78px 60px 0}.f45 .sheet .holes{top:20px}
-.f45 .sheet h4{font-size:32px;margin-bottom:10px}.f45 .sheet p{font-size:34px;gap:18px}.f45 .sheet p svg{width:36px;height:36px}
+.f45 .sheet{left:190px;top:548px;width:700px;height:400px;padding:64px 56px 0}.f45 .sheet .holes{top:20px}
+.f45 .sheet h4{font-size:28px;margin-bottom:6px}.f45 .sheet p{font-size:27px;gap:14px;line-height:1.42}.f45 .sheet p svg{width:36px;height:36px}
 .f45 .cta{left:190px;right:170px;top:946px;height:118px;font-size:52px;border-radius:36px}
-.f45 .cursor{left:720px;top:1016px;width:78px}
-.f45 .save{top:1092px;font-size:28px}
+.f45 .cursor{left:852px;top:1024px;width:72px}
+.f45 .save{top:1262px;font-size:26px}
+.f45 .url{top:1080px;font-size:28px}
+.f45 .note .ok .fn{font-size:24px}
 .f45 .cvban{height:240px;border-radius:0 0 110px 110px;font-size:120px}
 .f45 .cvlogo{left:300px;top:290px;width:420px}.f45 .cvqa{left:740px;top:302px;width:188px}
 .f45 .cvclaim{top:588px;font-size:64px}.f45 .cvclaim b{font-size:74px}
 .f45 .cvpaper{left:-40px;top:700px;width:620px;height:560px;padding:120px 0 0 110px}.f45 .cvpaper p{font-size:40px;line-height:1.6}
-.f45 .cvres{left:640px;top:806px}.f45 .cvres p{font-size:44px;line-height:1.46}
-.f45 .cvcta{left:150px;right:150px;top:1092px;height:130px;font-size:62px;border-radius:40px}
-.f45 .cvcur{left:716px;top:1170px;width:80px}
+.f45 .cvres{left:640px;top:772px}.f45 .cvres p{font-size:42px;line-height:1.4}
+.f45 .cvfn{left:640px;top:950px;width:420px;font-size:25px}.f45 .cvdec{left:640px;top:1024px;width:420px;font-size:28px}
+.f45 .cvcta{left:150px;right:150px;top:1104px;height:122px;font-size:52px;border-radius:40px}
+.f45 .cvcur{left:858px;top:1188px;width:72px}
 
 /* ===== 1:1 (1080×1080) ===== */
 .f11 .frame{height:302px}
@@ -225,8 +269,8 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .f11 .ban b{font-size:52px}.f11 .ban span{font-size:26px}
 .f11 .hd{top:146px;left:60px;right:60px}
 .f11 .hd .a{font-size:50px}.f11 .hd .b{font-size:64px;margin-top:0}
-.f11 .lead{display:none}
-.f11 .vis{top:292px;transform:scale(.6);transform-origin:50% 0}
+.f11 .lead{font-size:23px;line-height:1.3;margin-top:8px}
+.f11 .vis{top:352px;transform:scale(.53);transform-origin:50% 0}
 .f11 .note{top:678px;height:150px}.f11 .note .paper{height:150px}
 .f11 .note .x{font-size:26px;top:30px;left:60px;width:430px}
 .f11 .note .ok{font-size:30px;top:34px}
@@ -234,18 +278,21 @@ body{font-family:var(--grot);font-size:15px;line-height:1.5;padding-inline:16px;
 .f11 .foot{bottom:22px;left:60px;right:60px}.f11 .foot svg{height:38px}.f11 .foot span{font-size:22px}.f11 .foot span svg{height:22px}
 .f11 .biglogo{left:390px;top:140px;width:300px}.f11 .qa{left:702px;top:150px;width:150px}
 .f11 .claim{top:346px;font-size:50px}.f11 .claim b{font-size:58px}
-.f11 .sheet{left:200px;top:432px;width:680px;height:300px;padding:60px 50px 0}.f11 .sheet .holes{top:16px}.f11 .sheet .holes i{width:16px;height:24px}
-.f11 .sheet h4{font-size:26px;margin-bottom:6px}.f11 .sheet p{font-size:27px;gap:14px;line-height:1.45}.f11 .sheet p svg{width:28px;height:28px}
+.f11 .sheet{left:200px;top:420px;width:680px;height:270px;padding:48px 48px 0}.f11 .sheet .holes{top:16px}.f11 .sheet .holes i{width:16px;height:24px}
+.f11 .sheet h4{font-size:22px;margin-bottom:4px}.f11 .sheet p{font-size:21px;gap:10px;line-height:1.38}.f11 .sheet p svg{width:28px;height:28px}
 .f11 .cta{left:200px;right:180px;top:700px;height:100px;font-size:44px;border-radius:30px}
-.f11 .cursor{left:690px;top:758px;width:64px}
-.f11 .save{top:806px;font-size:24px}
+.f11 .cursor{left:852px;top:762px;width:58px}
+.f11 .save{top:950px;font-size:22px}
+.f11 .url{top:806px;font-size:24px}
+.f11 .note .ok .fn{font-size:21px;margin-top:4px}
 .f11 .cvban{height:190px;border-radius:0 0 90px 90px;font-size:96px}
 .f11 .cvlogo{left:350px;top:226px;width:340px}.f11 .cvqa{left:706px;top:236px;width:150px}
 .f11 .cvclaim{top:462px;font-size:52px}.f11 .cvclaim b{font-size:60px}
 .f11 .cvpaper{left:-40px;top:548px;width:560px;height:500px;padding:96px 0 0 100px}.f11 .cvpaper .holes i{width:16px;height:24px}.f11 .cvpaper p{font-size:34px;line-height:1.6}
-.f11 .cvres{left:580px;top:636px}.f11 .cvres p{font-size:38px;line-height:1.46}
-.f11 .cvcta{left:150px;right:150px;top:850px;height:110px;font-size:52px;border-radius:34px}
-.f11 .cvcur{left:690px;top:918px;width:68px}
+.f11 .cvres{left:580px;top:606px}.f11 .cvres p{font-size:36px;line-height:1.4}
+.f11 .cvfn{left:580px;top:762px;width:480px;font-size:23px}.f11 .cvdec{left:580px;top:830px;width:470px;font-size:25px}
+.f11 .cvcta{left:150px;right:150px;top:898px;height:100px;font-size:44px;border-radius:32px}
+.f11 .cvcur{left:868px;top:962px;width:58px}
 
 body.export{padding:0;margin:0;background:#000}
 body.export .wrap{max-width:none;display:block}
@@ -262,7 +309,7 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <span class="eyebrow">8 slajdów · 1080×1920 · Stories, TikTok photo mode</span>
   </header>
   <h1 class="pg-h">Karuzela premierowa. <em>Od Zwiadu do decyzji.</em></h1>
-  <p class="lede">Pierwszy slajd to Wasza karta „Premiera”. Kolejne prowadzą przez BudOS w kolejności pracy nad przetargiem: Zwiad znajduje ogłoszenie, filtry zostawiają Twoje, potem termin, analiza SWZ i skład pozycji. Zielona linia na dole przechodzi przez wszystkie slajdy, więc przewijanie czyta się jak jedna droga.</p>
+  <p class="lede">Wersja poprawiona pod landing i korektę QA10. Pierwszy slajd to Wasza karta „Premiera” odtworzona 1:1 w HTML, z dopiskiem o testach i przyciskiem do demo. Kolejne prowadzą przez BudOS w kolejności pracy nad przetargiem: Zwiad, dopasowanie, termin, analiza SWZ, kosztorys, decyzja i start. Przykłady i schematy są podpisane, żeby nie udawały ekranów aplikacji.</p>
 
   <div class="fmts" role="group" aria-label="Format"><button type="button" data-f="f916" aria-pressed="true">9:16 · Stories, TikTok</button><button type="button" data-f="f45" aria-pressed="false">4:5 · feed, LinkedIn</button><button type="button" data-f="f11" aria-pressed="false">1:1 · kwadrat</button></div>
   <div class="strip f916" id="strip" tabindex="0" aria-label="Slajdy karuzeli, przewiń w bok">
@@ -274,8 +321,10 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <img class="cvqa" src="%%QA10%%" alt="by QA10">
       <div class="cvclaim">Przetargi <b>OPANOWANE.</b></div>
       <div class="cvpaper"><div class="holes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p><s>33 godziny</s></p><p><s>żmudny research</s></p><p><s>stres i zmęczenie</s></p></div>
-      <div class="cvres"><p>6 minut</p><p>szybki wynik</p><p>czas i spokój</p></div>
-      <div class="cvcta">W ZASIĘGU KLIKNIĘCIA</div>
+      <div class="cvres"><p>6 minut<span class="st">*</span></p><p>szybki wynik</p><p>czas i spokój</p></div>
+      <div class="cvfn"><b>*</b>Potwierdzone po testach w&nbsp;firmach budowlanych.</div>
+      <div class="cvdec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.6 3 8.2 7 10 4-1.8 7-5.4 7-10V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg><span>Decydujesz i&nbsp;podpisujesz Ty.</span></div>
+      <div class="cvcta">ZOBACZ DEMO BEZ KONTA</div>
       <svg class="cvcur" viewBox="0 0 12 19" shape-rendering="crispEdges" aria-hidden="true"><path d="M0 0v16h1v-1h1v-1h1v-1h1v2h1v2h1v2h2v-1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#000"/><path d="M1 2v11h1v-1h1v-1h1v1h1v2h1v2h1v1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#fff"/></svg>
     </div><span class="num">01</span></div>
 
@@ -284,12 +333,12 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <div class="grid"></div>
       <div class="ban"><b>Zwiad</b><span>02/08</span></div>
       <div class="hd"><span class="a">Zwiad szuka.</span><span class="b">Ty wybierasz.</span>
-      <p class="lead">Codziennie przegląda nowe przetargi budowlane z&nbsp;całej Polski i&nbsp;daje znać, kiedy pojawi się coś <b>dla Ciebie.</b></p></div>
+      <p class="lead">Jedna lista z&nbsp;BZP, TED i&nbsp;BIP. Na górze przetargi <b>dopasowane do Twojej firmy.</b></p></div>
       <div class="vis">
         <canvas class="map" id="map" width="640" height="600"></canvas>
-        <div class="today">Dziś: 171 nowych</div>
-        <div class="alert card ghost" style="top:200px"><div class="hdr"><i></i>ZWIAD · NOWY ALERT<em>2 min temu</em></div><div class="t"><span class="tag">Drogi</span><span class="k">Budowa</span>Ronda w Mławie</div></div>
-        <div class="alert card" style="top:330px"><div class="hdr"><i></i>ZWIAD · NOWY ALERT<em>teraz</em></div><div class="t"><span class="tag">Drogi</span><span class="k">Przebudowa</span>Ulicy Staffa w&nbsp;Kościerzynie</div><div class="m">Pomorskie · termin 12.10.2026 · <b>za 17 dni</b></div></div>
+        <div class="today">BZP · TED · BIP</div>
+        <div class="alert card ghost" style="top:200px"><div class="hdr"><i></i>ZWIAD · ALERT</div><div class="t"><span class="tag">Drogi</span><span class="k">Budowa</span>Ronda w Mławie</div></div>
+        <div class="alert card" style="top:330px"><div class="hdr"><i></i>ZWIAD · ALERT<span class="lbl">Przykładowy alert</span></div><div class="t"><span class="tag">Drogi</span><span class="k">Przebudowa</span>Ulicy Staffa w&nbsp;Kościerzynie</div><div class="m">Pomorskie · termin składania 12.10.2026</div></div>
       </div>
       <div class="note"><div class="paper"></div><div class="x"><s>przekopywanie portali</s><br><s>10 otwartych kart</s></div><div class="ok">alert, gdy<br><b>coś pasuje</b></div></div>
       <div class="route"><i class="ln past" style="left:540px;width:0"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Zwiad</span></div>
@@ -300,16 +349,15 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="03">
       <div class="grid"></div>
       <div class="ban"><b>Filtry</b><span>03/08</span></div>
-      <div class="hd"><span class="a">Tylko Twoje</span><span class="b">przetargi.</span>
-      <p class="lead">Branża, województwo, wartość i&nbsp;termin. <b>Ustawiasz raz,</b> a&nbsp;Zwiad pilnuje reszty.</p></div>
+      <div class="hd sm"><span class="a">Przetargi dopasowane</span><span class="b">do Twojej firmy.</span>
+      <p class="lead">Twoje <b>kody CPV, województwa i&nbsp;widełki wartości.</b></p></div>
       <div class="vis"><div class="card filt">
-        <div class="row1"><span class="d">Dziś 171</span><span class="go">Pokaż wyniki</span></div>
-        <h5>WOJEWÓDZTWO</h5><div class="chips"><span>Dolnośląskie</span><span class="on">Mazowieckie</span><span class="on">Pomorskie</span><span>Śląskie</span><span>Łódzkie</span></div>
-        <h5>BRANŻA</h5><div class="chips"><span class="on">Drogi</span><span class="on">Mosty</span><span>Wod-Kan</span><span>Kubatura</span><span>OZE</span></div>
-        <h5>MIN. WARTOŚĆ</h5><div class="chips"><span>100 tys</span><span>500 tys</span><span class="on">1 mln</span><span>5 mln</span><span>10 mln</span></div>
-        <h5>TERMIN</h5><div class="chips"><span>7 dni</span><span>14 dni</span><span class="on">30 dni</span><span>30+ dni</span></div>
+        <div class="row1"><span class="lbl">Schemat filtrów</span><span class="d">PROFIL FIRMY</span></div>
+        <h5>KODY CPV</h5><div class="chips"><span class="on">45233000 · drogi</span><span class="on">45221000 · mosty</span><span>45232000 · sieci</span><span>45210000 · budynki</span></div>
+        <h5>WOJEWÓDZTWA</h5><div class="chips"><span>Dolnośląskie</span><span class="on">Mazowieckie</span><span class="on">Pomorskie</span><span>Śląskie</span><span>Łódzkie</span></div>
+        <h5>WIDEŁKI WARTOŚCI</h5><div class="chips"><span>do 500 tys.</span><span class="on">500 tys. – 5 mln</span><span>5–20 mln</span><span>powyżej 20 mln</span></div>
       </div></div>
-      <div class="note"><div class="paper"></div><div class="x"><s>171 ogłoszeń dziennie</s><br><s>czytanie wszystkiego</s></div><div class="ok">tylko<br><b>Twoja branża</b></div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>czytanie wszystkich</s><br><s>ogłoszeń</s></div><div class="ok">na górze<br><b>Twoja robota</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Filtry</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">03</span></div>
@@ -319,11 +367,12 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <div class="grid"></div>
       <div class="ban"><b>Termin</b><span>04/08</span></div>
       <div class="hd"><span class="a">Termin widzisz</span><span class="b">od razu.</span>
-      <p class="lead">Data i&nbsp;godzina składania ofert są na karcie przetargu, razem z&nbsp;<b>licznikiem dni.</b></p></div>
+      <p class="lead">Data i&nbsp;godzina składania ofert <b>na karcie przetargu.</b></p></div>
       <div class="vis">
-        <div class="big17">17<small>dni do złożenia oferty</small></div>
+        <div class="big17">Data<br>i godzina</div>
+        <div class="exlbl"><span class="lbl">Przykład — nie jest aktualnym odliczaniem.</span></div>
         <div class="card cal"><h6>PAŹDZIERNIK 2026</h6><div class="g" id="calg"></div></div>
-        <div class="card term"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><div class="k">TERMIN SKŁADANIA</div><div class="d">12 października 2026, 10:00</div><div class="z">za <b>17 dni</b> · Ronda w Mławie</div></div>
+        <div class="card term"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><div class="k">TERMIN SKŁADANIA</div><div class="d">12 października 2026, 10:00</div><div class="z">Ronda w Mławie</div></div>
       </div>
       <div class="note"><div class="paper"></div><div class="x"><s>szukanie w rozdz. XIV</s><br><s>„na kiedy to było?”</s></div><div class="ok">data na karcie<br><b>12.10, 10:00</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Termin</span></div>
@@ -334,18 +383,18 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="05">
       <div class="grid"></div>
       <div class="ban"><b>Analiza SWZ</b><span>05/08</span></div>
-      <div class="hd"><span class="a">SWZ w pigułce.</span><span class="b">Bez 186 stron.</span>
-      <p class="lead">Warunki udziału, kryteria oceny, wymagania formalne i&nbsp;ryzyka <b>zebrane w&nbsp;jednym miejscu.</b></p></div>
-      <div class="vis"><div class="acc">
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h7v14H4zM13 5h7v14h-7z"/></svg>Podsumowanie wykonawcze</div>
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6"/></svg>Warunki udziału<em>7 warunków</em></div>
-        <div class="r kry"><div class="h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 8 21l4-2 4 2-1-7.5"/></svg>Kryteria oceny ofert</div>
-          <div class="crit"><span>Cena</span><span class="b"><i style="width:90%"></i></span><span class="p">90%</span></div>
-          <div class="crit"><span>Gwarancja i rękojmia</span><span class="b"><i style="width:10%"></i></span><span class="p">10%</span></div></div>
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Wymagania formalne<em>4 wymagania</em></div>
-        <div class="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>Ryzyka kontraktowe<em class="w">0 ryzyk</em></div>
+      <div class="hd sm"><span class="a">SWZ przeczytana.</span><span class="b">Z numerem strony.</span>
+      <p class="lead">Warunki, wadium, kary i&nbsp;terminy na jednej liście. Przy czerwonej fladze <b>sprawdzasz dokument i&nbsp;stronę.</b></p></div>
+      <div class="vis"><div class="schema">
+        <div class="top"><span class="lbl">Schemat · nie jest ekranem aplikacji</span></div>
+        <div class="st"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6"/></svg></i><div><b>Warunek</b><span>warunek udziału, wadium, kara, termin</span></div></div>
+        <i class="ar"></i>
+        <div class="st"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg></i><div><b>Dokument</b><span>SWZ, załącznik albo pismo</span></div></div>
+        <i class="ar"></i>
+        <div class="st"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></i><div><b>Strona</b><span>miejsce do sprawdzenia w źródle</span></div></div>
+        <div class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>Analizę AI weryfikujesz w&nbsp;źródłach.</div>
       </div></div>
-      <div class="note"><div class="paper"></div><div class="x"><s>186 stron do czytania</s><br><s>ukryty warunek nr 7</s></div><div class="ok">wszystko<br><b>na jednym ekranie</b></div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>szukanie warunków</s><br><s>w dokumentach</s></div><div class="ok">wyciąg i źródła<br><b>do sprawdzenia</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Analiza SWZ</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">05</span></div>
@@ -354,12 +403,11 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="06">
       <div class="grid"></div>
       <div class="ban"><b>Kosztorys</b><span>06/08</span></div>
-      <div class="hd"><span class="a">Każda pozycja</span><span class="b">na części.</span>
-      <p class="lead">Klikasz w&nbsp;cenę i&nbsp;widzisz skład: <b>materiały, robociznę i&nbsp;ilości</b> z&nbsp;katalogu KNR.</p></div>
+      <div class="hd sm xs"><span class="a">Przedmiar z PDF</span><span class="b">w wiersze kosztorysu.</span>
+      <p class="lead">Stawki i&nbsp;narzuty ustawiasz sam. <b>Kosztorys zatwierdzasz Ty.</b></p></div>
       <div class="vis">
         <div class="card pos"><span class="c">POZ. 34 · KNR 4-01 0422-04</span><span class="n">Podstemplowanie zagrożonych stropów</span><span class="v">253 zł</span></div>
-        <i class="arrow"></i>
-        <div class="sk">
+                <div class="sk">
           <div class="r"><span class="ty">M</span><span>Bale iglaste obrzynane 50–100 mm</span><span class="q">0,011</span><span class="u">m³</span></div>
           <div class="r"><span class="ty">M</span><span>Deski iglaste obrzynane 28–45 mm</span><span class="q">0,008</span><span class="u">m³</span></div>
           <div class="r"><span class="ty">M</span><span>Drewno na stemple budowlane</span><span class="q">0,062</span><span class="u">m³</span></div>
@@ -367,8 +415,9 @@ body.export .frame .num,body.export .frame.cover{display:none}
           <div class="r"><span class="ty">M</span><span>Materiały pomocnicze</span><span class="q">2</span><span class="u">%</span></div>
           <div class="r"><span class="ty r">R</span><span>Roboty ogólnobudowlane – remontowe</span><span class="q">1,9855</span><span class="u">r-g</span></div>
         </div>
+        <div class="skcap">Przykładowa pozycja KNR — materiały, robocizna i&nbsp;ilości.</div>
       </div>
-      <div class="note"><div class="paper"></div><div class="x"><s>„co jest w tej cenie?”</s><br><s>liczenie od zera</s></div><div class="ok">skład pozycji<br><b>6 składników</b></div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>ręczne przepisywanie</s><br><s>przedmiaru</s></div><div class="ok">wiersze kosztorysu<br><b>do Twojej weryfikacji</b></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Kosztorys</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">06</span></div>
@@ -377,17 +426,17 @@ body.export .frame .num,body.export .frame.cover{display:none}
     <div class="frame"><div class="slide" data-n="07">
       <div class="grid"></div>
       <div class="ban"><b>Wynik</b><span>07/08</span></div>
-      <div class="hd"><span class="a">Od alertu</span><span class="b">do decyzji.</span>
-      <p class="lead">Cała droga w&nbsp;jednym miejscu. Na końcu wiesz, <b>czy startujesz,</b> zanim ktokolwiek otworzy Excela.</p></div>
+      <div class="hd"><span class="a">Najpierw decyzja.</span><span class="b">Potem oferta.</span>
+      <p class="lead">Tak, Analiza albo Nie — zawsze z&nbsp;powodem. <b>Decyzję „Tak” zapiszesz z&nbsp;zatwierdzonym kosztorysem.</b></p></div>
       <div class="vis"><div class="steps">
-        <div class="s"><i>1</i><div><b>Zwiad znajduje przetarg</b><span>alert z całej Polski</span></div><em>ZWIAD</em></div>
-        <div class="s"><i>2</i><div><b>Filtry zostawiają Twoje</b><span>branża, region, wartość</span></div><em>FILTRY</em></div>
-        <div class="s"><i>3</i><div><b>Termin na karcie</b><span>data, godzina, licznik dni</span></div><em>TERMIN</em></div>
-        <div class="s"><i>4</i><div><b>SWZ w pigułce</b><span>warunki, kryteria, ryzyka</span></div><em>SWZ</em></div>
-        <div class="s"><i>5</i><div><b>Skład każdej pozycji</b><span>materiały i robocizna</span></div><em>KOSZTORYS</em></div>
-        <div class="s fin"><i><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></i><div><b>Decyzja: startujesz czy odpuszczasz</b></div></div>
+        <div class="s"><i>1</i><div><b>Zwiad</b><span>znajdujesz przetarg</span></div><em>ZWIAD</em></div>
+        <div class="s"><i>2</i><div><b>SWZ</b><span>sprawdzasz warunki i źródła</span></div><em>SWZ</em></div>
+        <div class="s"><i>3</i><div><b>Kosztorys</b><span>ustawiasz stawki i zatwierdzasz</span></div><em>KOSZTORYS</em></div>
+        <div class="s"><i>4</i><div><b>Decyzja <span class="dc"><u class="t">TAK</u><u class="a">ANALIZA</u><u class="n">NIE</u></span></b><span>zawsze z powodem</span></div><em>DECYZJA</em></div>
+        <div class="s of"><i>5</i><div><b>Oferta, po decyzji „Tak”</b><span>formularze z danymi firmy i kwotami z zatwierdzonego kosztorysu</span></div></div>
+        <div class="s fin"><i><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></i><div><b>Decydujesz i podpisujesz Ty.</b></div></div>
       </div></div>
-      <div class="note"><div class="paper"></div><div class="x"><s>33 godziny</s><br><s>stres i zmęczenie</s></div><div class="ok"><b>6 minut</b><br>czas i spokój</div></div>
+      <div class="note"><div class="paper"></div><div class="x"><s>33 godziny</s><br><s>stres i zmęczenie</s></div><div class="ok"><b>6 minut</b><span class="st">*</span><br>czas i spokój<span class="fn"><span class="st">*</span>Potwierdzone po testach w&nbsp;firmach budowlanych.</span></div></div>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="ln fut" style="left:540px;right:0"></i><i class="nd"></i><span class="lb">Wynik</span></div>
       <div class="foot"><svg viewBox="0 0 421 264"><use href="#logo"></use></svg><span>przesuń <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div>
     </div><span class="num">07</span></div>
@@ -401,12 +450,14 @@ body.export .frame .num,body.export .frame.cover{display:none}
       <div class="claim">Przetargi <b>OPANOWANE.</b></div>
       <div class="sheet"><div class="holes" id="holes"></div>
         <h4>Twoja lista na następny przetarg:</h4>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Zwiad i alerty</p>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Filtry pod Twoją branżę</p>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Termin od razu</p>
-        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Analiza SWZ i kosztorys</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Zwiad i dopasowanie ogłoszeń.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Terminy na karcie przetargu.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Analiza SWZ ze źródłami.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Kosztorys do zatwierdzenia.</p>
+        <p><svg viewBox="0 0 24 24" fill="none" stroke="#3E8C3E" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg>Przygotowanie oferty.</p>
       </div>
-      <div class="cta">SPRAWDŹ NA BUDOS.IO</div>
+      <div class="cta">ZOBACZ DEMO BEZ KONTA</div>
+      <div class="url">budos.io</div>
       <svg class="cursor" viewBox="0 0 12 19" shape-rendering="crispEdges"><path d="M0 0v16h1v-1h1v-1h1v-1h1v2h1v2h1v2h2v-1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#000"/><path d="M1 2v11h1v-1h1v-1h1v1h1v2h1v2h1v1h1v-2h-1v-2h-1v-2h3v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1h-1v-1z" fill="#fff"/></svg>
       <p class="save"><b>Zapisz ten post.</b> Przyda się przy następnym przetargu.</p>
       <div class="route"><i class="ln past" style="left:0;width:540px"></i><i class="nd"></i></div>
@@ -417,9 +468,9 @@ body.export .frame .num,body.export .frame.cover{display:none}
   <section class="sh"><h2>Opis posta</h2><span class="eyebrow">do wklejenia pod karuzelą</span></section>
   <div class="cap-box"><pre id="capText">Premiera BudOS. Przetargi opanowane.
 
-Zwiad codziennie przegląda nowe przetargi budowlane z całej Polski i daje znać, kiedy pojawi się coś dla Ciebie. Dalej wszystko jest w jednym miejscu: filtry pod Twoją branżę, termin na karcie przetargu, analiza SWZ i skład każdej pozycji kosztorysu.
+Znajdziesz przetarg, sprawdzisz SWZ, policzysz przedmiar bez klepania i przygotujesz ofertę. Jedna lista z BZP, TED i BIP, analiza SWZ z odwołaniem do dokumentu i strony, przedmiar z PDF w wierszach kosztorysu. Decydujesz i podpisujesz Ty.
 
-Przesuń, żeby zobaczyć, jak to działa. Zapisz, żeby wrócić przy następnym przetargu.
+Przesuń, żeby zobaczyć, jak to działa. Całą drogę przejdziesz w demo bez konta.
 
 👉 budos.io
 
@@ -427,10 +478,10 @@ Przesuń, żeby zobaczyć, jak to działa. Zapisz, żeby wrócić przy następny
 
   <section class="sh"><h2>Kolejność slajdów</h2><span class="eyebrow">jedna funkcja na slajd</span></section>
   <div class="flow">
-    <div><b>01</b><span>Premiera (Wasza karta)</span></div><div><b>02 · ZWIAD</b><span>Alert o przetargu z całej Polski</span></div>
-    <div><b>03 · FILTRY</b><span>Branża, region, wartość, termin</span></div><div><b>04 · TERMIN</b><span>Data i licznik dni na karcie</span></div>
-    <div><b>05 · ANALIZA SWZ</b><span>Warunki, kryteria, ryzyka</span></div><div><b>06 · KOSZTORYS</b><span>Skład pozycji z KNR</span></div>
-    <div><b>07 · WYNIK</b><span>Od alertu do decyzji, 33 h → 6 min</span></div><div><b>08 · START</b><span>Budos.io i zachęta do zapisania</span></div>
+    <div><b>01 · PREMIERA</b><span>Przetargi opanowane, 33 h → 6 min* z dopiskiem, demo bez konta</span></div><div><b>02 · ZWIAD</b><span>Jedna lista z BZP, TED i BIP, przykładowy alert</span></div>
+    <div><b>03 · FILTRY</b><span>Kody CPV, województwa, widełki wartości (schemat)</span></div><div><b>04 · TERMIN</b><span>Data i godzina na karcie przetargu (przykład)</span></div>
+    <div><b>05 · ANALIZA SWZ</b><span>Warunek → dokument → strona (schemat)</span></div><div><b>06 · KOSZTORYS</b><span>Przedmiar z PDF w wiersze, stawki i zatwierdzenie po Twojej stronie</span></div>
+    <div><b>07 · WYNIK</b><span>Najpierw decyzja, potem oferta, 33 h → 6 min*</span></div><div><b>08 · START</b><span>Zobacz demo bez konta, budos.io</span></div>
   </div>
 </div>
 
