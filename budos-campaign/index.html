@@ -1,7 +1,7 @@
 <title>BudOS Projekt Yuna</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,100..800&family=Space+Grotesk:wght@400;500;600;700&display=swap">
 <style>
 :root{
   color-scheme: dark;
@@ -15,8 +15,9 @@
   --green:#75B974;      /* akcent marki */
   --green-2:#9BD49A;
   --amber:#E3B45B;
-  --display:"Onest", "Helvetica Neue", Arial, sans-serif;
-  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --red:#E5625C;        /* „Nie” i czerwone flagi z landingu */
+  --display:"Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --mono:"Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 *{box-sizing:border-box}
 html,body{background:var(--ink);color:var(--cream)}
@@ -30,7 +31,7 @@ body{font-family:var(--display);font-size:15px;line-height:1.5;padding-inline:16
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream-2)}
 .eyebrow b{color:var(--green);font-weight:500}
 .intro{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:32px;align-items:end}
-.intro h1{font-size:clamp(38px,6.2vw,84px);line-height:.98;letter-spacing:-.035em;font-weight:800;margin:0;text-wrap:balance}
+.intro h1{font-size:clamp(38px,6.2vw,84px);line-height:.98;letter-spacing:-.04em;font-weight:700;margin:0;text-wrap:balance}
 .intro h1 em{font-style:normal;color:var(--green)}
 .intro p{margin:0;color:var(--cream-2);max-width:52ch;font-size:16px}
 @media (max-width:820px){.intro{grid-template-columns:1fr}}
@@ -51,10 +52,10 @@ body{font-family:var(--display);font-size:15px;line-height:1.5;padding-inline:16
 .btn:focus-visible,.seg button:focus-visible,.scrub input:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 .btn svg{width:18px;height:18px}
 .btn.primary{background:var(--green);color:var(--ink);border-color:var(--green)}
-.time{font:500 13px var(--mono);color:var(--cream-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.time{font:500 13px var(--mono);font-stretch:87.5%;color:var(--cream-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .scrub{position:relative;display:flex;flex-direction:column;gap:6px;min-width:0}
 .scrub input{width:100%;accent-color:var(--green);margin:0;height:20px}
-.marks{position:relative;height:16px;font:500 10px var(--mono);color:var(--cream-3);letter-spacing:.04em;text-transform:uppercase}
+.marks{position:relative;height:16px;font:500 10px var(--mono);font-stretch:75%;color:var(--cream-3);letter-spacing:.04em;text-transform:uppercase}
 .marks span{position:absolute;top:0;transform:translateX(0);white-space:nowrap;cursor:pointer}
 .marks span::before{content:"";position:absolute;left:0;top:-7px;width:1px;height:5px;background:var(--cream-3)}
 .marks span.on{color:var(--green)}
@@ -100,146 +101,275 @@ body{font-family:var(--display);font-size:15px;line-height:1.5;padding-inline:16
 .scene{position:absolute;inset:0;display:none}
 .mono{font-family:var(--mono)}
 
-/* chrome (from the brand GIFs) */
-.chrome .tick{position:absolute;left:var(--pad);top:calc(var(--htop) - 30px);width:78px;height:6px;border-radius:3px;background:var(--green);transform-origin:0 50%}
-.chrome .foot{position:absolute;left:var(--pad);right:var(--pad);bottom:64px;height:74px;border-top:2px solid #1B2836;display:flex;justify-content:space-between;align-items:flex-end}
-.chrome .foot svg{height:52px;width:auto}
-.chrome .foot b{font-size:34px;font-weight:700;letter-spacing:-.01em}
-.chrome .idx{position:absolute;right:var(--pad);top:calc(var(--htop) - 36px);font:500 20px var(--mono);letter-spacing:.1em;color:var(--cream-3);text-transform:uppercase;display:flex;gap:14px}
-.chrome .idx i{font-style:normal;color:var(--green)}
-.f916 .chrome .foot{bottom:110px}
+/* chrome (landing v4: eyebrow, logo, the four steps) */
+.chrome .eb{position:absolute;left:var(--pad);top:calc(var(--htop) - 50px);display:flex;align-items:center;gap:16px;font:500 19px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--green);white-space:nowrap}
+.chrome .eb i{display:block;width:44px;height:2px;background:var(--green);transform-origin:0 50%}
+.chrome .lg{position:absolute;right:var(--pad);top:calc(var(--htop) - 68px);height:46px;width:auto}
+.chrome .steps{position:absolute;left:var(--pad);right:var(--pad);bottom:58px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.chrome .st{position:relative;padding-top:20px;display:flex;align-items:baseline;gap:14px;font-size:30px;font-weight:600;letter-spacing:-.01em;color:var(--cream-3);white-space:nowrap}
+.chrome .st::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:2px;background:#1D2A3A}
+.chrome .st i{position:absolute;left:0;top:0;height:3px;width:0;border-radius:2px;background:var(--green)}
+.chrome .st b{font:500 17px var(--mono);color:var(--cream-3)}
+.chrome .st.on{color:var(--cream)}
+.chrome .st.on b{color:var(--green)}
+.f916 .chrome .steps{bottom:118px;gap:16px}
+.f916 .chrome .st,.f45 .chrome .st{font-size:25px;gap:9px}
+.f916 .chrome .st b,.f45 .chrome .st b{font-size:14px}
 
-.hl{position:absolute;left:var(--pad);right:var(--pad);top:var(--htop);margin:0;font-size:var(--hl);line-height:1.02;letter-spacing:-.03em;font-weight:800;text-wrap:balance}
+.hl{position:absolute;left:var(--pad);right:var(--pad);top:var(--htop);margin:0;font-size:var(--hl);line-height:1.02;letter-spacing:-.035em;font-weight:700;text-wrap:balance}
 .hl .w{display:inline-block;will-change:transform,opacity,filter}
 .hl .br{display:block;height:0}
 
-.content{position:absolute;left:var(--pad);right:var(--pad);top:calc(var(--htop) + var(--hl)*2.4);bottom:190px;display:grid;place-items:center}
-.f916 .content{top:calc(var(--htop) + var(--hl)*2.6);bottom:260px}
-.cwrap{position:relative;transform:scale(var(--k));transform-origin:50% 50%}
+/* content box between the headline and the steps; .cwrap is a zero-size anchor at its centre */
+.content{position:absolute;left:var(--pad);right:var(--pad);top:calc(var(--htop) + var(--hl)*2.4);bottom:190px}
+.f916 .content{top:calc(var(--htop) + var(--hl)*2.6);bottom:270px}
+.cwrap{position:absolute;left:50%;top:50%;width:0;height:0;transform:scale(var(--k))}
+.cwrap>*{position:absolute;left:0;top:0}
 
 /* UI components (BudOS app look) */
-.card{background:linear-gradient(180deg,#101B28,#0C1520);border:1.5px solid #22334A;border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),0 0 0 1px rgba(0,0,0,.4);position:relative}
-.tag{display:inline-block;font:500 20px var(--display);padding:3px 12px;border-radius:7px;border:1.5px solid #2A3B52;background:#141F2D;color:var(--cream-2);vertical-align:middle}
-.tender{width:880px;padding:26px 30px;display:flex;flex-direction:column;gap:6px}
-.tender .t1{font-size:30px;line-height:1.2;color:var(--cream)}
-.tender .t1 .kind{color:var(--cream-2);margin-inline:10px 6px}
-.tender .t1 b{font-weight:600}
-.tender .t2{font-size:23px;color:var(--cream-2)}
-.tender .t2 .new{color:var(--green)}
-.cursor{position:absolute;width:18px;height:18px;border-radius:3px;background:var(--green);box-shadow:0 0 22px rgba(117,185,116,.9);pointer-events:none}
+.card{background:linear-gradient(180deg,#101A27,#0B141F);border:1.5px solid #213247;border-radius:18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8),0 0 0 1px rgba(0,0,0,.4)}
+.win{overflow:hidden}
+.win .bar{display:flex;align-items:center;gap:8px;height:46px;padding:0 18px;border-bottom:1.5px solid #1B2838}
+.win .bar i{width:11px;height:11px;border-radius:50%;background:#26364A}
+.win .bar .url{margin:0 auto;transform:translateX(-26px);font:500 15px var(--mono);color:var(--cream-3);background:#0E1824;border:1px solid #1E2C3D;padding:4px 14px;border-radius:8px}
+.win .bar .url b{color:var(--cream);font-weight:500}
+.demo{display:inline-flex;align-items:center;gap:9px;font:500 13px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-2)}
+.demo i{width:8px;height:8px;border-radius:50%;background:var(--cream-2)}
+.tag{display:inline-block;font:500 17px var(--display);padding:1px 9px;border-radius:7px;border:1.5px solid #2A3B52;background:#141F2D;color:var(--cream-2);vertical-align:2px}
+.cursor{position:absolute;width:18px;height:18px;border-radius:3px;background:var(--green);box-shadow:0 0 22px rgba(117,185,116,.9);pointer-events:none;opacity:0}
 .ripple{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid var(--green);opacity:0}
 
 /* S0 */
-.s0 .count{position:absolute;left:0;right:0;top:50%;text-align:center;font:700 var(--big)/1 var(--mono);letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--cream)}
-.s0 .typed{position:absolute;left:0;right:0;text-align:center;font:500 34px var(--mono);color:var(--cream-2);letter-spacing:.02em}
-.s0 .typed .car{display:inline-block;width:.55em;height:.9em;background:var(--green);vertical-align:-.1em;margin-left:6px}
-.s0 .lab{position:absolute;left:0;right:0;text-align:center;font-size:44px;font-weight:600;color:var(--cream-2);letter-spacing:-.01em}
-.s0 .q{position:absolute;left:0;right:0;text-align:center;font-size:132px;font-weight:800;letter-spacing:-.04em;white-space:nowrap}
+.s0 .count{position:absolute;left:0;right:0;top:50%;text-align:center;font:700 var(--big)/1 var(--mono);font-stretch:75%;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--cream);white-space:nowrap}
+.s0 .count .z{color:#233243}
+.s0 .typed{position:absolute;left:0;right:0;text-align:center;font:500 30px var(--mono);color:var(--cream-2);letter-spacing:.08em;text-transform:uppercase}
+.s0 .typed .car{display:inline-block;width:.6em;height:.95em;background:var(--green);vertical-align:-.12em;margin-left:8px}
+.s0 .lab{position:absolute;left:0;right:0;text-align:center;font-size:46px;font-weight:500;color:var(--cream-2);letter-spacing:-.01em}
+.s0 .q{position:absolute;left:0;right:0;text-align:center;font-size:132px;font-weight:700;letter-spacing:-.045em;white-space:nowrap}
 .s0 .q .g{color:var(--green)}
-.f916 .s0 .q,.f45 .s0 .q{font-size:104px}
+.f916 .s0 .q,.f45 .s0 .q{font-size:98px}
+.s0 .note0{position:absolute;left:0;right:0;bottom:72px;text-align:center;font:500 15px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--cream-3)}
+.f916 .s0 .note0{bottom:150px}
 
 /* S1 */
-.s1 .slam{position:absolute;left:var(--pad);right:var(--pad);top:50%;transform:translateY(-50%);text-align:center;font-size:var(--word);line-height:.92;font-weight:900;letter-spacing:-.05em;text-transform:none}
+.s1 .slam{position:absolute;left:var(--pad);right:var(--pad);top:50%;transform:translateY(-50%);text-align:center;font-size:calc(var(--word)*.9);line-height:.95;font-weight:700;letter-spacing:-.055em}
+.f916 .s1 .slam{font-size:150px}
 .s1 .slam .w{display:inline-block;margin-inline:.1em}
 .s1 .slam .row{display:block}
-.s1 .hud{position:absolute;left:var(--pad);right:var(--pad);bottom:80px;display:flex;justify-content:space-between;font:500 24px var(--mono);color:var(--cream-2);letter-spacing:.06em;text-transform:uppercase}
+.s1 .hud{position:absolute;left:var(--pad);right:var(--pad);bottom:80px;display:flex;justify-content:space-between;font:500 21px var(--mono);color:var(--cream-2);letter-spacing:.06em;text-transform:uppercase}
 .s1 .hud b{color:var(--amber);font-weight:500}
 .s1 .shade{position:absolute;inset:0;background:radial-gradient(ellipse 60% 45% at 50% 50%,rgba(7,14,24,.92),rgba(7,14,24,.35) 70%,rgba(7,14,24,0))}
 
-/* S2 */
-.branza{padding:30px 34px 34px;display:flex;flex-direction:column;gap:22px;width:640px}
-.branza .lab{font:500 34px var(--display);letter-spacing:.14em;color:var(--cream-2)}
-.chips{display:flex;gap:20px}
-.chip{position:relative;font-size:48px;font-weight:500;padding:14px 38px;border-radius:999px;border:2px solid #2A3B52;background:#141F2D;color:var(--cream-2)}
-.chip.on{border-color:var(--green);background:rgba(117,185,116,.12);color:var(--cream)}
-.stack{position:relative;display:flex;flex-direction:column;gap:22px;align-items:center}
+/* S2 · 01 Znajdź */
+.src{width:250px;padding:22px 26px 24px;display:flex;flex-direction:column;gap:10px}
+.src b{font:700 70px/1 var(--mono);font-stretch:75%;letter-spacing:-.01em;color:var(--cream)}
+.src span{font:500 15px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--green);white-space:nowrap}
+.f916 .src{width:224px;padding:20px 22px}
+.zw{width:1040px}
+.f916 .zw{width:748px}
+.f45 .zw{width:880px}
+.zw .zh{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:20px 26px 14px}
+.zw .zt{display:block;font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.zw .zsub{display:block;font-size:17px;color:var(--cream-3);margin-top:2px}
+.zw .zs{font:600 15px var(--mono);letter-spacing:.14em;color:var(--green);border:1.5px solid rgba(117,185,116,.45);background:rgba(117,185,116,.08);padding:6px 12px;border-radius:8px;white-space:nowrap}
+.zw .zcols,.zw .zr{display:grid;grid-template-columns:minmax(0,1fr) 170px 150px 128px;gap:18px;align-items:center}
+.zw .zcols{padding:10px 26px;font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-3);border-top:1.5px solid #1B2838;border-bottom:1.5px solid #1B2838}
+.zw .zcols span:nth-child(3){color:var(--green)}
+.zw .zr{position:relative;padding:15px 26px;border-bottom:1.5px solid #16222F}
+.zw .zr:last-child{border-bottom:0}
+.zw .zr .t1{font-size:21px;line-height:1.28;color:var(--cream);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.zw .zr .t1 .kind{color:var(--cream-2);margin-inline:8px 5px}
+.zw .zr .t1 b{font-weight:600}
+.zw .zr .t2{font-size:16px;color:var(--cream-3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zw .zd{font:500 15px/1.45 var(--mono);color:var(--cream)}
+.zw .zd small{display:block;color:var(--green);font-size:13px}
+.zw .zd.none{color:var(--cream-3)}
+.zw .zm{font:700 34px var(--mono);font-stretch:75%;color:var(--cream);font-variant-numeric:tabular-nums}
+.zw .zm::after{content:"";display:block;width:52px;height:3px;margin-top:4px;border-radius:2px;background:var(--green)}
+.zw .za{display:flex;flex-direction:column;gap:7px;align-items:flex-start}
+.zw .za span{font:600 15px var(--display);padding:4px 12px;border-radius:8px;border:1.5px solid rgba(117,185,116,.55);color:var(--green)}
+.zw .za span.no{border-color:#26364A;color:var(--cream-3)}
+.zw .zr.hot{background:rgba(117,185,116,.08);box-shadow:inset 5px 0 0 var(--green)}
+.f916 .zw .zcols,.f916 .zw .zr{grid-template-columns:minmax(0,1fr) 138px 70px;gap:14px}
+.f45 .zw .zcols,.f45 .zw .zr{grid-template-columns:minmax(0,1fr) 150px 84px;gap:16px}
+.f916 .zw .za,.f916 .zw .zcols span:nth-child(4),.f45 .zw .za,.f45 .zw .zcols span:nth-child(4){display:none}
+.f916 .zw .zcols span:nth-child(3),.f45 .zw .zcols span:nth-child(3){font-size:0}
+.f916 .zw .zcols span:nth-child(3)::before,.f45 .zw .zcols span:nth-child(3)::before{content:"Dopas.";font-size:12px}
 
-/* S3 */
-.s3 .ghost{position:absolute;left:50%;top:54%;font:900 880px/1 var(--display);letter-spacing:-.06em;color:transparent;-webkit-text-stroke:3px rgba(117,185,116,.5);white-space:nowrap}
-.s3 .ghost small{font-size:.16em;-webkit-text-stroke:0;color:var(--green);letter-spacing:.02em;margin-left:.15em;font-weight:700}
-.f916 .s3 .ghost{font-size:700px}
-.termin{width:760px;padding:32px 36px;display:grid;grid-template-columns:56px 1fr;column-gap:24px;row-gap:4px;align-items:center}
-.termin svg{width:44px;height:44px;color:var(--cream-2);grid-row:1}
-.termin .k{font:500 30px var(--display);letter-spacing:.1em;color:var(--cream-2);grid-column:2}
-.termin .d{font-size:44px;font-weight:600;grid-column:2}
-.termin .z{font-size:36px;color:var(--cream-2);grid-column:2;font-variant-numeric:tabular-nums}
-.termin .z b{color:var(--green);font-weight:700}
+/* S3 · 02 Sprawdź */
+.pages{width:520px;height:680px}
+.page{position:absolute;inset:0;border-radius:10px;background:#E8DDD4;color:#15202c;padding:40px 44px;display:flex;flex-direction:column;gap:13px;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
+.page h4{margin:0 0 6px;font-size:25px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.page .pn{font:500 14px var(--mono);color:#6b6258;display:flex;justify-content:space-between;letter-spacing:.04em}
+.page i{display:block;height:11px;border-radius:6px;background:#c9beb4}
+.page i.mk{background:rgba(229,98,92,.6)}
+.rep{width:900px}
+.f916 .rep{width:748px}
+.f45 .rep{width:840px}
+.rep .rh{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px 6px}
+.rep .rh b{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.rep .rows{display:flex;flex-direction:column;gap:9px;padding:10px 18px 18px}
+.rep .row{display:flex;align-items:center;gap:16px;padding:13px 20px;font-size:22px;font-weight:600;border-radius:12px;border:1.5px solid #1F2E41;background:#0E1823}
+.rep .row svg{width:24px;height:24px;color:var(--green);flex:none}
+.f169 .rep .row{padding:10px 18px}
+.f169 .rep .rows{gap:7px}
+.rep .row .meta{margin-left:auto;font:500 14px var(--mono);color:var(--cream-3);white-space:nowrap}
+.rep .row .meta.warn{color:var(--amber);background:rgba(227,180,91,.12);padding:3px 10px;border-radius:6px}
+.rep .row .meta.red{color:#fff;background:var(--red);padding:3px 11px;border-radius:6px;font-weight:700}
+.rep .flag{flex-direction:column;align-items:stretch;gap:0;border-color:rgba(229,98,92,.55);background:#18131A}
+.rep .flag .head{display:flex;align-items:center;gap:16px}
+.rep .flag .head svg{color:var(--red)}
+.rep .flag .body{overflow:hidden;max-height:0}
+.rep .fl{margin-top:14px;padding:14px 16px;border-radius:10px;background:rgba(229,98,92,.08);border:1.5px solid rgba(229,98,92,.35);display:flex;flex-direction:column;gap:9px}
+.rep .fl .ft{display:flex;align-items:flex-start;gap:12px}
+.rep .fl b{font-size:20px;font-weight:600;line-height:1.3}
+.rep .fl em{flex:none;font:600 12px var(--mono);font-style:normal;letter-spacing:.08em;text-transform:uppercase;color:var(--red);border:1.5px solid rgba(229,98,92,.6);padding:2px 8px;border-radius:6px;margin-top:2px}
+.rep .fl .sr{font:500 15px var(--mono);color:var(--cream-2);line-height:1.5}
+.rep .fl .sr u{white-space:nowrap;text-decoration:none;color:var(--ink);background:var(--cream);padding:1px 8px;border-radius:5px;font-weight:700}
+.dec{width:1040px}
+.f916 .dec{width:760px}
+.f45 .dec{width:880px}
+.dec .dh{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 24px;border-bottom:1.5px solid #1B2838;font:500 13px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-3)}
+.dec .dh span:first-child{display:flex;align-items:center;gap:10px;color:var(--cream-2)}
+.dec .dh i{width:8px;height:8px;border-radius:50%;background:var(--cream-2)}
+.dec .db{display:grid;grid-template-columns:minmax(0,1fr) 270px}
+.dec .dl{padding:26px 28px 28px;display:flex;flex-direction:column;gap:10px;border-right:1.5px solid #1B2838}
+.dec .dt{font-size:31px;font-weight:700;line-height:1.18;letter-spacing:-.02em}
+.dec .dm{font-size:19px;color:var(--cream-2)}
+.dec .dk{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.dec .dk div{border:1.5px solid #1F2E41;border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:6px;background:#0E1823}
+.dec .dk small{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-3)}
+.dec .dk b{font:600 19px var(--mono);color:var(--cream)}
+.dec .dr{padding:22px;display:flex;flex-direction:column;gap:11px}
+.dec .dr small{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-3)}
+.dc{position:relative;display:block;text-align:center;font:700 18px var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:11px 0;border-radius:10px;border:1.5px solid #243448;color:var(--cream-3)}
+.dc.t{border-color:rgba(117,185,116,.45);color:rgba(117,185,116,.75)}
+.dc.n{border-color:rgba(229,98,92,.45);color:rgba(229,98,92,.8)}
+.dc.a.on{background:#CFC8BF;border-color:#CFC8BF;color:var(--ink);box-shadow:0 0 36px rgba(232,221,212,.35)}
+.dec .dr p{margin:4px 0 0;font-size:17px;line-height:1.38;color:var(--cream-2)}
+.f916 .dec .db{grid-template-columns:minmax(0,1fr) 236px}
+.f916 .dec .dt{font-size:27px}
+.f916 .dec .dl{padding:22px 22px 24px}
+.f916 .dec .dh span:last-child{display:none}
 
-/* S4 */
-.pages{position:absolute;left:50%;top:50%;width:560px;height:720px;margin:-360px 0 0 -280px}
-.page{position:absolute;inset:0;border-radius:10px;background:#E8DDD4;color:#15202c;padding:44px 46px;display:flex;flex-direction:column;gap:14px;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
-.page h4{margin:0;font-size:26px;font-weight:800;letter-spacing:-.01em}
-.page .pn{font:500 18px var(--mono);color:#6b6258}
-.page i{display:block;height:12px;border-radius:6px;background:#c9beb4}
-.acc{width:860px;display:flex;flex-direction:column;gap:16px}
-.acc .row{display:flex;align-items:center;gap:20px;padding:22px 28px;font-size:30px;font-weight:500;border-radius:14px;border:1.5px solid #22334A;background:#0E1823}
-.acc .row svg{width:30px;height:30px;color:var(--green);flex:none}
-.acc .row .meta{margin-left:auto;font:500 22px var(--mono);color:var(--cream-3)}
-.acc .row .meta.warn{color:var(--amber);background:rgba(227,180,91,.12);padding:2px 10px;border-radius:6px}
-.acc .kry{flex-direction:column;align-items:stretch;gap:0;background:#101C28;border-color:#2C4260}
-.acc .kry .head{display:flex;align-items:center;gap:20px}
-.acc .kry .body{overflow:hidden}
-.crit{display:grid;grid-template-columns:1fr 240px 90px;align-items:center;gap:24px;font-size:26px;padding-top:22px;color:var(--cream)}
-.crit .bar{height:10px;border-radius:5px;background:#1E2C3D;overflow:hidden}
-.crit .bar i{display:block;height:100%;background:var(--green);border-radius:5px;width:0}
-.crit .pct{font:700 26px var(--mono);color:var(--green);text-align:right;font-variant-numeric:tabular-nums}
-.s4 .huge{position:absolute;right:var(--pad);bottom:210px;font:700 250px/1 var(--mono);letter-spacing:-.06em;color:var(--green);font-variant-numeric:tabular-nums}
-.f916 .s4 .huge{bottom:300px;font-size:220px}
-.f45 .s4 .huge{font-size:180px;bottom:200px}
-.f169 .s4 .cwrap{transform:scale(.82)}
-.f916 .s4 .cwrap{transform:scale(1.08)}
-.f916 .tender{width:760px}
-.f916 .termin{width:760px}
-.f916 .price{width:560px}
-
-/* S5 */
-.price{width:620px;padding:36px 44px;display:flex;align-items:center;justify-content:space-between}
-.price .v{font:700 76px var(--mono);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.price .s{font-size:42px;color:var(--cream-2);display:flex;align-items:center;gap:10px;position:relative}
-.price .s svg{width:34px;height:34px}
-.knr{font:500 24px var(--mono);color:var(--cream-2);letter-spacing:.02em;text-align:center}
-.knr b{color:var(--cream);font-weight:500}
+/* S4 · 03 Policz */
+.pdf{width:780px;padding:28px 32px 26px;border-radius:10px;background:#E8DDD4;color:#15202c;box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
+.f916 .pdf{width:740px}
+.pdf .ph{display:flex;justify-content:space-between;font:500 14px var(--mono);color:#6b6258;margin-bottom:16px;letter-spacing:.03em}
+.pdf .ph b{font-weight:700;color:#15202c}
+.pdf .pr{position:relative;display:grid;grid-template-columns:48px minmax(0,1fr) 58px 70px;gap:14px;align-items:center;padding:10px 12px;font-size:19px;border-top:1px solid #cfc4b9}
+.pdf .pr.hd{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#6b6258;border-top:0;padding-top:0}
+.pdf .pr .c{font:500 14px var(--mono);color:#6b6258}
+.pdf .pr .q{font:500 15px var(--mono);text-align:right}
+.pdf .pr .ln{display:block;height:10px;border-radius:5px;background:#c9beb4}
+.pdf .pr b{font-weight:600}
+.pdf .pr.hit::after{content:"";position:absolute;inset:1px -4px;border-radius:6px;background:rgba(117,185,116,.28);box-shadow:inset 0 0 0 2px #5E9E5D}
+.pdf .rows4{position:relative}
+.pdf .scan{position:absolute;left:-14px;right:-14px;top:0;height:3px;background:#5E9E5D;box-shadow:0 0 18px 4px rgba(117,185,116,.6);opacity:0}
+.price{width:860px;padding:22px 26px;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:20px;align-items:center}
+.price .pz{font:600 15px var(--mono);color:var(--ink);background:var(--cream-2);padding:4px 10px;border-radius:7px;white-space:nowrap}
+.price .pn2{font-size:24px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.price .v{font:700 46px var(--mono);font-stretch:75%;letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.price .s{position:relative;font-size:22px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:6px;border:1.5px solid rgba(117,185,116,.5);padding:8px 14px;border-radius:10px;white-space:nowrap}
+.price .s svg{width:22px;height:22px}
+.knr{font:500 20px var(--mono);color:var(--cream-2);letter-spacing:.01em;text-align:center;white-space:nowrap}
+.knr b{color:var(--green);font-weight:600}
 .sklad{width:980px;display:flex;flex-direction:column;gap:12px}
-.sklad .sh{display:flex;align-items:center;gap:16px;font-size:30px;font-weight:600;padding:0 6px 6px}
+.sklad .sh{display:flex;align-items:center;gap:16px;font-size:30px;font-weight:700;padding:0 6px 6px;letter-spacing:-.01em}
 .sklad .sh span{color:var(--cream-3);font-weight:400;font-size:24px}
 .sklad .r{display:grid;grid-template-columns:64px 1fr 130px 70px;align-items:center;gap:18px;padding:18px 24px;border-radius:12px;border:1.5px solid #22334A;background:#0E1823;font-size:26px}
-.sklad .r .ty{font:700 20px var(--mono);color:var(--ink);background:var(--cream-2);border-radius:6px;text-align:center;padding:2px 0}
+.sklad .r .ty{font:700 19px var(--mono);color:var(--ink);background:var(--cream-2);border-radius:6px;text-align:center;padding:2px 0}
 .sklad .r .ty.r{background:var(--green)}
-.sklad .r .q{font:500 24px var(--mono);text-align:right;color:var(--cream);font-variant-numeric:tabular-nums}
-.sklad .r .u{font:500 22px var(--mono);color:var(--cream-3)}
+.sklad .r .q{font:500 22px var(--mono);text-align:right;color:var(--cream);font-variant-numeric:tabular-nums}
+.sklad .r .u{font:500 20px var(--mono);color:var(--cream-3)}
 .sklad .r.hot{border-color:var(--green);background:#0F1E1C}
+.s4 .huge{position:absolute;right:var(--pad);bottom:150px;text-align:right;color:var(--green);opacity:0}
+.s4 .huge b{display:block;font:700 150px/1 var(--mono);font-stretch:75%;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.s4 .huge small{display:block;font:500 17px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-2);margin-top:12px}
+.f916 .s4 .huge,.f45 .s4 .huge{left:var(--pad);text-align:center}
+.f916 .s4 .huge{bottom:290px}
+.f916 .s4 .huge b{font-size:150px}
+.f45 .s4 .huge{bottom:150px}
+.f45 .s4 .huge b{font-size:120px}
+.f45 .s4 .huge small{font-size:14px;margin-top:8px}
 
-/* S6 */
-.s6 .w6{position:absolute;left:0;right:0;top:50%;text-align:center;font-size:var(--word);line-height:.9;font-weight:900;letter-spacing:-.05em;white-space:nowrap}
-.s6 .w6.o{color:transparent;-webkit-text-stroke:4px var(--cream)}
-.s6 .w6.g{color:var(--green)}
-.s6 .fin{position:absolute;left:var(--pad);right:var(--pad);top:50%;text-align:center;font-weight:900;letter-spacing:-.05em;line-height:.95}
-.s6 .fin .a{display:block;font-size:calc(var(--word)*.9)}
-.s6 .fin .b{display:block;font-size:calc(var(--word)*.42);color:var(--green);letter-spacing:-.03em;margin-top:.25em}
+/* S5 · 04 Złóż */
+.form{width:880px}
+.f916 .form{width:748px}
+.form .fh{display:flex;justify-content:space-between;align-items:baseline;padding:20px 26px 12px}
+.form .fh b{font-size:30px;font-weight:700;letter-spacing:-.02em}
+.form .fh span{font:500 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--cream-3)}
+.form .ff{display:grid;grid-template-columns:190px minmax(0,1fr) 176px;gap:18px;align-items:center;padding:13px 26px;border-top:1.5px solid #16222F}
+.form .ff label{font:500 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--cream-3);white-space:nowrap}
+.form .ff .fv{height:46px;border-radius:10px;border:1.5px solid #22334A;background:#0B131D;display:flex;align-items:center;padding:0 14px;overflow:hidden}
+.form .ff .sk{display:block;height:12px;border-radius:6px;background:rgba(232,221,212,.5);width:0}
+.form .ff em{font:600 13px var(--mono);font-style:normal;color:var(--green);letter-spacing:.04em;white-space:nowrap;opacity:0}
+.form .ff.tot .fv{border-color:rgba(117,185,116,.6);background:rgba(117,185,116,.08)}
+.form .ff.tot .fv b{font:700 28px var(--mono);font-stretch:75%;color:var(--cream);font-variant-numeric:tabular-nums;white-space:nowrap}
+.f916 .form .ff{grid-template-columns:150px minmax(0,1fr) 150px;gap:14px;padding:13px 20px}
+.f916 .form .ff em{font-size:12px}
+.miss{width:640px;padding:22px 24px 24px;display:flex;flex-direction:column;gap:11px}
+.miss .mh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:0 4px 4px}
+.miss .mh b{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.miss .mh span{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--cream-3)}
+.miss .mi{display:flex;align-items:center;gap:14px;font-size:22px;font-weight:500;padding:12px 14px;border-radius:11px;border:1.5px solid #1F2E41;background:#0E1823}
+.miss .mi i{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;font:700 15px var(--mono);font-style:normal}
+.miss .mi.ok i{background:var(--green);color:var(--ink)}
+.miss .mi.ty{border-color:rgba(227,180,91,.45)}
+.miss .mi.ty i{border:2px solid var(--amber);color:var(--amber)}
+.miss .mi span{margin-left:auto;font:700 14px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--amber);padding:3px 10px;border-radius:6px}
+.sign{width:640px}
+.sign svg{display:block;width:100%;height:150px;overflow:visible}
+.sign path{fill:none;stroke:var(--cream);stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+.sign .sl{display:flex;justify-content:space-between;align-items:center;border-top:2px solid rgba(232,221,212,.35);padding-top:12px;margin-top:6px;font:500 15px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-3)}
+.sign .sl b{font:700 15px var(--mono);letter-spacing:.14em;color:var(--ink);background:var(--green);padding:3px 12px;border-radius:6px}
+
+/* S6 · lejek */
+.s6 .vb{position:absolute;display:flex;flex-direction:column;gap:4px}
+.f169 .s6 .vb{left:var(--pad);top:50%;transform:translateY(-50%)}
+.f916 .s6 .vb{left:50%;top:1170px;transform:translateX(-50%)}
+.f45 .s6 .vb{left:50%;top:770px;transform:translateX(-50%)}
+.s6 .v6{display:flex;align-items:baseline;gap:22px;font-size:164px;line-height:1;font-weight:700;letter-spacing:-.055em;white-space:nowrap;transform-origin:0 50%;will-change:transform,opacity,filter}
+.s6 .v6 i{font:500 24px var(--mono);font-style:normal;letter-spacing:.1em;color:var(--green);transform:translateY(-.3em)}
+.f916 .s6 .v6{font-size:128px}
+.f45 .s6 .v6{font-size:104px;gap:16px}
+.f916 .s6 .v6 i,.f45 .s6 .v6 i{font-size:20px}
+.s6 .v6.o{color:transparent;-webkit-text-stroke:3px rgba(232,221,212,.55)}
+.s6 .fin{position:absolute;font-weight:700;letter-spacing:-.05em;line-height:.98}
+.f169 .s6 .fin{left:var(--pad);top:50%;transform:translateY(-50%)}
+.f916 .s6 .fin{left:var(--pad);right:var(--pad);top:1210px;text-align:center}
+.f45 .s6 .fin{left:var(--pad);right:var(--pad);top:800px;text-align:center}
+.s6 .fin .a{display:block;font-size:134px}
+.f916 .s6 .fin .a{font-size:112px}
+.f45 .s6 .fin .a{font-size:96px}
+.s6 .fin .a em{font-style:normal;color:var(--green)}
+.s6 .fin .b{display:block;font:500 22px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--cream-2);margin-top:38px;white-space:nowrap}
+.f916 .s6 .fin .b,.f45 .s6 .fin .b{font-size:17px;letter-spacing:.1em}
 
 /* S7 */
 .s7 .logo{position:absolute;left:50%;top:15%;width:440px;margin-left:-220px}
 .f916 .s7 .logo{top:21%;width:600px;margin-left:-300px}
 .f45 .s7 .logo{top:13%;width:460px;margin-left:-230px}
 .s7 .logo svg{width:100%;height:auto;overflow:visible}
-.s7 .tagl{position:absolute;left:var(--pad);right:var(--pad);top:55%;text-align:center;font-size:88px;font-weight:800;letter-spacing:-.04em;line-height:1.02;text-wrap:balance}
-.f916 .s7 .tagl{top:48%;font-size:92px}
-.f45 .s7 .tagl{top:45%;font-size:84px}
+.s7 .tagl{position:absolute;left:var(--pad);right:var(--pad);top:54%;text-align:center;font-size:124px;font-weight:700;letter-spacing:-.05em;line-height:1;text-wrap:balance}
+.f916 .s7 .tagl{top:48%;font-size:128px}
+.f45 .s7 .tagl{top:45%;font-size:112px}
 .s7 .tagl span{display:inline-block}
 .s7 .tagl .g{color:var(--green)}
-.s7 .cta{position:absolute;left:50%;top:74%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:22px}
-.f916 .s7 .cta{top:68%}
-.f45 .s7 .cta{top:70%}
-.s7 .pill{position:relative;overflow:hidden;background:var(--green);color:var(--ink);font-size:54px;font-weight:800;padding:16px 50px;border-radius:999px;letter-spacing:-.02em}
+.s7 .cta{position:absolute;left:50%;top:75%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:24px}
+.f916 .s7 .cta{top:69%}
+.f45 .s7 .cta{top:72%}
+.s7 .pill{position:relative;overflow:hidden;display:flex;align-items:center;gap:16px;background:var(--green);color:var(--ink);font-size:42px;font-weight:700;padding:18px 40px 18px 46px;border-radius:16px;letter-spacing:-.02em;white-space:nowrap;box-shadow:0 20px 70px -12px rgba(117,185,116,.65)}
+.s7 .pill svg{width:40px;height:40px}
 .s7 .pill i{position:absolute;top:0;bottom:0;width:120px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-20deg)}
-.s7 .sub{font:500 24px var(--mono);letter-spacing:.08em;color:var(--cream-2);text-transform:uppercase;white-space:nowrap}
-.f916 .s7 .sub,.f45 .s7 .sub{font-size:20px}
+.s7 .sub{font:500 21px var(--mono);letter-spacing:.14em;color:var(--cream-2);text-transform:uppercase;white-space:nowrap}
+.f916 .s7 .sub,.f45 .s7 .sub{font-size:18px}
 
 /* overlays */
 .flash{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen}
 .vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.55))}
 .grain{position:absolute;inset:-50%;pointer-events:none;opacity:.07;mix-blend-mode:overlay}
-.stage.glitch .hl,.stage.glitch .slam,.stage.glitch .q,.stage.glitch .w6,.stage.glitch .fin{text-shadow:6px 0 rgba(255,60,90,.75),-6px 0 rgba(60,220,255,.75)}
+.stage.glitch .hl,.stage.glitch .slam,.stage.glitch .q,.stage.glitch .v6,.stage.glitch .fin{text-shadow:6px 0 rgba(255,60,90,.75),-6px 0 rgba(60,220,255,.75)}
 .bars{position:absolute;inset:0;pointer-events:none}
 .bars i{position:absolute;left:0;right:0;background:var(--ink)}
 
@@ -263,8 +393,8 @@ body.export .viewport{border-radius:0;box-shadow:none}
   </header>
 
   <section class="intro">
-    <h1>Mniej szukania. <em>Więcej budowania.</em></h1>
-    <p>Trzydziestosekundowy spot BudOS z autorską ścieżką dźwiękową. Muzyka jest syntezowana na żywo w przeglądarce i zgrana z obrazem co do beatu: 128 BPM, f-moll, dźwiękowe logo C–Es–F na końcu. Włącz dźwięk.</p>
+    <h1>Przetargi <em>opanowane.</em></h1>
+    <p>Trzydziestosekundowy spot BudOS ułożony według nowego landingu: cztery kroki Znajdź, Sprawdź, Policz i Złóż, lejek od ogłoszenia do oferty i demo bez konta na końcu. Muzyka jest syntezowana na żywo w przeglądarce i zgrana z obrazem co do beatu: 128 BPM, f-moll, dźwiękowe logo C–Es–F. Włącz dźwięk.</p>
   </section>
 
   <section class="player" aria-label="Odtwarzacz spotu">
@@ -276,9 +406,10 @@ body.export .viewport{border-radius:0;box-shadow:none}
         <!-- S0 · intro -->
         <div class="scene s0" data-a="0" data-b="8">
           <div class="typed" id="s0typed"><span id="s0t"></span><i class="car" id="s0car"></i></div>
-          <div class="count" id="s0count">000</div>
-          <div class="lab" id="s0lab">nowych przetargów budowlanych</div>
+          <div class="count" id="s0count">0 000</div>
+          <div class="lab" id="s0lab">nowych ogłoszeń w BudOS</div>
           <div class="q" id="s0q"></div>
+          <div class="note0" id="s0note">Stan bazy BudOS z 30.09.2026</div>
         </div>
 
         <!-- S1 · chaos -->
@@ -288,102 +419,148 @@ body.export .viewport{border-radius:0;box-shadow:none}
           <div class="hud"><span>przewijanie · strona <b id="s1page">1</b>/48</span><span id="s1rows">0 wierszy</span></div>
         </div>
 
-        <!-- chrome shared by feature scenes -->
+        <!-- chrome shared by the four steps (landing v4) -->
         <div class="layer chrome" id="chrome">
-          <i class="tick" id="tick"></i>
-          <div class="idx" id="idx"><i id="idxn">01</i><span id="idxl">Branża</span></div>
-          <div class="foot" id="foot">
-            <svg viewBox="0 0 421 264" aria-hidden="true"><use href="#logo"></use></svg>
-            <b>Budos.io</b>
+          <div class="eb" id="eb"><i id="ebl"></i><span id="ebt">01 · Znajdź</span></div>
+          <svg class="lg" viewBox="0 0 421 264" aria-hidden="true"><use href="#logo"></use></svg>
+          <div class="steps" id="steps">
+            <div class="st"><i></i><b>01</b>Znajdź</div>
+            <div class="st"><i></i><b>02</b>Sprawdź</div>
+            <div class="st"><i></i><b>03</b>Policz</div>
+            <div class="st"><i></i><b>04</b>Złóż</div>
           </div>
         </div>
 
-        <!-- S2 · branża -->
+        <!-- S2 · 01 Znajdź -->
         <div class="scene s2" data-a="16" data-b="24">
-          <h2 class="hl" data-split id="s2a">Nie przekopuj|całej listy.</h2>
-          <h2 class="hl" data-split id="s2b">Twoja branża.|Twoje przetargi.</h2>
+          <h2 class="hl" data-split id="s2a">Jedna lista|z BZP, TED i BIP.</h2>
+          <h2 class="hl" data-split id="s2b">Na górze listy|Twoja robota.</h2>
           <div class="content"><div class="cwrap">
-            <div class="card branza" id="s2panel">
-              <div class="lab">BRANŻA</div>
-              <div class="chips">
-                <span class="chip" id="chipA">Drogi<i class="cursor" id="cur2"></i><i class="ripple" id="rip2a"></i></span>
-                <span class="chip" id="chipB">Mosty<i class="ripple" id="rip2b"></i></span>
-              </div>
-            </div>
-            <div class="stack" id="s2stack" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)">
-              <div class="card tender" id="s2c1"><div class="t1"><span class="tag">Drogi</span><span class="kind">Przebudowa</span><b>Ulicy Staffa w Kościerzynie</b></div><div class="t2">Gmina Miejska Kościerzyna · <span class="new">nowe dziś</span> · Pomorskie</div></div>
-              <div class="card tender" id="s2c2"><div class="t1"><span class="tag">Drogi</span><span class="kind">Budowa</span><b>Ronda na skrzyżowaniu ulic Szpitalnej, dr A. Dobrskiej i PCK w Mławie</b></div><div class="t2">Powiat Mławski · <span class="new">nowe dziś</span> · Mazowieckie</div></div>
-              <div class="card tender" id="s2c3"><div class="t1"><span class="tag">Mosty</span><span class="kind">Remont</span><b>Wiaduktu w ciągu drogi krajowej nr 63</b></div><div class="t2">Miasto Siedlce · <span class="new">nowe dziś</span> · Mazowieckie</div></div>
+            <div class="card src" id="src1"><b>BZP</b><span>co 15 minut</span></div>
+            <div class="card src" id="src2"><b>TED</b><span>codziennie</span></div>
+            <div class="card src" id="src3"><b>BIP</b><span>radar gmin</span></div>
+            <div class="card win zw" id="s2list">
+              <div class="bar"><i></i><i></i><i></i><span class="url">budos.io/app/<b>zwiad</b></span></div>
+              <div class="zh"><div><span class="zt">Zwiad</span><span class="zsub">Kolejka postępowań do przejrzenia</span></div><span class="zs">BZP · TED · BIP</span></div>
+              <div class="zcols"><span>Tytuł</span><span>Termin</span><span>Dopasowanie</span><span>Akcja</span></div>
+              <div class="zr" id="zr1"><div><div class="t1"><span class="tag">Drogi</span><span class="kind">Budowa</span><b>Obwodnicy Szamotuł w ciągu drogi wojewódzkiej nr 184 i 187</b></div><div class="t2">Wielkopolski Zarząd Dróg Wojewódzkich w Poznaniu · TED</div></div><div class="zd">17.10.2026<small>za 17 dni</small></div><div class="zm" id="zm1">0</div><div class="za"><span id="zp1">Przejrzyj</span><span class="no">Nie nasze</span></div></div>
+              <div class="zr" id="zr2"><div><div class="t1"><span class="tag">Drogi</span><span class="kind">Budowa</span><b>Obwodnicy Mierzyna w ciągu dk 10 (Dołuje – Szczecin)</b></div><div class="t2">Generalna Dyrekcja Dróg Krajowych i Autostrad · TED</div></div><div class="zd none">brak terminu</div><div class="zm" id="zm2">0</div><div class="za"><span>Przejrzyj</span><span class="no">Nie nasze</span></div></div>
+              <div class="zr" id="zr3"><div><div class="t1"><span class="tag">Drogi</span><span class="kind">Roboty budowlane</span><b>Rozbudowa ul. Senatorskiej wraz z budową i przebudową infrastruktury, etap I</b></div><div class="t2">Gmina Miasto Rzeszów · TED</div></div><div class="zd none">brak terminu</div><div class="zm" id="zm3">0</div><div class="za"><span>Przejrzyj</span><span class="no">Nie nasze</span></div></div>
             </div>
           </div></div>
         </div>
 
-        <!-- S3 · termin -->
+        <!-- S3 · 02 Sprawdź -->
         <div class="scene s3" data-a="24" data-b="32">
-          <div class="ghost" id="s3ghost">17<small>dni</small></div>
-          <h2 class="hl" data-split id="s3a">Zdążysz|z ofertą?</h2>
-          <h2 class="hl" data-split id="s3b">Termin widzisz|od razu.</h2>
+          <h2 class="hl" data-split id="s3a">SWZ przeczytana,|z numerem strony.</h2>
+          <h2 class="hl" data-split id="s3b">Najpierw decyzja.|Potem oferta.</h2>
           <div class="content"><div class="cwrap">
-            <div class="card tender" id="s3card"><div class="t1"><span class="tag">Drogi</span><span class="kind">Budowa</span><b>Ronda na skrzyżowaniu ulic Szpitalnej, dr A. Dobrskiej i PCK w Mławie</b></div><div class="t2">Powiat Mławski · <span class="new">nowe dziś</span> · Mazowieckie</div><i class="cursor" id="cur3"></i><i class="ripple" id="rip3"></i></div>
-            <div class="card termin" id="s3term" style="position:absolute;left:50%;top:50%">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>
-              <div class="k">TERMIN SKŁADANIA</div>
-              <div class="d">12 października 2026 10:00</div>
-              <div class="z">za <b id="s3days">30</b> dni</div>
-            </div>
-          </div></div>
-        </div>
-
-        <!-- S4 · analiza SWZ -->
-        <div class="scene s4" data-a="32" data-b="40">
-          <h2 class="hl" data-split id="s4a">Analiza SWZ.</h2>
-          <h2 class="hl" data-split id="s4b">Poznaj kryteria|oceny.</h2>
-          <div class="huge" id="s4huge">0%</div>
-          <div class="content"><div class="cwrap">
-            <div class="pages" id="s4pages"></div>
-            <div class="acc" id="s4acc">
-              <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h7v14H4zM13 5h7v14h-7z"/></svg>Podsumowanie Wykonawcze</div>
-              <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6"/></svg>Warunki Udziału w Postępowaniu<span class="meta">7 warunków</span></div>
-              <div class="row kry" id="s4kry">
-                <div class="head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 8 21l4-2 4 2-1-7.5"/></svg>Kryteria Oceny Ofert</div>
-                <div class="body" id="s4body">
-                  <div class="crit"><span>Cena</span><span class="bar"><i id="s4b1"></i></span><span class="pct" id="s4p1">0%</span></div>
-                  <div class="crit"><span>Przedłużenie okresu gwarancji i rękojmi</span><span class="bar"><i id="s4b2"></i></span><span class="pct" id="s4p2">0%</span></div>
+            <div class="pages" id="s3pages"></div>
+            <div class="card win rep" id="s3rep">
+              <div class="bar"><i></i><i></i><i></i><span class="url">budos.io/<b>demo</b>/zwiad</span></div>
+              <div class="rh"><b>Analiza SWZ</b><span class="demo"><i></i>Przykład z demo · przegląd dokumentów</span></div>
+              <div class="rows">
+                <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 9h6M9 13h6"/></svg>Warunki Udziału w Postępowaniu<span class="meta">2 warunki</span></div>
+                <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="9" r="5"/><path d="M9 13.5 8 21l4-2 4 2-1-7.5"/></svg>Kryteria Oceny Ofert</div>
+                <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Wymagania Formalne<span class="meta">13 wymagań</span></div>
+                <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M15.5 14.5h2"/></svg>Warunki finansowe<span class="meta">4 pozycje</span></div>
+                <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>Ryzyka Kontraktowe<span class="meta warn">13 ryzyk</span></div>
+                <div class="row flag" id="s3flag">
+                  <div class="head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"/></svg>Czerwone flagi<span class="meta red">5</span></div>
+                  <div class="body" id="s3fbody"><div class="fl"><div class="ft"><b>Rok 2025 w nowym brzmieniu terminów, BZP podaje 2026</b><em>ostrzeżenie</em></div><span class="sr">↳ Wyjaśnienia i zmiana treści SWZ (pismo z 22.09) · <u>str. 3</u></span></div></div>
                 </div>
               </div>
-              <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>Wymagania Formalne<span class="meta">4 wymagania</span></div>
-              <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>Zakres Zamówienia</div>
-              <div class="row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>Ryzyka Kontraktowe<span class="meta warn">0 ryzyk</span></div>
+            </div>
+            <div class="card dec" id="s3dec">
+              <div class="dh"><span><i></i>Przykład z demo · przegląd dokumentów</span><span>CPV 45000000-7</span></div>
+              <div class="db">
+                <div class="dl">
+                  <div class="dt">Remont pomieszczeń w budynku Urzędu Miasta Poznania, ul. Libelta 16/20</div>
+                  <div class="dm">Miasto Poznań</div>
+                  <div class="dk"><div><small>Termin</small><b>5.10.2026, 9:00</b></div><div><small>Dokumentacja</small><b>39 plików</b></div></div>
+                </div>
+                <div class="dr">
+                  <small>Na tym etapie</small>
+                  <span class="dc t" id="dcT">Tak</span>
+                  <span class="dc a" id="dcA">Analiza<i class="cursor" id="cur3"></i><i class="ripple" id="rip3"></i></span>
+                  <span class="dc n" id="dcN">Nie</span>
+                  <p id="s3why">Brakuje danych firmy i cen, a w dokumentach są niejasności.</p>
+                </div>
+              </div>
             </div>
           </div></div>
         </div>
 
-        <!-- S5 · kosztorys -->
-        <div class="scene s5" data-a="40" data-b="48">
-          <h2 class="hl" data-split id="s5a">Co kryje się|w pozycji?</h2>
-          <h2 class="hl" data-split id="s5b">Zobacz skład|pozycji.</h2>
+        <!-- S4 · 03 Policz -->
+        <div class="scene s4" data-a="32" data-b="40">
+          <h2 class="hl" data-split id="s4a">Przedmiar z PDF|w wierszu kosztorysu.</h2>
+          <h2 class="hl" data-split id="s4b">Kod KNR i skład|ceny pozycji.</h2>
+          <div class="huge" id="s4huge"><b id="s4hn">0</b><small>cen robocizny, materiałów i sprzętu w bazie</small></div>
           <div class="content"><div class="cwrap">
-            <div class="card price" id="s5price"><span class="v" id="s5v">253 zł</span><span class="s" id="s5s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>Skład 6<i class="cursor" id="cur5"></i><i class="ripple" id="rip5"></i></span></div>
-            <div class="sklad" id="s5sklad" style="position:absolute;left:50%;top:50%">
-              <div class="knr" id="s5knr"><b>KNR 4-01 0422-04</b> · Podstemplowanie zagrożonych stropów · 1 szt · 252,75 zł</div>
+            <div class="pdf" id="s4pdf">
+              <div class="ph"><span><b>przedmiar.pdf</b> · import do kosztorysu</span><span>str. 4</span></div>
+              <div class="pr hd"><span>Lp.</span><span>Opis robót</span><span>j.m.</span><span style="text-align:right">Ilość</span></div>
+              <div class="rows4" id="s4rows">
+                <div class="pr"><span class="c">33</span><span class="ln" style="width:74%"></span><span class="c">m³</span><span class="q">0,82</span></div>
+                <div class="pr" id="s4prow"><span class="c">34</span><b>Podstemplowanie zagrożonych stropów</b><span class="c">szt</span><span class="q">1</span></div>
+                <div class="pr"><span class="c">35</span><span class="ln" style="width:58%"></span><span class="c">m³</span><span class="q">0,12</span></div>
+                <div class="pr"><span class="c">36</span><span class="ln" style="width:81%"></span><span class="c">m²</span><span class="q">0,49</span></div>
+                <div class="pr"><span class="c">37</span><span class="ln" style="width:66%"></span><span class="c">m</span><span class="q">1,62</span></div>
+                <div class="pr"><span class="c">38</span><span class="ln" style="width:70%"></span><span class="c">szt</span><span class="q">1</span></div>
+                <i class="scan" id="s4scan"></i>
+              </div>
+            </div>
+            <div class="card price" id="s4price"><span class="pz">poz. 34</span><span class="pn2">Podstemplowanie zagrożonych stropów</span><span class="v" id="s4v">253 zł</span><span class="s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>Skład 6<i class="cursor" id="cur4"></i><i class="ripple" id="rip4"></i></span></div>
+            <div class="sklad" id="s4sklad">
+              <div class="knr"><b>KNR 4-01 0422-04</b> · Podstemplowanie zagrożonych stropów · 1 szt · 252,75 zł</div>
               <div class="sh"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#75B974" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Skład pozycji 34 <span>na 1 szt</span></div>
               <div class="r"><span class="ty">M</span><span>Bale iglaste obrzynane grubości 50–100 mm kl. II</span><span class="q">0,011</span><span class="u">m³</span></div>
               <div class="r"><span class="ty">M</span><span>Deski iglaste obrzynane 28–45 mm kl. III</span><span class="q">0,008</span><span class="u">m³</span></div>
               <div class="r"><span class="ty">M</span><span>Drewno na stemple budowlane okrągłe, iglaste</span><span class="q">0,062</span><span class="u">m³</span></div>
               <div class="r hot"><span class="ty">M</span><span>Gwoździe budowlane gołe okrągłe</span><span class="q">0,5</span><span class="u">kg</span></div>
               <div class="r hot"><span class="ty">M</span><span>Materiały pomocnicze</span><span class="q">2</span><span class="u">%</span></div>
-              <div class="r hot"><span class="ty r">R</span><span>Roboty ogólnobudowlane – remontowe (SL)</span><span class="q">1,9855</span><span class="u">r-g</span></div>
+              <div class="r hot"><span class="ty r">R</span><span>Roboty ogólnobudowlane, remontowe (SL)</span><span class="q">1,9855</span><span class="u">r-g</span></div>
             </div>
           </div></div>
         </div>
 
-        <!-- S6 · cała Polska -->
+        <!-- S5 · 04 Złóż -->
+        <div class="scene s5" data-a="40" data-b="48">
+          <h2 class="hl" data-split id="s5a">Formularze z danymi|Twojej firmy.</h2>
+          <h2 class="hl" data-split id="s5b">Decydujesz|i podpisujesz Ty.</h2>
+          <div class="content"><div class="cwrap">
+            <div class="card win form" id="s5form">
+              <div class="bar"><i></i><i></i><i></i><span class="url">budos.io/<b>demo</b>/oferta</span></div>
+              <div class="fh"><b>Formularz oferty</b><span>załącznik do SWZ</span></div>
+              <div class="ff"><label>NIP</label><span class="fv"><i class="sk" style="--w:46%"></i></span><em>✓ z profilu</em></div>
+              <div class="ff"><label>Nazwa</label><span class="fv"><i class="sk" style="--w:80%"></i></span><em>✓ z rejestru</em></div>
+              <div class="ff"><label>Adres</label><span class="fv"><i class="sk" style="--w:66%"></i></span><em>✓ z rejestru</em></div>
+              <div class="ff"><label>REGON · KRS</label><span class="fv"><i class="sk" style="--w:54%"></i></span><em>✓ z rejestru</em></div>
+              <div class="ff tot" id="s5tot"><label>Cena brutto</label><span class="fv"><b id="s5v">0,00 zł</b></span><em>✓ z kosztorysu</em></div>
+            </div>
+            <div class="card miss" id="s5miss">
+              <div class="mh"><b>Lista braków</b><span>przed pobraniem paczki</span></div>
+              <div class="mi ok"><i>✓</i>Dane firmy w formularzach</div>
+              <div class="mi ok"><i>✓</i>Kwoty z zatwierdzonego kosztorysu</div>
+              <div class="mi ty"><i>!</i>Oświadczenia<span>Ty</span></div>
+              <div class="mi ty"><i>!</i>Podpis<span>Ty</span></div>
+            </div>
+            <div class="sign" id="s5sign">
+              <svg viewBox="0 0 640 150" aria-hidden="true"><path id="s5sig" pathLength="1" d="M30 118C44 70 58 22 74 26C90 30 78 84 60 104C50 116 44 110 56 96C74 76 104 70 116 88C124 100 118 112 132 106C146 100 150 76 164 80C176 84 168 108 182 106C198 104 204 74 220 78C234 82 226 110 244 106C262 102 276 40 290 36C302 34 300 60 288 80C278 98 282 110 300 104C318 98 324 78 338 82C352 86 344 108 362 104C380 100 388 80 402 84C414 88 410 106 426 104C470 98 520 70 560 64C590 60 612 64 626 60"/><path id="s5sig2" pathLength="1" d="M60 134C220 124 420 126 610 116"/></svg>
+              <div class="sl"><span>Podpis wykonawcy</span><b>Ty</b></div>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- S6 · lejek -->
         <div class="scene s6" data-a="48" data-b="56">
-          <div class="w6" id="w6a">Drogi.</div>
-          <div class="w6 o" id="w6b">Mosty.</div>
-          <div class="w6" id="w6c">Kubatura.</div>
-          <div class="w6 g" id="w6d">Wod-Kan.</div>
-          <div class="fin" id="s6fin"><span class="a" id="s6a">Cała Polska.</span><span class="b" id="s6b">Tylko Twoje przetargi.</span></div>
+          <div class="vb">
+            <div class="v6" id="v6a"><i>01</i>Znajdź.</div>
+            <div class="v6" id="v6b"><i>02</i>Sprawdź.</div>
+            <div class="v6" id="v6c"><i>03</i>Policz.</div>
+            <div class="v6" id="v6d"><i>04</i>Złóż.</div>
+          </div>
+          <div class="fin" id="s6fin"><span class="a" id="s6a">Od ogłoszenia<br><em>do oferty.</em></span><span class="b" id="s6b">BZP co 15 min · TED codziennie · radar BIP</span></div>
         </div>
 
         <!-- S7 · logo -->
@@ -395,8 +572,8 @@ body.export .viewport{border-radius:0;box-shadow:none}
               <path id="lgOs" fill="#E8DDD4" fill-rule="evenodd" d="M267.38 263.63C266.96 263.45 265.56 263.17 264.25 263.02C260.93 262.62 256.29 261.41 254.45 260.47C253.94 260.21 253.40 260.00 253.24 260.00C252.95 260.00 248.34 257.78 247.39 257.18C242.33 254.01 238.75 250.71 235.79 246.50C233.67 243.48 233.67 243.48 232.61 241.25C232.11 240.22 231.62 239.19 231.50 238.97C230.92 237.87 229.22 232.20 228.76 229.88C227.89 225.41 227.88 224.92 227.88 203.88C227.88 182.83 227.89 182.34 228.76 177.88C229.26 175.32 230.87 170.05 231.60 168.58C231.80 168.19 232.28 167.23 232.67 166.44C233.94 163.86 234.55 162.87 236.25 160.62C238.52 157.62 242.28 154.10 245.60 151.86C246.00 151.59 246.62 151.18 246.97 150.94C247.33 150.70 248.07 150.27 248.62 149.99C249.18 149.71 250.24 149.15 251.00 148.75C251.76 148.34 252.53 148.01 252.71 148.00C252.90 148.00 253.35 147.83 253.71 147.63C255.20 146.81 260.54 145.31 264.50 144.61C269.16 143.79 282.29 143.72 285.38 144.50C285.93 144.63 287.15 144.86 288.11 145.00C289.06 145.15 290.35 145.42 290.98 145.61C295.21 146.92 296.21 147.26 296.88 147.61C297.29 147.82 297.76 148.00 297.93 148.00C298.32 148.00 302.26 150.08 304.00 151.20C308.61 154.19 314.16 159.65 316.09 163.12C316.32 163.54 316.79 164.32 317.14 164.88C317.48 165.43 317.86 166.10 317.98 166.38C318.10 166.65 318.56 167.66 319.00 168.62C319.44 169.59 319.95 170.88 320.13 171.50C321.23 175.23 321.81 177.68 322.31 180.83C322.86 184.29 322.88 184.84 322.88 203.62C322.88 220.87 322.83 223.21 322.42 226.12C321.41 233.39 319.37 239.41 316.18 244.62C313.04 249.73 307.45 254.92 301.93 257.86C301.34 258.17 300.64 258.55 300.37 258.70C296.94 260.58 290.00 262.68 285.76 263.12C284.87 263.21 283.76 263.45 283.29 263.64C282.11 264.14 268.51 264.13 267.38 263.63ZM369.25 263.63C368.91 263.44 367.89 263.21 367.00 263.12C364.22 262.85 358.79 261.44 355.88 260.24C355.02 259.89 350.38 257.60 349.62 257.16C345.20 254.57 340.43 250.07 337.86 246.08C337.35 245.28 336.75 244.34 336.53 244.00C335.67 242.66 334.52 240.03 333.68 237.46C332.21 232.98 331.77 229.77 331.76 223.45C331.75 220.06 331.79 219.75 332.23 219.51C332.96 219.12 352.31 219.16 352.70 219.55C352.89 219.74 353.01 220.71 353.02 222.11C353.04 225.86 353.78 231.09 354.48 232.45C354.60 232.68 355.06 233.61 355.50 234.50C356.53 236.57 358.01 238.39 359.75 239.73C361.57 241.12 362.95 242.00 363.33 242.00C363.50 242.00 363.90 242.18 364.22 242.41C364.54 242.63 365.16 242.91 365.59 243.02C366.02 243.13 366.88 243.39 367.50 243.59C373.93 245.66 384.84 245.10 390.49 242.41C396.85 239.37 400.19 233.55 399.26 227.09C398.67 222.97 396.53 220.27 391.87 217.75C391.11 217.34 390.35 217.00 390.18 216.99C390.01 216.99 389.43 216.77 388.88 216.50C388.32 216.23 387.71 216.01 387.50 216.00C387.29 215.99 386.68 215.77 386.12 215.50C385.57 215.23 384.90 215.01 384.62 215.01C384.35 215.00 383.45 214.78 382.62 214.51C381.02 213.98 378.57 213.36 374.75 212.51C373.44 212.22 371.53 211.77 370.50 211.52C369.47 211.26 368.12 210.93 367.50 210.78C366.88 210.63 365.59 210.27 364.62 209.98C363.66 209.70 362.31 209.30 361.62 209.10C360.94 208.91 360.02 208.58 359.59 208.37C359.15 208.17 358.62 208.00 358.41 208.00C358.00 208.00 356.35 207.32 354.70 206.47C354.19 206.21 353.57 205.99 353.33 205.98C353.08 205.97 352.31 205.64 351.62 205.23C350.94 204.83 350.00 204.32 349.54 204.11C348.71 203.73 347.23 202.73 344.88 200.99C342.58 199.28 339.03 195.31 337.86 193.12C337.21 191.91 337.03 191.56 336.53 190.47C336.24 189.84 336.00 189.13 336.00 188.90C336.00 188.67 335.83 188.08 335.63 187.59C335.10 186.33 334.51 182.18 334.34 178.50C334.22 176.02 334.30 174.65 334.72 171.84C335.01 169.90 335.42 167.91 335.62 167.41C335.83 166.92 336.00 166.35 336.00 166.14C336.00 165.78 338.17 161.15 338.81 160.13C340.76 157.06 345.04 152.77 348.12 150.79C350.26 149.41 355.13 147.01 355.82 146.99C355.99 146.99 356.57 146.77 357.12 146.50C357.68 146.23 358.37 146.01 358.68 146.01C358.98 146.00 359.73 145.83 360.34 145.62C361.33 145.29 362.52 145.05 367.25 144.23C368.01 144.09 371.47 143.98 374.96 143.98C381.68 143.97 386.11 144.43 389.64 145.53C390.48 145.79 391.38 146.00 391.64 146.01C391.91 146.01 392.57 146.23 393.12 146.50C393.68 146.77 394.26 146.99 394.43 146.99C395.17 147.01 400.93 149.84 402.90 151.14C405.37 152.78 407.65 154.79 409.93 157.33C411.20 158.73 413.40 162.11 414.26 163.95C414.69 164.87 415.21 165.97 415.41 166.40C415.62 166.82 415.88 167.55 416.00 168.02C416.12 168.49 416.38 169.38 416.58 170.00C417.46 172.75 417.83 175.69 417.94 180.71C418.01 183.86 417.97 185.88 417.81 186.04C417.45 186.40 397.28 186.34 396.84 185.97C396.59 185.77 396.50 184.96 396.49 183.03C396.48 178.26 395.63 173.71 394.43 172.01C394.20 171.67 394.00 171.29 394.00 171.18C394.00 170.59 391.38 167.73 389.85 166.65C388.89 165.97 387.03 165.00 386.67 165.00C386.51 165.00 386.05 164.83 385.65 164.62C384.97 164.27 382.89 163.73 380.25 163.24C378.33 162.88 370.77 162.96 369.24 163.35C368.49 163.55 367.23 163.82 366.44 163.97C363.36 164.53 359.51 167.05 357.76 169.65C357.34 170.27 357.00 170.87 357.00 170.99C357.00 171.10 356.78 171.69 356.51 172.29C356.09 173.19 356.01 173.93 356.01 176.70C356.00 179.71 356.06 180.16 356.65 181.57C357.75 184.22 360.05 186.60 362.88 188.03C363.29 188.24 363.85 188.52 364.12 188.67C365.41 189.33 366.53 189.78 368.38 190.36C371.94 191.47 373.83 192.00 374.26 192.00C374.49 192.00 375.39 192.22 376.25 192.50C377.11 192.78 378.12 193.00 378.49 193.00C378.86 193.00 379.89 193.21 380.77 193.47C381.65 193.73 382.94 194.06 383.62 194.21C387.33 195.00 387.89 195.16 393.00 196.89C394.44 197.38 395.98 197.87 396.41 197.98C396.84 198.09 397.46 198.37 397.78 198.59C398.10 198.82 398.57 199.00 398.82 199.00C399.07 199.00 399.69 199.21 400.20 199.48C400.71 199.74 402.02 200.39 403.12 200.91C404.22 201.44 405.49 202.13 405.94 202.44C406.40 202.75 406.83 203.00 406.90 203.00C407.26 203.00 412.18 206.87 413.38 208.10C414.29 209.04 416.74 212.15 417.23 213.01C417.88 214.12 419.00 216.50 419.00 216.77C419.00 216.91 419.16 217.34 419.37 217.73C419.57 218.12 419.85 219.21 420.00 220.16C420.15 221.10 420.44 222.12 420.64 222.43C421.17 223.24 421.17 233.62 420.64 234.15C420.44 234.34 420.21 235.04 420.12 235.69C419.90 237.36 418.86 240.89 418.39 241.55C418.18 241.86 418.00 242.26 418.00 242.44C418.00 243.06 415.67 246.87 413.98 249.00C410.60 253.28 406.96 256.17 401.62 258.81C398.50 260.36 397.04 261.00 396.65 261.00C396.47 261.00 395.77 261.21 395.10 261.47C393.60 262.05 389.64 262.92 387.67 263.12C386.87 263.19 385.81 263.43 385.33 263.63C384.06 264.16 370.19 264.16 369.25 263.63ZM279.88 244.15C283.66 243.70 285.90 243.01 289.12 241.32C292.65 239.48 296.22 235.76 298.20 231.84C299.43 229.44 299.83 228.13 300.75 223.59C300.93 222.74 300.99 215.75 300.94 203.09C300.86 182.05 300.94 183.21 299.33 178.61C298.02 174.85 295.42 171.16 292.24 168.57C290.47 167.12 290.04 166.84 288.00 165.87C280.83 162.47 270.17 162.40 263.00 165.71C258.47 167.80 254.72 171.37 252.55 175.62C251.58 177.55 251.00 178.93 251.00 179.35C251.00 179.58 250.82 180.18 250.61 180.70C249.71 182.86 249.51 186.99 249.51 203.88C249.50 220.78 249.70 224.90 250.61 227.05C250.82 227.57 251.00 228.21 251.00 228.48C251.00 229.85 254.03 234.99 256.22 237.34C257.18 238.37 260.21 240.69 261.25 241.19C261.59 241.36 262.04 241.60 262.25 241.72C262.46 241.84 263.19 242.17 263.88 242.44C268.63 244.31 273.86 244.87 279.88 244.15Z"/>
             </svg>
           </div>
-          <div class="tagl" id="s7tag"><span id="s7t1">Mniej szukania.</span> <span class="g" id="s7t2">Więcej budowania.</span></div>
-          <div class="cta" id="s7cta"><div class="pill" id="s7pill">Budos.io<i id="s7shine"></i></div><div class="sub" id="s7sub">Przetargi · Analiza SWZ · Kosztorysy · Terminy</div></div>
+          <div class="tagl" id="s7tag"><span id="s7t1">Przetargi</span> <span class="g" id="s7t2">opanowane.</span></div>
+          <div class="cta" id="s7cta"><div class="pill" id="s7pill">Zobacz demo bez konta<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><i id="s7shine"></i></div><div class="sub" id="s7sub">budos.io · bez konta i bez karty</div></div>
         </div>
 
         <div class="flash" id="flash"></div>
@@ -434,7 +611,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
 
   <section class="section-h">
     <h2>Specyfikacja</h2>
-    <span class="eyebrow">Paleta i typografia z materiałów BudOS</span>
+    <span class="eyebrow">Paleta i typografia z landingu BudOS v4</span>
   </section>
   <dl class="spec">
     <div><dt>Długość</dt><dd>30 s · 16 taktów</dd></div>
@@ -442,7 +619,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
     <div><dt>Dźwiękowe logo</dt><dd>C5 – Es5 – F5, dzwon FM</dd></div>
     <div><dt>Formaty</dt><dd>1920×1080 · 1080×1920 · 1080×1350</dd></div>
   </dl>
-  <p class="note">Wersje MP4 z tą samą ścieżką (H.264 + AAC) leżą w repozytorium, w katalogu <span class="mono">budos-campaign/export</span>. Nazwy przetargów, pozycje kosztorysu i kryteria oceny pochodzą z animacji GIF przekazanych przez BudOS.</p>
+  <p class="note">Wersje MP4 z tą samą ścieżką (H.264 + AAC) leżą w repozytorium, w katalogu <span class="mono">budos-campaign/export</span>. Hasła, kroki i liczby pochodzą z landingu BudOS v4 (stan bazy z 30.09.2026), a przetargi w Zwiadzie z jego nagrania. Kadry analizy SWZ, decyzji i oferty to publiczne demo na przetargu z Poznania i tak są podpisane. Pozycja 34 i jej skład pochodzą z animacji GIF przekazanych przez BudOS.</p>
 </div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -462,14 +639,14 @@ body.export .viewport{border-radius:0;box-shadow:none}
 const BPM = 128, BEAT = 60 / BPM, BAR = BEAT * 4, DUR = 16 * BAR; // 30.0 s
 const FORMATS = { f169: [1920, 1080], f916: [1080, 1920], f45: [1080, 1350] };
 const SCENES = [
-  { a: 0,  name: 'Intro',     tc: '00:00', title: 'Licznik',           copy: '171 nowych przetargów budowlanych. Który jest Twój?', sfx: 'Sub-boom, tykanie licznika, dzwon na pytaniu' },
-  { a: 8,  name: 'Chaos',     tc: '00:03.7', title: 'Ściana ogłoszeń', copy: 'Nie przekopuj całej listy.', sfx: 'Stopa przez filtr, werbel narasta, cisza przed dropem' },
-  { a: 16, name: 'Branża',    tc: '00:07.5', title: 'Filtr branży',    copy: 'Twoja branża. Twoje przetargi.', sfx: 'DROP: pełny bit, klik w chip Drogi i Mosty' },
-  { a: 24, name: 'Termin',    tc: '00:11.2', title: 'Termin składania', copy: 'Zdążysz z ofertą? Termin widzisz od razu.', sfx: 'Arpeggio wchodzi, licznik dni 30 → 17' },
-  { a: 32, name: 'SWZ',       tc: '00:15.0', title: 'Analiza SWZ',     copy: 'Poznaj kryteria oceny. Cena 90%, gwarancja 10%.', sfx: 'Szelest stron, melodia-hook C–Es–F' },
-  { a: 40, name: 'Kosztorys', tc: '00:18.7', title: 'Skład pozycji',   copy: 'Co kryje się w pozycji? Zobacz skład pozycji.', sfx: '253 zł rozbija się na 6 składników z uderzeniem' },
-  { a: 48, name: 'Polska',    tc: '00:22.5', title: 'Cała Polska',     copy: 'Drogi. Mosty. Kubatura. Wod-Kan. Cała Polska.', sfx: 'Tomy na każde słowo, mapa zapala się od Warszawy' },
-  { a: 56, name: 'Logo',      tc: '00:26.2', title: 'Packshot',        copy: 'Mniej szukania. Więcej budowania. Budos.io', sfx: 'Uderzenie, dźwiękowe logo C–Es–F, wybrzmienie' }
+  { a: 0,  name: 'Intro',   tc: '00:00',   title: 'Licznik',         copy: '2 787 nowych ogłoszeń z ostatnich 7 dni. Który jest Twój?', sfx: 'Sub-boom, tykanie licznika, mapa Polski zapala się ogłoszeniami' },
+  { a: 8,  name: 'Chaos',   tc: '00:03.7', title: 'Ściana ogłoszeń', copy: 'Nie przekopuj całej listy.', sfx: 'Stopa przez filtr, werbel narasta, cisza przed dropem' },
+  { a: 16, name: 'Znajdź',  tc: '00:07.5', title: '01 Znajdź',       copy: 'Jedna lista z BZP, TED i BIP. Na górze listy Twoja robota.', sfx: 'DROP: pełny bit, BZP, TED i BIP lądują na tomach i łączą się w Zwiad' },
+  { a: 24, name: 'Sprawdź', tc: '00:11.2', title: '02 Sprawdź',      copy: 'SWZ przeczytana, z numerem strony. Najpierw decyzja. Potem oferta.', sfx: 'Szelest stron, czerwona flaga, klik w Analiza' },
+  { a: 32, name: 'Policz',  tc: '00:15.0', title: '03 Policz',       copy: 'Przedmiar z PDF w wierszu kosztorysu. Kod KNR i skład ceny pozycji.', sfx: 'Skaner przedmiaru, hook C–Es–F, uderzenie na składzie pozycji' },
+  { a: 40, name: 'Złóż',    tc: '00:18.7', title: '04 Złóż',         copy: 'Formularze z danymi Twojej firmy. Decydujesz i podpisujesz Ty.', sfx: 'Stukot pól, licznik kwoty, lista braków, podpis piórem' },
+  { a: 48, name: 'Lejek',   tc: '00:22.5', title: 'Lejek',           copy: 'Znajdź. Sprawdź. Policz. Złóż. Od ogłoszenia do oferty.', sfx: 'Tom na każdy krok, pierścienie lejka zapalają się po kolei' },
+  { a: 56, name: 'Logo',    tc: '00:26.2', title: 'Packshot',        copy: 'Przetargi opanowane. Zobacz demo bez konta. budos.io', sfx: 'Uderzenie, dźwiękowe logo C–Es–F, wybrzmienie' }
 ];
 
 /* ================= math ================= */
@@ -524,6 +701,25 @@ function blurIO(el, lb, len = 8, inDur = .6, outDur = .5) {
   const pi = eo3(seg(lb, 0, inDur)), po = seg(lb, len - outDur, len);
   fx(el, pi * (1 - po), 0, 0, lerp(1.06, 1, pi) + po * .05, (1 - pi) * 24 + po * 28);
 }
+/* fx for components centred on a .cwrap anchor */
+function fxc(el, o, x = 0, y = 0, sc = 1, blur = 0, rot = 0) {
+  el.style.opacity = o;
+  el.style.transform = `translate(-50%,-50%) translate(${x}px,${y}px) scale(${sc})` + (rot ? ` rotate(${rot}deg)` : '');
+  el.style.filter = blur > 0.05 ? `blur(${blur}px)` : 'none';
+}
+const thou = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
+const zl = v => { const [i, d] = v.toFixed(2).split('.'); return thou(+i) + ',' + d + '\u00A0zł'; };
+function fmtCount(n) { // odometer look: 0 042 with the leading zeros dimmed
+  const s = String(n).padStart(4, '0'), txt = s[0] + '\u00A0' + s.slice(1);
+  let k = 0; while (k < txt.length - 1 && (txt[k] === '0' || txt[k] === '\u00A0')) k++;
+  return k ? `<span class="z">${txt.slice(0, k)}</span>${txt.slice(k)}` : txt;
+}
+/* per-format placement of the scene components, in stage px before the --k scale */
+const LAY = {
+  f169: { srcGap: 300, mergeY: -160, listK: 1.08, pagesK: .7, repK: .86, decK: 1.06, pdfK: 1.15, rowY: -8, priceK: 1.08, skladX: -250, skladY: 0, skladK: .84, formK: 1.1, missX: -345, missY: 0, missK: 1, signX: 375, signY: 20, signK: 1 },
+  f916: { srcGap: 250, mergeY: -160, listK: 1, pagesK: 1, repK: 1, decK: 1, pdfK: 1, rowY: -8, priceK: .86, skladX: 0, skladY: -60, skladK: .76, formK: 1, missX: 0, missY: -175, missK: 1.08, signX: 0, signY: 225, signK: 1.08 },
+  f45: { srcGap: 290, mergeY: -160, listK: 1, pagesK: .95, repK: .98, decK: 1, pdfK: 1, rowY: -8, priceK: 1, skladX: 0, skladY: -40, skladK: .84, formK: 1, missX: 0, missY: -150, missK: 1, signX: 0, signY: 205, signK: 1 }
+};
 
 /* ================= poster data ================= */
 const TITLES = [
@@ -559,7 +755,8 @@ const KOSZT = [
   ['37', 'Dostarczenie i obsadzenie', 'm', '1,62', '157,16', '469 zł'], ['38', 'Rozebranie podstemplowania', 'szt', '1', '78,11', '78 zł'],
   ['39', 'Umocowanie siatki Rabitza', 'm', '1,62', '10,68', '23 zł'], ['40', 'Wykonanie tynku', 'm2', '4,10', '46,20', '189 zł']
 ];
-const DATES = ['12.10.2026 · za 17 dni', '13.10.2026 · za 18 dni', '15.10.2026 · za 20 dni', '09.10.2026 · za 14 dni', '21.10.2026 · za 26 dni', '06.10.2026 · za 11 dni'];
+const DATES = ['17.10.2026 · za 17 dni', '07.10.2026 · za 7 dni', '15.10.2026 · za 15 dni', '09.10.2026 · za 9 dni', '21.10.2026 · za 21 dni', '06.10.2026 · za 6 dni'];
+const SRCS = ['BZP', 'BZP', 'TED', 'BZP', 'BIP', 'BZP', 'TED'];
 
 /* ================= Poland map ================= */
 const PL = [[14.2,53.92],[14.6,54.03],[15.5,54.2],[16.5,54.55],[17.5,54.75],[18.35,54.83],[18.6,54.43],[19.4,54.37],[19.8,54.43],[21.0,54.35],[22.8,54.36],[23.5,53.95],[23.9,53.2],[23.6,52.6],[23.2,52.3],[23.65,51.55],[24.1,50.85],[23.5,50.4],[22.7,49.6],[22.55,49.08],[22.0,49.2],[21.0,49.4],[20.0,49.2],[19.4,49.6],[18.85,49.5],[18.2,50.0],[17.6,50.25],[16.9,50.45],[16.3,50.65],[16.0,50.6],[15.0,51.0],[14.82,50.87],[14.95,51.4],[14.6,51.9],[14.7,52.1],[14.55,52.6],[14.1,52.85],[14.4,53.25]];
@@ -578,7 +775,9 @@ function buildMap() {
     dots.push({ x: ox + x, y: oy + y, d: Math.hypot(u - wx, v - wy) / 5.2, r: hash(x * 3.1 + y * 7.7) });
   }
   const cities = CITIES.map(([n, lo, la], i) => { const [u, v] = proj(lo, la); return { n, x: ox + u * s, y: oy + v * s, i }; });
-  MAP = { dots, cities, step };
+  // one ping per ~44 new notices, timed to the eased intro counter
+  const pings = []; for (let k = 0; k < 64; k++) { const f = (k + .5) / 64; pings.push({ at: 1 + 4.5 * (1 - Math.pow(1 - f, 1 / 5)), i: Math.floor(hash(k * 13.7 + 5) * dots.length) }); }
+  MAP = { dots, cities, step, pings };
 }
 
 /* ================= format / layout ================= */
@@ -599,13 +798,13 @@ function fit() {
   stage.style.transform = `scale(${k})`;
 }
 function buildPages() {
-  const box = $('s4pages'); box.innerHTML = '';
-  const pn = ['str. 62', 'str. 37', 'str. 14', 'str. 1'];
-  pn.forEach((p, i) => {
+  const box = $('s3pages'); box.innerHTML = '';
+  const P = [['str. 14', 'Rozdział XVII. Kryteria oceny ofert'], ['str. 9', 'Rozdział VIII. Warunki udziału w postępowaniu'], ['str. 3', 'Rozdział III. Opis przedmiotu zamówienia'], ['str. 1', 'Specyfikacja Warunków Zamówienia']];
+  P.forEach(([p, h], i) => {
     const d = document.createElement('div'); d.className = 'page';
     const r = rngFrom(i + 3);
-    let lines = ''; for (let k = 0; k < 16; k++) lines += `<i style="width:${40 + r() * 58}%"></i>`;
-    d.innerHTML = `<span class="pn">SWZ · ${p}</span><h4>${i === 3 ? 'Specyfikacja Warunków Zamówienia' : ['Rozdział XVI. Kryteria oceny ofert', 'Rozdział VIII. Warunki udziału', 'Rozdział III. Opis przedmiotu'][i]}</h4>${lines}`;
+    let lines = ''; for (let k = 0; k < 16; k++) lines += `<i${i === 2 && k === 6 ? ' class="mk"' : ''} style="width:${40 + r() * 58}%"></i>`;
+    d.innerHTML = `<span class="pn"><span>SWZ</span><span>${p}</span></span><h4>${h}</h4>${lines}`;
     box.appendChild(d);
   });
 }
@@ -625,7 +824,7 @@ function wallPos(b) { // scroll distance in px, deterministic in beats
 function drawWall(b) {
   const c = wctx; c.clearRect(0, 0, W, H);
   if (b < 8 || b >= 48.5) return;
-  const kosz = b >= 40;
+  const kosz = b >= 32 && b < 40;
   const cols = FMT === 'f169' ? 3 : 2, gap = 26, pad = 60;
   const cw = (W - pad * 2 - gap * (cols - 1)) / cols, rh = kosz ? 74 : 104;
   const pos = wallPos(b);
@@ -640,20 +839,20 @@ function drawWall(b) {
       rr(c, x, y + 6, cw, rh - 12, 12); c.fillStyle = '#0D1621'; c.fill(); c.strokeStyle = '#1C2A3B'; c.lineWidth = 1.5; c.stroke();
       if (!kosz) {
         const T = TITLES[idx % TITLES.length];
-        c.font = '500 15px Onest'; const tw = c.measureText(T[0]).width + 16;
+        c.font = '500 15px "Space Grotesk"'; const tw = c.measureText(T[0]).width + 16;
         rr(c, x + 18, y + 20, tw, 24, 5); c.fillStyle = '#152131'; c.fill(); c.strokeStyle = '#2A3B52'; c.stroke();
         c.fillStyle = '#A89F98'; c.fillText(T[0], x + 26, y + 37);
-        c.font = '600 19px Onest'; c.fillStyle = '#E8DDD4';
+        c.font = '600 19px "Space Grotesk"'; c.fillStyle = '#E8DDD4';
         c.fillText(clipText(c, T[1] + ' ' + T[2], cw - tw - 200), x + 30 + tw, y + 39);
-        c.font = '400 15px Onest'; c.fillStyle = '#7F7A78';
-        c.fillText(T[3] + ' · ' + T[4], x + 18, y + 72);
-        c.font = '500 14px JetBrains Mono'; c.fillStyle = '#75B974';
+        c.font = '400 15px "Space Grotesk"'; c.fillStyle = '#7F7A78';
+        c.fillText(T[3] + ' · ' + T[4] + ' · ' + SRCS[idx % SRCS.length], x + 18, y + 72);
+        c.font = '500 12px "Martian Mono"'; c.fillStyle = '#75B974';
         const dt = DATES[idx % DATES.length]; c.fillText(dt, x + cw - c.measureText(dt).width - 18, y + 72);
       } else {
         const R = KOSZT[idx % KOSZT.length];
-        c.font = '500 15px JetBrains Mono'; c.fillStyle = '#6E6A6A'; c.fillText(R[0], x + 16, y + 43);
-        c.font = '600 17px Onest'; c.fillStyle = '#E8DDD4'; c.fillText(clipText(c, R[1] + '…', cw * .42), x + 56, y + 43);
-        c.font = '500 15px JetBrains Mono'; c.fillStyle = '#A89F98';
+        c.font = '500 13px "Martian Mono"'; c.fillStyle = '#6E6A6A'; c.fillText(R[0], x + 16, y + 43);
+        c.font = '600 17px "Space Grotesk"'; c.fillStyle = '#E8DDD4'; c.fillText(clipText(c, R[1] + '…', cw * .42), x + 56, y + 43);
+        c.font = '500 13px "Martian Mono"'; c.fillStyle = '#A89F98';
         const cols2 = [R[2], R[3], R[4]]; cols2.forEach((v, i) => c.fillText(v, x + cw * .52 + i * cw * .12, y + 43));
         c.fillStyle = '#E8DDD4'; c.fillText(R[5], x + cw - c.measureText(R[5]).width - 18, y + 43);
       }
@@ -667,7 +866,73 @@ function drawWall(b) {
   }
 }
 
-/* ================= fx canvas (grid, map, particles) ================= */
+/* intro: Poland lights up with new tenders while the counter runs */
+function drawMap(c, b) {
+  const A = seg(b, .3, 1.3) * (1 - seg(b, 7.4, 8.4)) * lerp(1, .5, seg(b, 6, 6.6));
+  if (A <= 0) return;
+  const sz = MAP.step * .36;
+  c.fillStyle = `rgba(232,221,212,${A * .13})`;
+  for (const d of MAP.dots) c.fillRect(d.x - sz, d.y - sz, sz * 2, sz * 2);
+  for (const p of MAP.pings) {
+    const age = b - p.at; if (age < 0) continue;
+    const d = MAP.dots[p.i], s2 = sz * 1.5;
+    c.fillStyle = `rgba(117,185,116,${A * .7})`; c.fillRect(d.x - s2, d.y - s2, s2 * 2, s2 * 2);
+    if (age < 1.2) { const r = age / 1.2; c.strokeStyle = `rgba(117,185,116,${A * (1 - r) * .9})`; c.lineWidth = 2; c.beginPath(); c.arc(d.x, d.y, 4 + eo3(r) * 34, 0, 7); c.stroke(); }
+  }
+}
+
+/* montage: the BudOS funnel from the landing hero, one ring per step */
+const FUNNEL = [[0, '01', 'ZWIAD', 'BZP · TED · BIP'], [.33, '02', 'ANALIZA SWZ', 'WARUNKI · RYZYKA · FLAGI'], [.62, '03', 'KOSZTORYS', 'KNR · 784 685 CEN'], [.88, '04', 'OFERTA', 'PDF · DOCX']];
+function funnelGeo() {
+  return FMT === 'f169' ? { cx: 1360, top: 150, bot: 930, R: 300, lab: 20 }
+    : FMT === 'f916' ? { cx: 540, top: 250, bot: 1080, R: 350, lab: 21 }
+    : { cx: 540, top: 110, bot: 690, R: 285, lab: 18 };
+}
+function drawFunnel(c, t, b, A) {
+  const G = funnelGeo(), E = .2;
+  const rOf = u => G.R * (.07 + .93 * Math.pow(1 - u, 1.65)), yOf = u => lerp(G.top, G.bot, u);
+  const col = (k, a) => `rgba(${Math.round(lerp(232, 117, k))},${Math.round(lerp(221, 185, k))},${Math.round(lerp(212, 116, k))},${a})`;
+  const gl = c.createRadialGradient(G.cx, G.bot, 0, G.cx, G.bot, G.R * 1.1);
+  gl.addColorStop(0, `rgba(117,185,116,${.2 * A})`); gl.addColorStop(1, 'rgba(117,185,116,0)');
+  c.fillStyle = gl; c.fillRect(G.cx - G.R * 1.2, G.bot - G.R * 1.2, G.R * 2.4, G.R * 2.4);
+  // wireframe
+  c.lineWidth = 1; c.strokeStyle = `rgba(232,221,212,${A * .07})`;
+  for (let m = 0; m < 20; m++) {
+    const th0 = m / 20 * Math.PI * 2 + t * .3;
+    c.beginPath();
+    for (let k = 0; k <= 24; k++) { const u = k / 24, th = th0 + u * 1.4, r = rOf(u), x = G.cx + r * Math.cos(th), y = yOf(u) + r * E * Math.sin(th); k ? c.lineTo(x, y) : c.moveTo(x, y); }
+    c.stroke();
+  }
+  // particles spiralling down, cream at the mouth, green at the throat
+  for (let i = 0; i < 1100; i++) {
+    const h1 = hash(i * 1.37 + .5), h2 = hash(i * 7.11 + 3), h3 = hash(i * 3.91 + 11);
+    const u = (h1 + t * (.03 + h3 * .05)) % 1, th = h2 * 6.2832 + t * (.35 + u * 1.8);
+    const r = rOf(u) * (.9 + h3 * .2), s = Math.sin(th), dep = (s + 1) / 2;
+    const x = G.cx + r * Math.cos(th), y = yOf(u) + r * E * s;
+    const a = A * (.15 + .75 * dep) * clamp(u / .04) * clamp((1 - u) / .04), sz = 1.1 + dep * 1.9;
+    c.fillStyle = col(clamp(u * 1.2), a); c.fillRect(x - sz / 2, y - sz / 2, sz, sz);
+  }
+  // rings + labels
+  FUNNEL.forEach(([u, n, name, sub], i) => {
+    const L = eo3(seg(b, 48 + i, 48.25 + i)), fl = b >= 48 + i ? Math.exp(-(b - 48 - i) * 3) : 0;
+    const r = rOf(u), y = yOf(u);
+    c.save();
+    c.shadowColor = 'rgba(117,185,116,.9)'; c.shadowBlur = (10 + 30 * fl) * L;
+    c.strokeStyle = col(L, A * (.5 + .5 * L)); c.lineWidth = 2 + 2 * L + 3 * fl;
+    c.beginPath(); c.ellipse(G.cx, y, r, r * E, 0, 0, Math.PI * 2); c.stroke();
+    c.restore();
+    const f1 = `600 ${G.lab}px "Martian Mono"`, f2 = `500 ${Math.round(G.lab * .7)}px "Martian Mono"`;
+    c.font = f1; const nw = c.measureText(n + '  ').width, w1 = nw + c.measureText(name).width;
+    c.font = f2; const w2 = c.measureText(sub).width;
+    const lx = G.cx + r * .62 + 16, ly = y + r * E * .8 + 6, bw = Math.max(w1, w2) + 28, bh = G.lab * 2.6, la = A * (.35 + .65 * L);
+    rr(c, lx, ly - bh / 2, bw, bh, 10); c.fillStyle = `rgba(9,16,26,${.85 * A})`; c.fill(); c.strokeStyle = col(L, la * .6); c.lineWidth = 1.5; c.stroke();
+    c.font = f1; c.fillStyle = `rgba(117,185,116,${la})`; c.fillText(n, lx + 14, ly - 3);
+    c.fillStyle = `rgba(232,221,212,${la})`; c.fillText(name, lx + 14 + nw, ly - 3);
+    c.font = f2; c.fillStyle = `rgba(168,159,152,${la})`; c.fillText(sub, lx + 14, ly + G.lab * .9);
+  });
+}
+
+/* ================= fx canvas (grid, map, funnel, particles) ================= */
 function drawFx(b, t) {
   const c = fctx; c.clearRect(0, 0, W, H);
   // blueprint grid
@@ -702,39 +967,9 @@ function drawFx(b, t) {
     c.fillStyle = `rgba(232,221,212,${.08 + r3 * .18})`; c.fillRect(x, y, 2 + r3 * 2, 2 + r3 * 2);
   }
 
-  // Poland map
-  if (b >= 47.5 && MAP) {
-    const lb = b - 48;
-    const inA = seg(lb, -.5, .3);
-    const R = lb < 0 ? -1 : eo3(seg(lb, 0, 4.5)) * 1.15;
-    const endDim = b >= 56 ? .22 : 1;
-    const wordDim = lb >= 0 && lb < 4 ? .55 : lb >= 4 && b < 56 ? .38 : 1;
-    const A = inA * endDim * wordDim;
-    const sz = MAP.step * .42;
-    for (const d of MAP.dots) {
-      const lit = d.d < R;
-      const tw = lit && hash(d.r * 1000 + Math.floor(b * 4)) > .965;
-      if (lit) {
-        const edge = clamp(1 - (R - d.d) * 8);
-        c.fillStyle = tw ? `rgba(232,221,212,${A})` : `rgba(117,185,116,${A * (.55 + edge * .45)})`;
-        const s2 = sz * (1 + edge * .7);
-        c.fillRect(d.x - s2, d.y - s2, s2 * 2, s2 * 2);
-      } else {
-        c.fillStyle = `rgba(232,221,212,${A * .14})`; c.fillRect(d.x - sz * .7, d.y - sz * .7, sz * 1.4, sz * 1.4);
-      }
-    }
-    // city pings
-    c.font = '500 17px JetBrains Mono';
-    for (const ct of MAP.cities) {
-      const at = ct.i * .3; const p = lb - at; if (p < 0) continue;
-      const ring = (p % 2) / 2;
-      c.strokeStyle = `rgba(117,185,116,${(1 - ring) * .8 * A})`; c.lineWidth = 2;
-      c.beginPath(); c.arc(ct.x, ct.y, 6 + ring * 38, 0, 7); c.stroke();
-      c.fillStyle = `rgba(232,221,212,${A})`; c.beginPath(); c.arc(ct.x, ct.y, 5, 0, 7); c.fill();
-      const la = clamp(p * 3) * A * (b < 56 ? 1 : 0);
-      c.fillStyle = `rgba(232,221,212,${la * .85})`; c.fillText(ct.n.toUpperCase(), ct.x + 12, ct.y - 10);
-    }
-  }
+  // intro map, montage funnel
+  if (b < 8.5 && MAP) drawMap(c, b);
+  if (b >= 47.5 && b < 56) drawFunnel(c, t, b, seg(b, 47.6, 48.3));
   // end: rays
   if (b >= 56) {
     const lb = b - 56;
@@ -752,11 +987,11 @@ function scramble(txt, p, seed) { let o = ''; const n = txt.length, k = Math.flo
 
 const U = {
   s0(lb, b, t) {
-    const typedTxt = 'Dziś ogłoszono';
-    const tp = seg(lb, .3, 1.4); $('s0t').textContent = typedTxt.slice(0, Math.round(tp * typedTxt.length));
+    const typedTxt = 'Ostatnie 7 dni';
+    const tp = seg(lb, .3, 1.3); $('s0t').textContent = typedTxt.slice(0, Math.round(tp * typedTxt.length));
     $('s0car').style.opacity = (Math.floor(t * 4) % 2 === 0 || tp < 1) ? 1 : 0;
-    const cp = seg(lb, 1, 5.5), cnt = Math.round(171 * eo5(cp));
-    $('s0count').textContent = String(cnt).padStart(3, '0');
+    const cp = seg(lb, 1, 5.5), cnt = Math.round(2787 * eo5(cp));
+    $('s0count').innerHTML = fmtCount(cnt);
     const up = eio(seg(lb, 5.6, 6.4));
     const big = H * (FMT === 'f169' ? .5 : .46);
     const sc = lerp(1, .42, up);
@@ -765,18 +1000,19 @@ const U = {
     $('s0count').style.opacity = seg(lb, .9, 1.2);
     $('s0count').style.transform = `translateY(-50%) translateY(${yC}px) scale(${sc * (1 + land * .06)})`;
     $('s0count').style.color = lb > 5.5 ? 'var(--green)' : 'var(--cream)';
-    const tyY = lerp(-(FMT === 'f169' ? 250 : 280), -(FMT === 'f169' ? 250 : 280) - (FMT === 'f169' ? 170 : 300), up);
-    $('s0typed').style.top = (big) + 'px';
+    const ty0 = -(FMT === 'f169' ? 250 : 280), tyY = lerp(ty0, ty0 - (FMT === 'f169' ? 170 : 300), up);
+    $('s0typed').style.top = big + 'px';
     fx($('s0typed'), 1 - up, 0, tyY, 1, up * 10);
     $('s0lab').style.top = big + 'px';
-    fx($('s0lab'), eo3(seg(lb, 2, 3)) * 1, 0, lerp(FMT === 'f169' ? 180 : 200, FMT === 'f169' ? -120 : -140, up) + (1 - eo3(seg(lb, 2, 3))) * 30, lerp(1, .85, up));
+    fx($('s0lab'), eo3(seg(lb, 2, 3)), 0, lerp(FMT === 'f169' ? 180 : 200, FMT === 'f169' ? -120 : -140, up) + (1 - eo3(seg(lb, 2, 3))) * 30, lerp(1, .85, up));
     const q = $('s0q'); q.style.top = big + 'px';
     const qp = seg(lb, 6, 6.9);
     const txt = scramble('Który jest Twój?', eo3(qp), Math.floor(t * 30));
     q.innerHTML = txt.replace('Twój?', '<span class="g">Twój?</span>');
-    fx(q, seg(lb, 6, 6.15), 0, FMT === 'f169' ? 60 : 60, 1 + (lb > 6 ? Math.exp(-(lb - 6) * 6) * .08 : 0));
+    fx(q, seg(lb, 6, 6.15), 0, 60, 1 + (lb > 6 ? Math.exp(-(lb - 6) * 6) * .08 : 0));
+    $('s0note').style.opacity = seg(lb, 2.2, 3) * .9;
     // out glitch
-    const o = seg(lb, 7.6, 8); stage.querySelector('.s0').style.opacity = 1 - o;
+    stage.querySelector('.s0').style.opacity = 1 - seg(lb, 7.6, 8);
   },
   s1(lb, b, t) {
     const ws = $('s1slam').querySelectorAll('.w');
@@ -791,116 +1027,135 @@ const U = {
     $('s1rows').textContent = Math.floor(wallPos(b) / 104 * 3).toLocaleString('pl-PL') + ' wierszy';
     $('s1page').parentElement.parentElement.style.opacity = lb < 7.5 ? seg(lb, .5, 1) : 0;
   },
+  // 01 Znajdź: BZP, TED and BIP land one by one and merge into one Zwiad list
   s2(lb, b, t) {
     words($('s2a'), lb, -.1, 3.6); words($('s2b'), lb, 4);
-    const P = $('s2panel');
-    const pin = eoBack(seg(lb, 0, .6)), pout = eo3(seg(lb, 3.3, 3.9));
-    fx(P, seg(lb, 0, .2) * (1 - pout), 0, (1 - pin) * 80 - pout * 120, lerp(.8, 1, pin) - pout * .1, pout * 18);
-    // cursor: from off to chip A (1.5), then to chip B (2.5)
-    const cur = $('cur2');
-    const m1 = eio(seg(lb, .4, 1.4)), m2 = eio(seg(lb, 1.7, 2.4));
-    const cx = lerp(420, 100, m1) + m2 * 250, cy = lerp(260, 40, m1);
-    S(cur, { left: cx + 'px', top: cy + 'px', opacity: seg(lb, .35, .5) * (1 - seg(lb, 2.9, 3.1)) });
-    const click = (el, at, rip) => { const p = seg(lb, at, at + .5); S(rip, { left: '50%', top: '50%', opacity: p > 0 && p < 1 ? 1 - p : 0, transform: `scale(${1 + p * 5})` }); el.classList.toggle('on', lb >= at); el.style.transform = `scale(${lb >= at ? 1 + Math.exp(-(lb - at) * 8) * .08 : 1})`; };
-    click($('chipA'), 1.5, $('rip2a')); click($('chipB'), 2.5, $('rip2b'));
-    // result cards
-    const cards = [$('s2c1'), $('s2c2'), $('s2c3')];
-    cards.forEach((c, i) => {
-      const at = 4 + i * .5; const p = eoExpo(seg(lb, at, at + .6));
-      const keep = i === 1; const out = keep ? 0 : eo3(seg(lb, 7, 7.5));
-      const toC = keep ? eio(seg(lb, 7, 7.8)) : 0;
-      fx(c, p * (1 - out), 0, (1 - p) * 90 + toC * (FMT === 'f169' ? 0 : 0), 1 - out * .05, (1 - p) * 20 + out * 20);
+    const L = LAY[FMT], merge = eio(seg(lb, 2.1, 2.7));
+    ['src1', 'src2', 'src3'].forEach((id, i) => {
+      const at = .2 + i * .5, p = seg(lb, at, at + .45), e = eoBack(p);
+      const d = [[-1, 0], [0, -1], [1, 0]][i], rx = (i - 1) * L.srcGap;
+      const x = lerp(rx + d[0] * 380, rx, e) * (1 - merge), y = lerp(d[1] * 280, 0, e) * (1 - merge) + merge * L.mergeY;
+      fxc($(id), clamp(p * 5) * (1 - seg(lb, 2.45, 2.75)), x, y, lerp(.75, 1, e) * lerp(1, .4, merge), (1 - eo3(p)) * 18 + merge * 8);
+      $(id).style.visibility = lb < 2.8 ? 'visible' : 'hidden';
     });
-    $('s2stack').style.visibility = lb >= 3.9 ? 'visible' : 'hidden';
+    const Z = $('s2list'), zp = eoExpo(seg(lb, 2.5, 3.1));
+    fxc(Z, seg(lb, 2.5, 2.7), 0, (1 - zp) * 70, lerp(.94, 1, zp) * L.listK, (1 - zp) * 18);
+    Z.style.visibility = lb >= 2.45 ? 'visible' : 'hidden';
+    Z.querySelectorAll('.zr').forEach((r, i) => {
+      const at = 3.2 + i * .4, p = eoExpo(seg(lb, at, at + .5));
+      fx(r, p, 0, (1 - p) * 30, 1, (1 - p) * 10);
+      $('zm' + (i + 1)).textContent = Math.round(100 * eo3(seg(lb, 4.4 + i * .2, 5.2 + i * .2)));
+      r.classList.toggle('hot', i === 0 && lb >= 5.6);
+    });
+    const hp = lb >= 5.6 ? Math.exp(-(lb - 5.6) * 2.5) : 0;
+    $('zr1').style.transform += ` scale(${1 + hp * .015})`;
+    $('zp1').style.background = lb >= 5.6 ? 'var(--green)' : 'transparent'; $('zp1').style.color = lb >= 5.6 ? 'var(--ink)' : '';
     blurIO(stage.querySelector('.s2 .content'), lb, 8, .01, .45);
   },
+  // 02 Sprawdź: SWZ pages flip into the demo report, a red flag with its page, then the decision
   s3(lb, b, t) {
     words($('s3a'), lb, 0, 3.6); words($('s3b'), lb, 4);
-    blurIO(stage.querySelector('.s3 .content'), lb, 8, .5, .01);
-    const card = $('s3card');
-    const lift = eio(seg(lb, 2, 2.6));
-    fx(card, 1 - seg(lb, 7.5, 8), 0, -lift * (FMT === 'f169' ? 150 : 190), 1 - lift * .04, lift * 5 + seg(lb, 7.5, 8) * 20);
-    const cur = $('cur3'); const m = eio(seg(lb, .3, 1.4));
-    S(cur, { left: lerp(900, 560, m) + 'px', top: lerp(260, 50, m) + 'px', opacity: seg(lb, .2, .4) * (1 - seg(lb, 1.9, 2.1)) });
-    const rp = seg(lb, 1.5, 2); S($('rip3'), { left: '560px', top: '50px', opacity: rp > 0 && rp < 1 ? 1 - rp : 0, transform: `scale(${1 + rp * 5})` });
-    const T = $('s3term'); const tp = eoBack(seg(lb, 2, 2.6));
-    const ty = FMT === 'f169' ? 90 : 130;
-    T.style.opacity = seg(lb, 2, 2.2) * (1 - seg(lb, 7.5, 8));
-    T.style.transform = `translate(-50%,-50%) translateY(${ty + (1 - tp) * 120}px) scale(${lerp(.85, 1, tp) * (lb > 3.5 ? 1 + Math.exp(-(lb - 3.5) * 7) * .05 : 1)})`;
-    T.style.filter = `blur(${(1 - tp) * 12 + seg(lb, 7.5, 8) * 20}px)`;
-    const dp = seg(lb, 2.3, 3.5); $('s3days').textContent = Math.round(lerp(30, 17, eo3(dp)));
-    const g = $('s3ghost'); const gp = eo3(seg(lb, 3.5, 4.3));
-    const beatPulse = lb > 3.5 ? Math.exp(-((lb % 1) * BEAT) * 9) * .015 : 0;
-    g.style.opacity = gp * .6 * (1 - seg(lb, 7.4, 8));
-    g.style.transform = `translate(-50%,-50%) scale(${lerp(1.5, 1, gp) + lb * .006 + beatPulse})`;
+    const L = LAY[FMT];
+    const pages = [...$('s3pages').children];
+    pages.forEach((p, i) => {
+      const k = 3 - i; // top page is the last child
+      const at = .3 + k * .3, fp = eio(seg(lb, at, at + .35)), fan = seg(lb, 0, .3), dir = k % 2 ? 1 : -1, gone = seg(lb, 1.4, 1.7);
+      fx(p, seg(lb, 0, .2) * (1 - fp) * (1 - gone), dir * fp * 900 + (k - 1.5) * 10 * fan, -fp * 180 + k * -6, 1 - k * .02 + fp * .1, fp * 8, dir * (fp * 28 + (k - 1.5) * 2.5 * fan));
+    });
+    fxc($('s3pages'), 1, 0, 0, L.pagesK);
+    $('s3pages').style.visibility = lb < 1.75 ? 'visible' : 'hidden';
+    const R = $('s3rep'), rp = eoExpo(seg(lb, 1.35, 1.85)), rout = eo3(seg(lb, 3.75, 4.2));
+    fxc(R, seg(lb, 1.35, 1.5) * (1 - rout), 0, (1 - rp) * 50 - rout * 40, L.repK * (lerp(.95, 1, rp) - rout * .05), (1 - rp) * 16 + rout * 22);
+    R.style.visibility = lb >= 1.3 && lb < 4.25 ? 'visible' : 'hidden';
+    R.querySelectorAll('.rows>.row').forEach((r, i) => { const at = 1.45 + i * .08, p = eoExpo(seg(lb, at, at + .4)); fx(r, p, 0, (1 - p) * 26, 1, (1 - p) * 10); });
+    const fo = eio(seg(lb, 2.3, 2.75)); $('s3fbody').style.maxHeight = fo * 190 + 'px'; $('s3fbody').style.opacity = fo;
+    $('s3flag').style.boxShadow = `0 0 ${fo * 50}px rgba(229,98,92,${fo * .28})`;
+    const D = $('s3dec'), dp = eoBack(seg(lb, 4, 4.6));
+    fxc(D, seg(lb, 4, 4.15), 0, (1 - dp) * 80, L.decK * lerp(.9, 1, dp), (1 - eo3(seg(lb, 4, 4.4))) * 16);
+    D.style.visibility = lb >= 3.95 ? 'visible' : 'hidden';
+    const cur = $('cur3'), m = eio(seg(lb, 4.6, 5.4));
+    S(cur, { left: lerp(250, 150, m) + 'px', top: lerp(170, 24, m) + 'px', opacity: seg(lb, 4.5, 4.7) * (1 - seg(lb, 6.3, 6.5)) });
+    const rp2 = seg(lb, 5.5, 6); S($('rip3'), { left: '150px', top: '24px', opacity: rp2 > 0 && rp2 < 1 ? 1 - rp2 : 0, transform: `scale(${1 + rp2 * 5})` });
+    const on = lb >= 5.5; $('dcA').classList.toggle('on', on);
+    $('dcA').style.transform = `scale(${on ? 1 + Math.exp(-(lb - 5.5) * 8) * .08 : 1})`;
+    const wp = eo3(seg(lb, 5.8, 6.3)); fx($('s3why'), wp, 0, (1 - wp) * 14, 1, (1 - wp) * 8);
+    blurIO(stage.querySelector('.s3 .content'), lb, 8, .5, .5);
   },
+  // 03 Policz: the przedmiar PDF is read row by row, position 34 lands in the estimate and opens into its KNR make-up
   s4(lb, b, t) {
     words($('s4a'), lb, 0, 3.6); words($('s4b'), lb, 4);
-    const pages = [...$('s4pages').children];
-    pages.forEach((p, i) => {
-      const k = 3 - i; // top page is last child
-      const at = .5 + k * .45; const fp = eio(seg(lb, at, at + .45));
-      const fan = seg(lb, 0, .4);
-      const dir = k % 2 ? 1 : -1;
-      const gone = seg(lb, 2, 2.4);
-      fx(p, seg(lb, 0, .25) * (1 - fp) * (1 - gone), dir * fp * 900 + (k - 1.5) * 10 * fan, -fp * 180 + k * -6, 1 - k * .02 + fp * .1, fp * 8, dir * (fp * 28 + (k - 1.5) * 2.5 * fan));
+    const L = LAY[FMT];
+    const P = $('s4pdf'), pin = eo3(seg(lb, 0, .5)), pout = eo3(seg(lb, 2, 2.4));
+    fxc(P, seg(lb, 0, .2) * (1 - pout), 0, (1 - pin) * 40 - pout * 30, L.pdfK * lerp(.96, 1, pin) * (1 + pout * .04), (1 - pin) * 14 + pout * 22);
+    P.style.visibility = lb < 2.45 ? 'visible' : 'hidden';
+    const sp = seg(lb, .6, 1.8), rows = [...$('s4rows').querySelectorAll('.pr')];
+    S($('s4scan'), { top: sp * 100 + '%', opacity: sp > 0 && sp < 1 ? 1 : 0 });
+    rows.forEach((r, i) => r.classList.toggle('hit', (sp > i / rows.length && sp < (i + 1) / rows.length) || (r.id === 's4prow' && lb >= 1.85)));
+    const C = $('s4price'), lift = eio(seg(lb, 2, 2.6)), boom = seg(lb, 4, 4.3);
+    fxc(C, seg(lb, 2, 2.1) * (1 - boom), 0, lerp(L.rowY, 0, lift), L.priceK * lerp(.85, 1, lift) * (1 + boom * .5), boom * 30 + (1 - lift) * 4);
+    C.style.visibility = lb >= 1.95 && lb < 4.35 ? 'visible' : 'hidden';
+    const cur = $('cur4'), m = eio(seg(lb, 2.7, 3.4));
+    S(cur, { left: lerp(210, 64, m) + 'px', top: lerp(120, 24, m) + 'px', opacity: seg(lb, 2.6, 2.8) * (1 - seg(lb, 3.9, 4)) });
+    const rp = seg(lb, 3.5, 4); S($('rip4'), { left: '64px', top: '24px', opacity: rp > 0 && rp < 1 ? 1 - rp : 0, transform: `scale(${1 + rp * 5})` });
+    $('s4v').textContent = lb >= 3.9 && lb < 4 ? '2' + Math.floor(hash(Math.floor(t * 40)) * 90 + 10) + ' zł' : '253 zł';
+    const sk = $('s4sklad');
+    fxc(sk, 1, L.skladX, L.skladY, L.skladK);
+    sk.style.visibility = lb >= 4 ? 'visible' : 'hidden';
+    [...sk.children].forEach((k, i) => {
+      const at = 4 + i * .12, p = eoExpo(seg(lb, at, at + .45));
+      const hot = k.classList.contains('hot'), foc = eio(seg(lb, 5.6, 6.2));
+      const dx = (hash(i + 7) - .5) * 400 * (1 - p), dy = (hash(i + 17) - .5) * 300 * (1 - p);
+      fx(k, p * (i < 2 || hot ? 1 : lerp(1, .35, foc)), dx, dy, (hot ? 1 + foc * .02 : 1) * lerp(1.4, 1, p), (1 - p) * 16 + (hot || i < 2 ? 0 : foc * 3), (1 - p) * (hash(i) - .5) * 30);
     });
-    const acc = $('s4acc'); const rows = [...acc.children];
-    rows.forEach((r, i) => {
-      const at = 2 + i * .1; const p = eoExpo(seg(lb, at, at + .5));
-      const isK = r.id === 's4kry'; const foc = eio(seg(lb, 3.5, 4.2));
-      fx(r, p * (isK ? 1 : lerp(1, .32, foc)), 0, (1 - p) * 40, isK ? 1 + foc * .04 : 1, (1 - p) * 14 + (isK ? 0 : foc * 4));
-      if (isK) r.style.boxShadow = `0 0 ${foc * 60}px rgba(117,185,116,${foc * .25})`;
-    });
-    acc.style.visibility = lb >= 1.95 ? 'visible' : 'hidden';
-    const ex = eio(seg(lb, 4, 4.6)); $('s4body').style.maxHeight = ex * 220 + 'px'; $('s4body').style.opacity = ex;
-    const b1 = eo3(seg(lb, 4.5, 5.5)), b2 = eo3(seg(lb, 5, 6));
-    $('s4b1').style.width = b1 * 90 + '%'; $('s4b2').style.width = b2 * 10 + '%';
-    $('s4p1').textContent = Math.round(b1 * 90) + '%'; $('s4p2').textContent = Math.round(b2 * 10) + '%';
-    const hp = seg(lb, 4.5, 5.5); const hu = $('s4huge');
-    hu.textContent = Math.round(eo3(hp) * 90) + '%';
-    fx(hu, seg(lb, 4.5, 4.7) * .9, 0, (1 - eo3(hp)) * 60, 1 + (lb > 5.5 ? Math.exp(-(lb - 5.5) * 7) * .06 : 0), (1 - eo3(hp)) * 10);
-    hu.style.opacity = seg(lb, 4.5, 4.7) * .22 * (1 - seg(lb, 7.5, 8));
+    // the price database behind the make-up
+    const hp = seg(lb, 4.6, 5.8), hu = $('s4huge');
+    $('s4hn').textContent = thou(Math.round(784685 * eo3(hp)));
+    fx(hu, seg(lb, 4.6, 4.8) * (1 - seg(lb, 7.5, 8)), 0, (1 - eo3(hp)) * 50, 1 + (lb > 5.8 ? Math.exp(-(lb - 5.8) * 7) * .05 : 0), (1 - eo3(hp)) * 10 + seg(lb, 7.5, 8) * 16);
     blurIO(stage.querySelector('.s4 .content'), lb, 8, .5, .5);
   },
+  // 04 Złóż: company data and the total fill the form, then the missing items and your signature
   s5(lb, b, t) {
     words($('s5a'), lb, 0, 3.6); words($('s5b'), lb, 4);
+    const L = LAY[FMT];
+    const F = $('s5form'), fin = eoBack(seg(lb, 0, .5)), fout = eo3(seg(lb, 3.8, 4.3));
+    fxc(F, seg(lb, 0, .15) * (1 - fout), 0, (1 - fin) * 60 - fout * 40, L.formK * lerp(.92, 1, fin) * (1 - fout * .05), (1 - eo3(seg(lb, 0, .35))) * 14 + fout * 24);
+    F.style.visibility = lb < 4.35 ? 'visible' : 'hidden';
+    F.querySelectorAll('.ff:not(.tot)').forEach((f, i) => {
+      const at = .5 + i * .45, p = eo3(seg(lb, at, at + .4));
+      f.querySelector('.sk').style.width = `calc(var(--w) * ${p})`;
+      const tp = seg(lb, at + .4, at + .55); fx(f.querySelector('em'), tp, (1 - tp) * -10, 0, 1, (1 - tp) * 6);
+    });
+    $('s5v').textContent = zl(340235.02 * eo3(seg(lb, 2.4, 3.3)));
+    const tp2 = seg(lb, 3.3, 3.45); fx($('s5tot').querySelector('em'), tp2, (1 - tp2) * -10, 0, 1, (1 - tp2) * 6);
+    const M = $('s5miss'), mp = eoBack(seg(lb, 4.05, 4.6));
+    fxc(M, seg(lb, 4.05, 4.2), L.missX, L.missY + (1 - mp) * 60, L.missK * lerp(.9, 1, mp), (1 - eo3(seg(lb, 4.05, 4.4))) * 16);
+    M.style.visibility = lb >= 4 ? 'visible' : 'hidden';
+    M.querySelectorAll('.mi').forEach((it, i) => {
+      const at = 4.3 + i * .35, p = eoBack(seg(lb, at, at + .3));
+      fx(it, seg(lb, at, at + .1), (1 - p) * 30, 0, 1, (1 - eo3(seg(lb, at, at + .25))) * 8);
+    });
+    const G = $('s5sign'), gp = eo3(seg(lb, 5.3, 5.7));
+    fxc(G, gp, L.signX, L.signY + (1 - gp) * 40, L.signK, (1 - gp) * 12);
+    G.style.visibility = lb >= 5.25 ? 'visible' : 'hidden';
+    $('s5sig').style.strokeDashoffset = 1 - eio(seg(lb, 5.6, 6.5)); $('s5sig2').style.strokeDashoffset = 1 - eo3(seg(lb, 6.45, 6.8));
     blurIO(stage.querySelector('.s5 .content'), lb, 8, .5, .01);
-    const P = $('s5price');
-    const pin = eoBack(seg(lb, .3, .9)); const boom = seg(lb, 2, 2.35);
-    fx(P, seg(lb, .3, .5) * (1 - boom), 0, (1 - pin) * 70, lerp(.8, 1, pin) * (1 + boom * .6), boom * 30);
-    const cur = $('cur5'); const m = eio(seg(lb, .9, 1.8));
-    S(cur, { left: lerp(260, 120, m) + 'px', top: lerp(180, 20, m) + 'px', opacity: seg(lb, .8, 1) * (1 - seg(lb, 1.95, 2.05)) });
-    const rp = seg(lb, 2, 2.5); S($('rip5'), { left: '120px', top: '20px', opacity: rp > 0 && rp < 1 ? 1 - rp : 0, transform: `scale(${1 + rp * 5})` });
-    $('s5v').textContent = lb < 1.9 ? '253 zł' : (lb < 2 ? '2' + Math.floor(hash(Math.floor(t * 40)) * 90 + 10) + ' zł' : '253 zł');
-    const sk = $('s5sklad'); const kids = [...sk.children];
-    sk.style.transform = `translate(-50%,-50%) scale(${FMT === 'f169' ? .85 : FMT === 'f916' ? .77 : .84})`;
-    sk.style.visibility = lb >= 2 ? 'visible' : 'hidden';
-    kids.forEach((k, i) => {
-      const at = 2 + i * .12; const p = eoExpo(seg(lb, at, at + .45));
-      const hot = k.classList.contains('hot'); const foc = eio(seg(lb, 4.2, 4.8));
-      const dx = (hash(i + 7) - .5) * 400 * (1 - p), dy = (hash(i + 17) - .5) * 300 * (1 - p);
-      const o = p * (i < 2 || hot ? 1 : lerp(1, .35, foc)) * (1 - seg(lb, 7.5, 8));
-      fx(k, o, dx, dy + (hot ? 0 : 0), (hot ? 1 + foc * .02 : 1) * lerp(1.4, 1, p), (1 - p) * 16 + (hot || i < 2 ? 0 : foc * 3) + seg(lb, 7.5, 8) * 20, (1 - p) * (hash(i) - .5) * 30);
-    });
   },
+  // the four verbs light the funnel rings one by one
   s6(lb, b, t) {
-    const ws = [$('w6a'), $('w6b'), $('w6c'), $('w6d')];
-    ws.forEach((w, i) => {
-      const on = lb >= i && lb < i + 1; const p = seg(lb, i, i + .18);
-      const sc = lerp(1.5, 1, eo5(p)) + (lb - i) * .05;
-      fx(w, on ? 1 : 0, 0, 0, sc, (1 - eo5(p)) * 16);
-      w.style.transform = `translateY(-50%) scale(${sc})`;
+    const vs = [$('v6a'), $('v6b'), $('v6c'), $('v6d')], out = eo3(seg(lb, 3.8, 4.15));
+    vs.forEach((v, i) => {
+      const p = seg(lb, i, i + .18), e = eo5(p);
+      v.classList.toggle('o', lb >= i + 1);
+      fx(v, (p > 0 ? 1 : 0) * (1 - out), (1 - e) * -60, 0, lerp(1.3, 1, e) + (lb >= i && lb < i + 1 ? (lb - i) * .02 : 0), (1 - e) * 16 + out * 22);
     });
-    const f = $('s6fin'); f.style.visibility = lb >= 4 ? 'visible' : 'hidden';
-    const a = eoExpo(seg(lb, 4, 4.4)), bb = eoExpo(seg(lb, 6, 6.4));
-    fx($('s6a'), a * (lb < 7.5 ? 1 : 0), 0, (1 - a) * 80, lerp(1.3, 1, a) + (lb - 4) * .012, (1 - a) * 20);
-    fx($('s6b'), bb * (lb < 7.5 ? 1 : 0), 0, (1 - bb) * 60, 1, (1 - bb) * 20);
-    f.style.transform = 'translateY(-50%)';
+    $('s6fin').style.visibility = lb >= 4 ? 'visible' : 'hidden';
+    const a = eoExpo(seg(lb, 4, 4.4)), bb = eoExpo(seg(lb, 5.5, 5.9));
+    fx($('s6a'), a * (lb < 7.5 ? 1 : 0), 0, (1 - a) * 70, lerp(1.2, 1, a) + (lb - 4) * .01, (1 - a) * 20);
+    fx($('s6b'), bb * (lb < 7.5 ? 1 : 0), 0, (1 - bb) * 40, 1, (1 - bb) * 14);
   },
   s7(lb, b, t) {
-    const L = $('s7logo'); const lp = eoBack(seg(lb, 0, .55));
-    fx(L, seg(lb, 0, .1), 0, 0, lerp(.6, 1, lp) + lb * .004, (1 - eo3(seg(lb, 0, .4))) * 20);
+    const Lg = $('s7logo'); const lp = eoBack(seg(lb, 0, .55));
+    fx(Lg, seg(lb, 0, .1), 0, 0, lerp(.6, 1, lp) + lb * .004, (1 - eo3(seg(lb, 0, .4))) * 20);
     const bp = eo3(seg(lb, 0, .5)); $('lgB').style.clipPath = `inset(0 ${(1 - bp) * 100}% 0 0)`;
     const ud = eoBack(seg(lb, .5, .9)), os = eoBack(seg(lb, 1, 1.4));
     $('lgUd').style.transform = `translateY(${(1 - ud) * -60}px)`; $('lgUd').style.opacity = ud;
@@ -910,7 +1165,7 @@ const U = {
     const c = eoBack(seg(lb, 3.5, 4.1));
     $('s7cta').style.opacity = seg(lb, 3.5, 3.7);
     $('s7cta').style.transform = `translateX(-50%) translateY(${(1 - c) * 50}px) scale(${lerp(.8, 1, c) * (lb > 6 ? 1 + Math.exp(-(lb - 6) * 6) * .06 : 1)})`;
-    const sh = seg(lb, 6, 6.8); $('s7shine').style.left = lerp(-160, 520, sh) + 'px';
+    const sh = seg(lb, 6, 6.8); $('s7shine').style.left = lerp(-160, 760, sh) + 'px';
     $('s7sub').style.opacity = seg(lb, 4.2, 4.8) * .9;
     stage.querySelector('.s7').style.opacity = 1;
   }
@@ -918,9 +1173,10 @@ const U = {
 
 /* ================= master render(t) ================= */
 let playhead = 0;
-const IDX = { 16: ['01', 'Branża'], 24: ['02', 'Termin'], 32: ['03', 'Analiza SWZ'], 40: ['04', 'Kosztorys'] };
+const IDX = { 16: ['01', 'Znajdź'], 24: ['02', 'Sprawdź'], 32: ['03', 'Policz'], 40: ['04', 'Złóż'] };
+const STEPS = [...$('steps').children];
 function flashAmt(b) {
-  const hits = [[0, .25, 'g'], [16, 1, 'g'], [24, .35, 'c'], [32, .35, 'c'], [40, .35, 'c'], [42, .55, 'g'], [48, .45, 'c'], [52, .6, 'g'], [56, 1, 'g']];
+  const hits = [[0, .25, 'g'], [16, 1, 'g'], [24, .35, 'c'], [32, .35, 'c'], [36, .55, 'g'], [40, .35, 'c'], [48, .45, 'c'], [49, .22, 'g'], [50, .22, 'g'], [51, .28, 'g'], [52, .6, 'g'], [56, 1, 'g']];
   let g = 0, cr = 0; for (const [at, a, k] of hits) { if (b >= at) { const v = a * Math.exp(-(b - at) * BEAT * 7); if (k === 'g') g += v; else cr += v; } }
   return [g, cr];
 }
@@ -936,10 +1192,11 @@ function render(t) {
   // chrome
   const ch = $('chrome'); const cin = seg(b, 16, 16.5), cout = seg(b, 47.6, 48);
   ch.style.opacity = cin * (1 - cout); ch.style.display = b >= 16 && b < 48 ? 'block' : 'none';
-  $('tick').style.transform = `scaleX(${eo3(cin)})`;
-  const key = b >= 40 ? 40 : b >= 32 ? 32 : b >= 24 ? 24 : 16;
-  $('idxn').textContent = IDX[key][0]; $('idxl').textContent = IDX[key][1];
-  const lbk = b - key; $('idx').style.opacity = seg(lbk, .3, .8) * (1 - seg(lbk, 7.6, 8));
+  const key = b >= 40 ? 40 : b >= 32 ? 32 : b >= 24 ? 24 : 16, si = (key - 16) / 8, lbk = b - key;
+  $('ebl').style.transform = `scaleX(${eo3(seg(lbk, 0, .5))})`;
+  $('ebt').textContent = scramble(IDX[key][0] + ' · ' + IDX[key][1], eo3(seg(lbk, .1, .7)), Math.floor(t * 30) + key);
+  $('eb').style.opacity = seg(lbk, 0, .25) * (1 - seg(lbk, 7.6, 8));
+  STEPS.forEach((el, i) => { el.classList.toggle('on', i === si); el.querySelector('i').style.width = (i < si ? 100 : i === si ? seg(lbk, 0, 8) * 100 : 0) + '%'; });
   // wall
   drawWall(b);
   const wOp = b < 8 ? 0 : b < 16 ? seg(b, 8, 9) * .95 : b < 48 ? .42 : .42 * (1 - seg(b, 48, 48.5));
@@ -1109,6 +1366,12 @@ function buildScore(ctx, dest, startAt, offset) {
     if (!live(x)) return; const t = T(x);
     const n = noise(t, .25); const bp = filt('bandpass', 3000, .7); bp.frequency.setValueAtTime(1500, t); bp.frequency.exponentialRampToValueAtTime(6000, t + .2); const g = gain(); envAD(g, t, .02, .18, .2); n.connect(bp); bp.connect(g); g.connect(master);
   }
+  function scribble(x, dur, v = .12) { // pen on paper
+    if (!live(x, dur)) return; const t = T(x);
+    const n = noise(t, dur); const bp = filt('bandpass', 2600, 1.3); const g = gain(); g.gain.setValueAtTime(.0001, t);
+    for (let k = 0; k < Math.floor(dur / .045); k++) { const tt = t + k * .045; g.gain.linearRampToValueAtTime(v * (.3 + .7 * rng()), tt + .02); g.gain.linearRampToValueAtTime(v * .08, tt + .044); }
+    g.gain.linearRampToValueAtTime(.0001, t + dur); n.connect(bp); bp.connect(g); g.connect(master);
+  }
   function drone(x, dur, m, v = .14) {
     const st = Math.max(T(x), now), len = T(x) + dur - st; if (len <= .05) return;
     const o = osc('sine', mtof(m), st, len); const g = gain(); g.gain.setValueAtTime(.0001, st); g.gain.exponentialRampToValueAtTime(v, st + Math.min(1, len * .3)); g.gain.setValueAtTime(v, st + len * .8); g.gain.exponentialRampToValueAtTime(.0001, st + len); o.connect(g); g.connect(master);
@@ -1126,7 +1389,7 @@ function buildScore(ctx, dest, startAt, offset) {
   drone(0, B(8), 41, .05);
   const p0 = pad(0, [53, 56, 60, 65], B(8), .022, 500); if (p0) p0.frequency.exponentialRampToValueAtTime(1600, T(B(7.5)));
   let prev = -1;
-  for (let k = 0; k <= 18; k++) { const bb = 1 + k * .25; const cnt = Math.round(171 * eo5(seg(bb, 1, 5.5))); if (cnt !== prev) tick(B(bb), 1800 + k * 60, .09); prev = cnt; }
+  for (let k = 0; k <= 18; k++) { const bb = 1 + k * .25; const cnt = Math.round(2787 * eo5(seg(bb, 1, 5.5))); if (cnt !== prev) tick(B(bb), 1800 + k * 60, .09); prev = cnt; }
   bell(B(5.5), 77, .12, 1.4);
   blips(B(6), B(.9), 9);
   bell(B(6), 72, .16, 2); bell(B(6.5), 68, .12, 2);
@@ -1162,13 +1425,28 @@ function buildScore(ctx, dest, startAt, offset) {
   HOOK.forEach(([o, m, d]) => lead(B(32 + o), m, B(d))); HOOK2.forEach(([o, m, d]) => lead(B(40 + o), m, B(d)));
   // transitions + ui foley
   [24, 32, 40, 48].forEach(bb => sweep(B(bb - 1), B(1), .16));
-  uiClick(B(17.5)); uiClick(B(18.5)); uiClick(B(25.5)); uiClick(B(42));
-  [20, 20.5, 21].forEach(bb => tick(B(bb), 1400, .05));
-  for (let k = 0; k < 13; k++) tick(B(26.3 + k * .09), 2000 + k * 80, .06);
-  [32.5, 32.95, 33.4, 33.85].forEach(bb => paper(B(bb)));
-  bell(B(37.5), 84, .09, 1.2);
-  // kosztorys explode
-  impact(B(42), .55); tom(B(42), 45, .6); blips(B(42), B(.6), 8);
+  // 01 Znajdź: BZP, TED and BIP land, merge into one list, rows drop in, match scores count up
+  [16.5, 17, 17.5].forEach((bb, i) => { tom(B(bb), 52 + i * 3, .3); tick(B(bb), 2600 - i * 200, .08); });
+  sweep(B(17.6), B(.5), .12); uiClick(B(18.5));
+  [19.2, 19.6, 20].forEach(bb => tick(B(bb), 1400, .05));
+  blips(B(20.4), B(1.2), 12);
+  bell(B(21.6), 79, .06, .9);
+  // 02 Sprawdź: SWZ pages flip, report rows, the red flag opens, click on Analiza
+  [24.3, 24.6, 24.9, 25.2].forEach(bb => paper(B(bb)));
+  blips(B(25.45), B(.6), 7);
+  tick(B(26.3), 900, .12); tick(B(26.36), 650, .1);
+  uiClick(B(29.5)); bell(B(29.5), 84, .08, 1.2);
+  // 03 Policz: the przedmiar page, scanner over six rows, position 34 lifts, click on Skład, explode
+  paper(B(32.2));
+  for (let k = 0; k < 6; k++) tick(B(32.7 + k * .2), 1600 + k * 140, .05);
+  sweep(B(33.6), B(.4), .12); uiClick(B(35.5));
+  impact(B(36), .55); tom(B(36), 45, .6); blips(B(36), B(.6), 8);
+  // 04 Złóż: company data types into the form, the total counts up, checklist, signature
+  for (let f = 0; f < 4; f++) { for (let k = 0; k < 4; k++) tick(B(40.5 + f * .45 + k * .1), 2800 + rng() * 900, .035); tick(B(40.95 + f * .45), 2300, .06); }
+  for (let k = 0; k < 9; k++) tick(B(42.4 + k * .1), 1700 + k * 100, .045);
+  [44.3, 44.65, 45, 45.35].forEach((bb, i) => tick(B(bb), 2200 + i * 220, .09));
+  scribble(B(45.6), B(1.1));
+  bell(B(46.8), 84, .07, 1.2);
 
   // ===== MONTAGE (beats 48-56)
   for (let bb = 48; bb < 55.5; bb++) kick(B(bb), 1);
@@ -1278,6 +1556,6 @@ let startFmt = window.__BUDOS_EXPORT ? window.__BUDOS_EXPORT.format : 'f169';
 if (!window.__BUDOS_EXPORT) { let saved = null; try { saved = localStorage.getItem('budos-fmt'); } catch (e) {} if (saved && FORMATS[saved]) startFmt = saved; else if (innerWidth < 600) startFmt = 'f916'; }
 playhead = window.__BUDOS_EXPORT ? 0 : 58.6 * BEAT; // poster frame: packshot
 const boot = () => { setFormat(startFmt); window.__budosReady = true; };
-(document.fonts && document.fonts.load) ? Promise.all([document.fonts.load('800 80px Onest'), document.fonts.load('600 20px Onest'), document.fonts.load('500 20px "JetBrains Mono"'), document.fonts.load('700 20px "JetBrains Mono"')]).then(boot, boot) : boot();
+(document.fonts && document.fonts.load) ? Promise.all([document.fonts.load('700 80px "Space Grotesk"'), document.fonts.load('500 20px "Space Grotesk"'), document.fonts.load('500 20px "Martian Mono"'), document.fonts.load('700 20px "Martian Mono"')]).then(boot, boot) : boot();
 })();
 </script>
