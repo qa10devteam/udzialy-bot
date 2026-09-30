@@ -1,15 +1,15 @@
 <title>Projekt Yuna Shorts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,100..800&family=Space+Grotesk:wght@400;500;600;700&display=swap">
 <style>
 :root{
   color-scheme: dark;
   --ink:#070E18; --ink-2:#0C1521; --ink-3:#111C2A; --line:#1C2A3B;
   --cream:#E8DDD4; --cream-2:#A89F98; --cream-3:#6E6A6A;
   --green:#75B974; --amber:#E3B45B; --red:#E5604F;
-  --display:"Onest","Helvetica Neue",Arial,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --display:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+  --mono:"Martian Mono",ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
 html,body{background:var(--ink);color:var(--cream)}
@@ -20,7 +20,7 @@ body{font-family:var(--display);font-size:15px;line-height:1.5;padding-inline:16
 .brandmark svg{height:34px;width:auto}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cream-2)}
 .eyebrow b{color:var(--green);font-weight:500}
-h1{font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.035em;font-weight:800;margin:0;text-wrap:balance}
+h1{font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.035em;font-weight:700;margin:0;text-wrap:balance}
 h1 em{font-style:normal;color:var(--green)}
 .lede{margin:0;color:var(--cream-2);max-width:62ch;font-size:16px}
 
@@ -73,17 +73,17 @@ h1 em{font-style:normal;color:var(--green)}
 .stage canvas{position:absolute;inset:0;width:100%;height:100%}
 .spot{position:absolute;inset:0;display:none}
 .mono{font-family:var(--mono)}
-.cap{position:absolute;left:64px;right:140px;text-align:center;font-size:52px;font-weight:800;line-height:1.5;letter-spacing:-.015em}
+.cap{position:absolute;left:64px;right:140px;text-align:center;font-size:52px;font-weight:700;line-height:1.5;letter-spacing:-.015em}
 .cap span{background:#F2ECE6;color:#070E18;padding:.06em .32em;border-radius:.22em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 .cap.dark span{background:#070E18;color:var(--cream);box-shadow:0 0 0 2px #22334A}
-.kar{position:absolute;left:64px;right:140px;text-align:center;font-size:66px;font-weight:900;line-height:1.08;letter-spacing:-.025em;color:#fff;text-shadow:0 5px 0 #000,0 0 24px rgba(0,0,0,.8),3px 3px 0 #000,-3px 3px 0 #000,3px -3px 0 #000,-3px -3px 0 #000}
+.kar{position:absolute;left:64px;right:140px;text-align:center;font-size:66px;font-weight:700;line-height:1.08;letter-spacing:-.025em;color:#fff;text-shadow:0 5px 0 #000,0 0 24px rgba(0,0,0,.8),3px 3px 0 #000,-3px 3px 0 #000,3px -3px 0 #000,-3px -3px 0 #000}
 .kar .w{display:inline-block;margin-right:.22em;will-change:transform}
 .kar .w.hi{color:var(--green)}
 .card{background:linear-gradient(180deg,#101B28,#0C1520);border:2px solid #22334A;border-radius:18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
 .tag{display:inline-block;font:500 22px var(--display);padding:2px 12px;border-radius:7px;border:1.5px solid #2A3B52;background:#141F2D;color:var(--cream-2);vertical-align:middle}
 .ck{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--green);color:var(--ink);flex:none}
 .ck svg{width:30px;height:30px}
-.stamp{position:absolute;left:50%;top:0;font:900 110px/1 var(--display);letter-spacing:-.02em;padding:14px 34px;border:10px solid currentColor;border-radius:18px;white-space:nowrap;color:var(--red);text-transform:uppercase;mix-blend-mode:normal}
+.stamp{position:absolute;left:50%;top:0;font:700 110px/1 var(--display);letter-spacing:-.02em;padding:14px 34px;border:10px solid currentColor;border-radius:18px;white-space:nowrap;color:var(--red);text-transform:uppercase;mix-blend-mode:normal}
 .stamp.am{color:var(--amber)}
 .tap{position:absolute;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:rgba(242,236,230,.9);box-shadow:0 0 0 10px rgba(242,236,230,.25),0 10px 30px rgba(0,0,0,.5)}
 .ring{position:absolute;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;border:5px solid #F2ECE6;opacity:0}
@@ -92,11 +92,13 @@ h1 em{font-style:normal;color:var(--green)}
 .end{position:absolute;inset:0;background:radial-gradient(ellipse 80% 55% at 50% 40%,#10241F,#070E18 70%)}
 .end .lg{position:absolute;left:50%;top:430px;width:600px;margin-left:-300px}
 .end .lg svg{width:100%;height:auto;overflow:visible}
-.end .tl{position:absolute;left:64px;right:64px;top:900px;text-align:center;font-size:90px;font-weight:800;letter-spacing:-.04em;line-height:1.02}
+.end .tl{position:absolute;left:64px;right:64px;top:880px;text-align:center;font-size:124px;font-weight:700;letter-spacing:-.05em;line-height:1}
+.end .tl.sm{font-size:78px;letter-spacing:-.04em;line-height:1.08}
 .end .tl span{display:inline-block}
 .end .tl .g{color:var(--green)}
-.end .ct{position:absolute;left:50%;top:1170px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:24px}
-.end .pill{position:relative;overflow:hidden;background:var(--green);color:var(--ink);font-size:64px;font-weight:800;padding:16px 56px;border-radius:999px;letter-spacing:-.02em}
+.end .ct{position:absolute;left:50%;top:1215px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:24px}
+.end .pill{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;background:var(--green);color:var(--ink);font-size:48px;font-weight:700;padding:20px 40px 20px 46px;border-radius:18px;letter-spacing:-.02em;white-space:nowrap;box-shadow:0 20px 70px -12px rgba(117,185,116,.65)}
+.end .pill svg{width:46px;height:46px}
 .end .pill i{position:absolute;top:0;bottom:0;width:130px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-20deg);left:-200px}
 .end .sub{font:500 26px var(--mono);letter-spacing:.1em;color:var(--cream-2);text-transform:uppercase}
 
@@ -109,10 +111,10 @@ h1 em{font-style:normal;color:var(--green)}
 .bub.in{left:28px;background:#1A2636;color:var(--cream);border-bottom-left-radius:8px}
 .bub.out{right:28px;background:var(--green);color:#071208;border-bottom-right-radius:8px;font-weight:600}
 .bub small{display:block;font:500 20px var(--mono);opacity:.6;margin-bottom:6px}
-.bpm{position:absolute;right:28px;font:700 44px var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.bpm{position:absolute;right:28px;font:700 44px var(--mono);font-stretch:75%;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .bpm small{font-size:20px;margin-left:8px;color:var(--cream-2);font-weight:500}
 .toast{position:absolute;left:0;top:0;width:560px;padding:18px 22px;border-radius:16px;background:#131F2E;border:2px solid #2A3B52;font-size:28px;font-weight:600;line-height:1.2;box-shadow:0 20px 40px -10px rgba(0,0,0,.7);display:flex;gap:16px;align-items:center}
-.toast i{flex:none;width:40px;height:40px;border-radius:10px;background:var(--amber);color:var(--ink);font:800 26px/40px var(--display);text-align:center;font-style:normal}
+.toast i{flex:none;width:40px;height:40px;border-radius:10px;background:var(--amber);color:var(--ink);font:700 26px/40px var(--display);text-align:center;font-style:normal}
 .toast.r i{background:var(--red)}
 .tabsn{position:absolute;left:28px;top:70px;font:500 22px var(--mono);color:var(--cream-3)}
 .tabsn b{color:var(--amber);font-weight:700}
@@ -120,7 +122,9 @@ h1 em{font-style:normal;color:var(--green)}
 .mini .t{font-size:30px;font-weight:600;line-height:1.2}
 .mini .t small{display:block;font:500 22px var(--mono);color:var(--cream-2);letter-spacing:.06em;margin-bottom:4px}
 .mini .t b{color:var(--green)}
-.frz{position:absolute;left:64px;right:140px;top:850px;text-align:center;font-size:88px;font-weight:900;letter-spacing:-.04em;line-height:1}
+.dtag{position:absolute;right:28px;top:26px;display:flex;align-items:center;gap:10px;font:500 15px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--cream-2);opacity:0}
+.dtag::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--cream-2)}
+.frz{position:absolute;left:64px;right:140px;top:850px;text-align:center;font-size:88px;font-weight:700;letter-spacing:-.04em;line-height:1}
 .frz .g{color:var(--green)}
 
 /* spot B */
@@ -132,15 +136,15 @@ h1 em{font-style:normal;color:var(--green)}
 .up .bar{height:18px;border-radius:9px;background:#1E2C3D;overflow:hidden}
 .up .bar i{display:block;height:100%;background:var(--amber);width:0}
 .up .pc{font:700 30px var(--mono);color:var(--cream-2)}
-.clock{position:absolute;left:0;right:0;top:0;text-align:center;font:700 190px/1 var(--mono);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.clock{position:absolute;left:0;right:0;top:0;text-align:center;font:700 190px/1 var(--mono);font-stretch:75%;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 .clock small{display:block;font:600 26px var(--mono);letter-spacing:.14em;color:var(--amber);margin-top:14px}
 .pg{position:absolute;left:50%;top:40px;width:380px;height:500px;margin-left:-190px;border-radius:10px;background:#E8DDD4;color:#15202c;padding:34px;display:flex;flex-direction:column;gap:12px}
-.pg h4{margin:0;font-size:24px;font-weight:800}
+.pg h4{margin:0;font-size:24px;font-weight:700}
 .pg .pn{font:500 18px var(--mono);color:#6b6258}
 .pg i{display:block;height:11px;border-radius:6px;background:#c9beb4}
 .pg mark{background:rgba(227,180,91,.55);padding:4px 6px;border-radius:4px;font-weight:700;font-size:20px;color:#15202c}
 .pcount{position:absolute;left:0;right:0;top:570px;text-align:center;font:700 44px var(--mono);font-variant-numeric:tabular-nums}
-.price{position:absolute;left:0;right:0;text-align:center;font:700 180px/1 var(--mono);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.price{position:absolute;left:0;right:0;text-align:center;font:700 180px/1 var(--mono);font-stretch:75%;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
 .price.bad{top:120px}
 .price.good{top:360px;color:var(--green);font-size:150px}
 .strike{position:absolute;left:40px;right:40px;top:205px;height:14px;background:var(--red);border-radius:7px;transform-origin:0 50%}
@@ -156,7 +160,7 @@ h1 em{font-style:normal;color:var(--green)}
 .fix .t{font-size:34px;font-weight:700;line-height:1.15}
 .fix .t small{display:block;font:500 24px var(--mono);color:var(--cream-2);margin-top:6px}
 .slots{position:absolute;left:64px;right:140px;top:1250px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.slot{position:relative;font:800 30px var(--display);transform-origin:50% 50%;text-align:center;padding:12px 8px;border:4px solid var(--red);color:var(--red);border-radius:12px;text-transform:uppercase;white-space:nowrap}
+.slot{position:relative;font:700 30px var(--display);transform-origin:50% 50%;text-align:center;padding:12px 8px;border:4px solid var(--red);color:var(--red);border-radius:12px;text-transform:uppercase;white-space:nowrap}
 .slot.am{border-color:var(--amber);color:var(--amber)}
 .slot i{position:absolute;left:-6px;right:-6px;top:50%;height:8px;margin-top:-4px;background:var(--green);border-radius:4px;transform-origin:0 50%;transform:scaleX(0)}
 
@@ -168,7 +172,7 @@ h1 em{font-style:normal;color:var(--green)}
 .tile .cover svg{width:64px;height:64px}
 .tile .no{position:absolute;left:18px;top:14px;font:700 24px var(--mono);color:var(--cream-2)}
 .tile .h{font:600 22px var(--mono);letter-spacing:.1em;color:var(--cream-2)}
-.tile .big{font-size:40px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.tile .big{font-size:40px;font-weight:700;line-height:1.1;letter-spacing:-.02em}
 .tile .big.g{color:var(--green)}
 .tile .sm{font-size:24px;color:var(--cream-2);line-height:1.3}
 .tile .chips{display:flex;gap:12px;flex-wrap:wrap}
@@ -178,6 +182,14 @@ h1 em{font-style:normal;color:var(--green)}
 .tile .cr .b i{display:block;height:100%;background:var(--green)}
 .tile .cr em{font:700 24px var(--mono);color:var(--green);font-style:normal;text-align:right}
 .tile .sk{font:500 21px var(--mono);color:var(--cream-2);display:flex;justify-content:space-between}
+.tile .chips span.m{font:700 26px var(--mono);letter-spacing:.06em;padding:8px 18px}
+.tile .fl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:2px solid rgba(229,96,79,.6);background:rgba(229,96,79,.1);font-size:22px;font-weight:600}
+.tile .fl span{font:700 18px var(--mono);background:var(--cream);color:var(--ink);padding:3px 9px;border-radius:6px;white-space:nowrap}
+.tile .dcs{display:flex;gap:8px}
+.tile .dcs span{flex:1;font:700 16px var(--mono);letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:10px 0;border-radius:10px;border:2px solid #243448}
+.tile .dcs .t{border-color:rgba(117,185,116,.5);color:var(--green)}
+.tile .dcs .a{background:#CFC8BF;border-color:#CFC8BF;color:var(--ink)}
+.tile .dcs .n{border-color:rgba(229,96,79,.5);color:var(--red)}
 .tile svg.lgt{width:300px;height:auto;margin:0 auto}
 
 /* overlays */
@@ -203,10 +215,10 @@ body.export .viewport{border-radius:0;box-shadow:none}
     <span class="eyebrow">9:16 · TikTok · Instagram Reels · YouTube Shorts</span>
   </header>
   <h1>Trzy spoty na <em>TikTok, Reels i Shorts.</em></h1>
-  <p class="lede">Każdy spot bierze format, który teraz krąży w feedach, i przerabia go na język wykonawcy budowlanego. Hak jest w pierwszej sekundzie, napisy są od pierwszej klatki, a ważne treści omijają przyciski platform. Muzyka jest syntezowana na żywo i zgrana z obrazem. Włącz dźwięk.</p>
+  <p class="lede">Każdy spot bierze format, który teraz krąży w feedach, i przerabia go na język wykonawcy budowlanego. Hak jest w pierwszej sekundzie, napisy są od pierwszej klatki, a ważne treści omijają przyciski platform. Muzyka jest syntezowana na żywo i zgrana z obrazem. Hasło, liczby i kroki pochodzą z landingu BudOS v4, a kadry z demo mają podpis. Włącz dźwięk.</p>
 
   <div class="tabs" role="tablist" aria-label="Spot">
-    <button class="tab" role="tab" id="tabA" data-s="A" aria-selected="true"><span class="k">Spot A · TikTok</span><b>„Staram się zachowywać normalnie”</b><span>Na zewnątrz spokój, w środku SWZ na 186 stron</span></button>
+    <button class="tab" role="tab" id="tabA" data-s="A" aria-selected="true"><span class="k">Spot A · TikTok</span><b>„Staram się zachowywać normalnie”</b><span>Na zewnątrz spokój, w środku 39 plików dokumentacji</span></button>
     <button class="tab" role="tab" id="tabB" data-s="B" aria-selected="false"><span class="k">Spot B · Reels</span><b>„Flop-core”</b><span>Cztery przetargowe wtopy i koniec wtop</span></button>
     <button class="tab" role="tab" id="tabC" data-s="C" aria-selected="false"><span class="k">Spot C · Reels i Shorts</span><b>„Tapnij, żeby odkryć”</b><span>Sześć rozmytych kafelków, zapętlony</span></button>
   </div>
@@ -223,16 +235,17 @@ body.export .viewport{border-radius:0;box-shadow:none}
             <div class="cap" id="aCap2" style="top:180px"><span>Teraz to nawet prawda.</span></div>
             <div class="panel" id="pOut" style="top:420px;height:440px">
               <div class="lab"><i></i>NA ZEWNĄTRZ</div>
-              <div class="bub in" id="aB1" style="top:86px"><small>Szef · 16:58</small>Wszystko ogarnięte z przetargiem na rondo w Mławie?</div>
+              <div class="bub in" id="aB1" style="top:86px"><small>Szef · 16:58</small>Przetarg na remont urzędu w Poznaniu ogarnięty?</div>
               <div class="bub out" id="aB2" style="top:268px">Jasne, pod kontrolą.</div>
             </div>
             <div class="panel" id="pIn" style="top:900px;height:620px">
               <div class="lab"><i></i>W ŚRODKU</div>
+              <div class="dtag" id="aDemo">Przykład z demo · przegląd dokumentów</div>
               <div class="tabsn" id="aTabs">otwarte zakładki: <b>12</b></div>
               <div id="aToasts"></div>
-              <div class="mini card" id="aM1" style="top:110px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>TERMIN SKŁADANIA</small>12 października 2026 10:00 · <b>za 17 dni</b></div></div>
-              <div class="mini card" id="aM2" style="top:250px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>KRYTERIA OCENY</small>Cena <b>90%</b> · gwarancja i rękojmia <b>10%</b></div></div>
-              <div class="mini card" id="aM3" style="top:390px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>POZYCJA 34</small>253 zł · skład: <b>6 składników</b></div></div>
+              <div class="mini card" id="aM1" style="top:110px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>TERMIN SKŁADANIA</small>5.10.2026, 9:00 · <b>39 plików</b> w teczce</div></div>
+              <div class="mini card" id="aM2" style="top:250px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>ANALIZA SWZ</small>13 wymagań · <b>5 czerwonych flag</b></div></div>
+              <div class="mini card" id="aM3" style="top:390px"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t"><small>KOSZTORYS</small>276 613,84 zł netto · <b>29 pozycji</b></div></div>
               <div class="bpm" id="aBpm" style="top:548px">88<small>BPM</small></div>
             </div>
             <canvas id="aEcg"></canvas>
@@ -250,7 +263,7 @@ body.export .viewport{border-radius:0;box-shadow:none}
               <div class="clock" id="bClock">09:58<small id="bClockL">TERMIN 10:00</small></div>
               <div class="up card"><div class="f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>Oferta_final_FINAL.pdf</div><div class="bar"><i id="bUp"></i></div><div class="pc" id="bUpP">wysyłanie… 0%</div></div>
             </div>
-            <div class="fv" id="bF2"><div id="bPages"></div><div class="pcount" id="bPc">str. 1 / 186</div></div>
+            <div class="fv" id="bF2"><div id="bPages"></div><div class="pcount" id="bPc">str. 1 / 19</div></div>
             <div class="fv" id="bF3"><div class="price bad" id="bBad">25,30 zł</div><i class="strike" id="bStrike"></i><div class="price good" id="bGood">253,00 zł</div></div>
             <div class="fv" id="bF4"><div class="lst"><div class="in" id="bList"></div></div></div>
             <div class="stamp" id="bSt1" style="top:760px">Odrzucona</div>
@@ -261,10 +274,10 @@ body.export .viewport{border-radius:0;box-shadow:none}
             <div class="kar" id="bK2" style="top:1360px"></div>
             <div class="frz" id="bTurn">Aż w końcu<br><span class="g">ogarnąłem.</span></div>
             <div class="fixes" id="bFixes">
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Termin widzę od razu<small>12.10.2026 10:00 · za 17 dni</small></div></div>
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Warunki udziału w jednym miejscu<small>Analiza SWZ · 7 warunków</small></div></div>
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Skład pozycji rozpisany<small>Pozycja 34 · 253 zł · 6 składników</small></div></div>
-              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Tylko moja branża<small>Drogi · Mosty · nowe dziś</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Termin widzę od razu<small>Zwiad: 17.10.2026 · za 17 dni</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Wyciąg i flagi z numerem strony<small>Analiza SWZ: warunki, wymagania, ryzyka</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Przedmiar z PDF, ceny z bazy<small>Kod KNR i skład ceny · 784 685 cen</small></div></div>
+              <div class="fix card"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></span><div class="t">Na górze listy moja robota<small>BZP, TED i BIP w jednej kolejce</small></div></div>
             </div>
             <div class="slots" id="bSlots"><div class="slot">Odrzucona<i></i></div><div class="slot am">Wykluczony<i></i></div><div class="slot">Strata<i></i></div><div class="slot am">2 h w plecy<i></i></div></div>
             <div class="end" id="bEnd"></div>
@@ -275,11 +288,11 @@ body.export .viewport{border-radius:0;box-shadow:none}
             <div class="cap" id="cCap" style="top:170px"><span>Tapnij, żeby odkryć</span></div>
             <div class="cap dark" id="cCap2" style="top:270px"><span id="cCap2t">Co kryje się pod blurem?</span></div>
             <div class="grid" id="cGrid">
-              <div class="tile"><div class="in"><div class="h">BRANŻA</div><div class="chips"><span>Drogi</span><span>Mosty</span></div></div></div>
-              <div class="tile"><div class="in"><span class="tag" style="align-self:flex-start">Drogi</span><div class="big" style="font-size:32px">Przebudowa ulicy Staffa w Kościerzynie</div><div class="sm"><b style="color:var(--green);font-weight:500">nowe dziś</b> · Pomorskie</div></div></div>
-              <div class="tile"><div class="in"><div class="h">TERMIN SKŁADANIA</div><div class="big">12.10.2026<br>10:00</div><div class="big g" style="font-size:34px">za 17 dni</div></div></div>
-              <div class="tile"><div class="in"><div class="h">KRYTERIA OCENY</div><div class="cr"><span>Cena</span><em>90%</em><span class="b"><i style="width:90%"></i></span><span>Gwarancja</span><em>10%</em><span class="b"><i style="width:10%"></i></span></div></div></div>
-              <div class="tile"><div class="in"><div class="h">POZYCJA 34</div><div class="big">253 zł</div><div class="sk"><span>Gwoździe</span><span>0,5 kg</span></div><div class="sk"><span>Mat. pomocnicze</span><span>2 %</span></div><div class="sk"><span>Robocizna</span><span>1,9855 r-g</span></div></div></div>
+              <div class="tile"><div class="in"><div class="h">ZNAJDŹ</div><div class="big" style="font-size:34px">Jedna lista z BZP, TED i BIP</div><div class="chips"><span class="m">BZP</span><span class="m">TED</span><span class="m">BIP</span></div></div></div>
+              <div class="tile"><div class="in"><div class="h">SPRAWDŹ · DEMO</div><div class="big" style="font-size:34px">SWZ z numerem strony</div><div class="fl">Czerwona flaga<span>str. 3</span></div></div></div>
+              <div class="tile"><div class="in"><div class="h">DECYZJA · DEMO</div><div class="dcs"><span class="t">Tak</span><span class="a">Analiza</span><span class="n">Nie</span></div><div class="sm">Na tym etapie. Najpierw decyzja, potem oferta.</div></div></div>
+              <div class="tile"><div class="in"><div class="h">POLICZ · DEMO</div><div class="big">276 613,84 zł</div><div class="sm">netto, 29 pozycji z przedmiaru PDF</div></div></div>
+              <div class="tile"><div class="in"><div class="h">ZŁÓŻ · DEMO</div><div class="big g">340 235,02 zł</div><div class="sm">brutto w formularzu. Podpisujesz Ty.</div></div></div>
               <div class="tile"><div class="in" style="align-items:center"><svg class="lgt" viewBox="0 0 421 264"><use href="#logo"></use></svg></div></div>
             </div>
             <i class="ring" id="cRing"></i><i class="tap" id="cTap"></i>
@@ -368,10 +381,10 @@ function capPop(el, lb, at, out = 999, dur = .35) {
 
 /* shared end card */
 const LOGO_PATHS = { B: '%%B%%', UD: '%%UD%%', OS: '%%OS%%' };
-function buildEnd(el, t1, t2, sub) {
+function buildEnd(el, t1, t2, sub, size = '') {
   el.innerHTML = `<div class="lg"><svg viewBox="0 0 421 264"><path class="lB" fill="#75B974" fill-rule="evenodd" d="${LOGO_PATHS.B}"/><path class="lU" fill="#75B974" fill-rule="evenodd" d="${LOGO_PATHS.UD}"/><path class="lO" fill="#E8DDD4" fill-rule="evenodd" d="${LOGO_PATHS.OS}"/></svg></div>
-  <div class="tl"><span class="t1">${t1}</span><br><span class="g t2">${t2}</span></div>
-  <div class="ct"><div class="pill">Budos.io<i></i></div><div class="sub">${sub}</div></div>`;
+  <div class="tl ${size}"><span class="t1">${t1}</span><br><span class="g t2">${t2}</span></div>
+  <div class="ct"><div class="pill">Zobacz demo bez konta<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><i></i></div><div class="sub">${sub}</div></div>`;
 }
 function endCard(el, lb, dur) {
   // lb: beats since the end card starts (beat units of the spot)
@@ -389,7 +402,7 @@ function endCard(el, lb, dur) {
   const c = eoBack(seg(lb, 3, 3.6));
   q('.ct').style.opacity = seg(lb, 3, 3.2);
   q('.ct').style.transform = `translateX(-50%) translateY(${(1 - c) * 50}px) scale(${lerp(.8, 1, c)})`;
-  q('.pill i').style.left = lerp(-200, 560, seg(lb, 4.5, 5.3)) + 'px';
+  q('.pill i').style.left = lerp(-200, 900, seg(lb, 4.5, 5.3)) + 'px';
 }
 
 /* background canvas: blueprint grid + dust + optional ECG */
@@ -614,9 +627,9 @@ const A = (() => {
   const phase = t => { const i = clamp(t / DT, 0, PH.length - 1); const k = Math.floor(i); return lerp(PH[k], PH[Math.min(k + 1, PH.length - 1)], i - k); };
   const flat = t => t >= 12 && t < 13.2;
   const TOASTS = [
-    ['!', 'SWZ_final_v3_POPRAWIONA.pdf · 186 str.'], ['?', 'Termin składania? Gdzieś w rozdziale XIV'], ['!', 'Warunki udziału: ???'],
-    ['?', 'Kryteria oceny: cena… i co jeszcze?'], ['!', 'Pozycja 34 = ? zł'], ['?', 'Zostało 17 dni czy 7?'], ['!', 'Czy to w ogóle nasza branża?'],
-    ['!', 'Wadium?!'], ['?', 'Gdzie jest załącznik nr 7?'], ['!', 'Kosztorys_v12.xlsx'], ['?', 'Kto ma login do platformy?'], ['!', 'Termin: JUTRO?']
+    ['!', 'Dokumentacja: 39 plików'], ['?', 'Termin składania? Gdzieś w rozdziale XIV'], ['!', 'Warunki udziału: ???'],
+    ['?', 'BZP, TED czy BIP gminy?'], ['!', 'Przedmiar do wklepania: 29 pozycji'], ['?', 'Zostało 5 dni czy 15?'], ['!', 'Pismo z 22.09 zmienia terminy?!'],
+    ['!', 'Wadium?!'], ['?', 'Gdzie jest załącznik nr 7?'], ['!', 'Kosztorys_v12.xlsx'], ['?', 'Formularz oferty znowu ręcznie?'], ['!', 'Termin: JUTRO?']
   ];
   const TT = [4, 5.5, 7, 8.5, 10, 11, 12, 13, 14, 14.75, 15.5, 16.25, 16.75, 17.25, 17.75, 18.25, 18.6, 18.9, 19.2, 19.5];
   let built = false;
@@ -624,7 +637,7 @@ const A = (() => {
     if (built) return; built = true;
     const box = $('aToasts');
     TT.forEach((b, i) => { const [k, txt] = TOASTS[i % TOASTS.length]; const d = document.createElement('div'); d.className = 'toast' + (k === '!' ? ' r' : ''); d.innerHTML = `<i>${k}</i><span>${txt}</span>`; box.appendChild(d); });
-    buildEnd($('aEnd'), 'Mniej szukania.', 'Więcej budowania.', 'link w bio · budos.io');
+    buildEnd($('aEnd'), 'Przetargi', 'opanowane.', 'link w bio · budos.io');
   }
   function update(b, t) {
     const pIn = $('pIn');
@@ -649,6 +662,7 @@ const A = (() => {
       const out = after;
       fx(el, seg(b, at, at + .05) * (1 - out), x + (1 - p) * 60, y, lerp(.7, 1, p) + out * .1, out * 26 + (b >= 20 && b < 22 ? 2 : 0), r);
     });
+    fx($('aDemo'), seg(b, 22.3, 22.8));
     ['aM1', 'aM2', 'aM3'].forEach((id, i) => { const at = 22.5 + i * 1.5; const p = eoExpo(seg(b, at, at + .6)); fx($(id), p, 0, (1 - p) * 70, 1, (1 - p) * 20); });
     // BPM readouts synced to the ECG
     const r = rate(t); const bpmIn = $('aBpm');
@@ -708,15 +722,15 @@ const A = (() => {
   }
   const beats = [
     [0, 'Hak', '„Staram się zachowywać normalnie, kiedy szef pyta o przetarg”', 'Tykanie zegara, spokojne serce 72 BPM'],
-    [2.4, 'Na zewnątrz spokój', '„Jasne, pod kontrolą.” Pod spodem: 186 stron SWZ, 47 zakładek, pytania bez odpowiedzi', 'Serce przyspiesza do 180, powiadomienia'],
+    [2.4, 'Na zewnątrz spokój', '„Jasne, pod kontrolą.” Pod spodem: 39 plików dokumentacji, 47 zakładek, pytania bez odpowiedzi', 'Serce przyspiesza do 180, powiadomienia'],
     [12, 'Stop', 'Wszystko zamiera: „…a potem otwierasz BudOS.”', 'Tape stop, płaska linia'],
-    [13.2, 'Ulga', 'Termin, kryteria i skład pozycji wskakują na miejsce, puls spada do 72', 'Drop: luźny trap, Rhodes, 808'],
+    [13.2, 'Ulga', 'Termin, analiza SWZ i kosztorys z demo wskakują na miejsce, puls spada do 72', 'Drop: luźny trap, Rhodes, 808'],
     [16.2, 'Puenta', '„Teraz to nawet prawda.”', 'Dzwonek przy ✓'],
-    [20.4, 'Packshot', 'Mniej szukania. Więcej budowania. · Budos.io', 'Dźwiękowe logo C–Es–F']
+    [20.4, 'Packshot', 'Przetargi opanowane. · Zobacz demo bez konta', 'Dźwiękowe logo C–Es–F']
   ];
   return { BPM, BT, DUR, build, update, score, poster: 9.5, beats,
     k: 'Spot A · TikTok', h: '„Staram się zachowywać normalnie”',
-    why: 'Na TikToku krąży trend „I Try to Act Normal”: twórcy pokazują sytuacje, w których na zewnątrz trzymają fason, a w środku panikują. Tu to rozjazd między „pod kontrolą” w czacie z szefem a SWZ na 186 stron w głowie. BudOS zamienia ten rozjazd w prawdę.',
+    why: 'Na TikToku krąży trend „I Try to Act Normal”: twórcy pokazują sytuacje, w których na zewnątrz trzymają fason, a w środku panikują. Tu to rozjazd między „pod kontrolą” w czacie z szefem a 39 plikami dokumentacji w głowie. BudOS zamienia ten rozjazd w prawdę.',
     facts: [['Długość', '24 s'], ['Tempo', '100 BPM'], ['Hak', 'podpis od 1. klatki'], ['Puenta', '16. sekunda']] };
 })();
 
@@ -727,17 +741,17 @@ const Bs = (() => {
   const BPM = 140, BT = 60 / BPM, BEATS = 60, DUR = BEATS * BT; // 25.7 s
   const LIST = ['Termomodernizacja budynku Szkoły Podstawowej nr 3', 'Budowa sieci wodociągowej w Starej Wsi', 'Remont elewacji Urzędu Gminy', 'Budowa hali sportowej przy ZS nr 2', 'Rozbudowa oczyszczalni ścieków', 'Modernizacja oświetlenia LED', 'Remont dachu szpitala powiatowego', 'Budowa boiska wielofunkcyjnego', 'Budowa kanalizacji w ul. Leśnej', 'Przebudowa targowiska miejskiego', 'Budowa ścieżki rowerowej wzdłuż DW 780', 'Rozbudowa przedszkola w Jabłonnie'];
   const K1 = [['Oferta wysłana o 10:03.', 4.5], ['Termin był do 10:00.', 8]];
-  const K2 = [['Przeczytałem 186 stron SWZ.', 12.5], ['Warunek, który mnie wykluczył, był w załączniku.', 15.6]];
+  const K2 = [['Przeczytałem całą SWZ.', 12.5], ['Warunek, który mnie wykluczył, był w załączniku.', 15.6]];
   const K3 = [['Pozycja 34 wyceniona na 25,30 zł.', 20.5], ['Powinno być 253 zł. Przecinek.', 23.6]];
   const K4 = [['2 godziny szukania przetargu na drogę.', 28.5], ['Był na pierwszej stronie.', 31.8]];
   let built = false;
   function build() {
     if (built) return; built = true;
     const pg = $('bPages'); const lab = ['Specyfikacja Warunków Zamówienia', 'Rozdział VIII. Warunki udziału', 'Rozdział XIV. Termin składania', 'Załącznik nr 7'];
-    lab.forEach((h, i) => { const d = document.createElement('div'); d.className = 'pg'; const r = rngFrom(i + 3); const L2 = []; for (let k = 0; k < 13; k++) L2.push(`<i style="width:${40 + r() * 58}%"></i>`); if (i === 3) L2.splice(5, 0, '<mark>Warunek nr 7: doświadczenie w 3 podobnych robotach</mark>'); const ln = L2.join(''); d.innerHTML = `<span class="pn">SWZ · str. ${[1, 64, 121, 186][i]}</span><h4>${h}</h4>${ln}`; pg.appendChild(d); });
+    lab.forEach((h, i) => { const d = document.createElement('div'); d.className = 'pg'; const r = rngFrom(i + 3); const L2 = []; for (let k = 0; k < 13; k++) L2.push(`<i style="width:${40 + r() * 58}%"></i>`); if (i === 3) L2.splice(5, 0, '<mark>Warunek nr 7: doświadczenie w 3 podobnych robotach</mark>'); const ln = L2.join(''); d.innerHTML = `<span class="pn">SWZ · str. ${[1, 7, 14, 19][i]}</span><h4>${h}</h4>${ln}`; pg.appendChild(d); });
     const L = $('bList'); const rows = LIST.concat(LIST).concat(LIST);
-    L.innerHTML = `<div class="row hit"><b>Przebudowa ulicy Staffa w Kościerzynie</b><span>Drogi · nowe dziś · Pomorskie</span></div>` + rows.map((r, i) => `<div class="row"><b>${r}</b><span>${['Kubatura', 'Wod-Kan', 'Wykończenia', 'OZE'][i % 4]} · ${['Opolskie', 'Mazowieckie', 'Łódzkie', 'Pomorskie', 'Śląskie'][i % 5]}</span></div>`).join('');
-    buildEnd($('bEnd'), 'Mniej flopów.', 'Więcej budowania.', 'link w bio · budos.io');
+    L.innerHTML = `<div class="row hit"><b>Budowa obwodnicy Szamotuł w ciągu DW 184 i 187</b><span>Drogi · TED · Wielkopolskie · dopasowanie 100</span></div>` + rows.map((r, i) => `<div class="row"><b>${r}</b><span>${['Kubatura', 'Wod-Kan', 'Wykończenia', 'OZE'][i % 4]} · ${['Opolskie', 'Mazowieckie', 'Łódzkie', 'Pomorskie', 'Śląskie'][i % 5]}</span></div>`).join('');
+    buildEnd($('bEnd'), 'Mniej flopów.', 'Przetargi opanowane.', 'link w bio · budos.io', 'sm');
   }
   function kline(el, arr, b, out) { const [txt, at] = arr; karaoke(el, txt, b, at, .3, out); }
   function update(b, t) {
@@ -758,10 +772,10 @@ const Bs = (() => {
       $('bClock').firstChild.nodeValue = `${hh}:${String(mins[k]).padStart(2, '0')}`; $('bClock').style.color = k >= 2 ? 'var(--red)' : 'var(--cream)';
       $('bClockL').style.opacity = k >= 2 ? (Math.floor(t * 4) % 2 ? 1 : .3) : 1;
       const up = eo3(seg(lb, .5, 3)) * .99; $('bUp').style.width = up * 100 + '%'; $('bUpP').textContent = up >= .985 ? 'wysyłanie… 99% (od 3 minut)' : `wysyłanie… ${Math.round(up * 100)}%`; }
-    // F2: pages flip, counter to 186
+    // F2: pages flip, counter to 19 (average SWZ length in the BudOS base)
     { const lb = b - 12; [...$('bPages').children].forEach((p, i) => { const at = .4 + i * 1; const fp = eio(seg(lb, at, at + .5)); const last = i === 3; const vis = lb >= 0;
         fx(p, vis ? 1 : 0, last ? 0 : -fp * 900 * (i % 2 ? -1 : 1), 0, 1, 0, last ? (lb > 4 ? 0 : 0) : -fp * 30); p.style.zIndex = 10 - i; if (!last) p.style.opacity = (vis ? 1 : 0) * (1 - seg(lb, at + .5, at + .6)); });
-      const n = Math.round(lerp(1, 186, eo3(seg(lb, .3, 3.8)))); $('bPc').textContent = `str. ${n} / 186`; }
+      const n = Math.round(lerp(1, 19, eo3(seg(lb, .3, 3.8)))); $('bPc').textContent = `str. ${n} / 19`; }
     // F3: wrong price, strike, right price
     { const lb = b - 20; const gl = lb > 2.8 && lb < 3.3; $('bBad').textContent = gl ? (hash(fr) > .5 ? '2 5,30 zł' : '253,0 zł') : '25,30 zł';
       $('bBad').style.color = lb > 3.3 ? 'var(--cream-3)' : 'var(--cream)';
@@ -840,15 +854,15 @@ const Bs = (() => {
   const beats = [
     [0, 'Hak', '„Moje przetargowe flopy, zanim ogarnąłem BudOS”', 'Jersey club od pierwszej klatki'],
     [1.7, 'Flop 1', 'Oferta wysłana o 10:03, termin do 10:00 → ODRZUCONA', 'Muzyka się urywa, smutny puzon'],
-    [5.1, 'Flop 2', '186 stron SWZ, warunek w załączniku → WYKLUCZONY', 'Głuche „boom”'],
+    [5.1, 'Flop 2', 'Cała SWZ przeczytana, warunek w załączniku → WYKLUCZONY', 'Głuche „boom”'],
     [8.6, 'Flop 3', '25,30 zł zamiast 253 zł → STRATA', '„Bwomp” i glitch'],
     [12, 'Flop 4', '2 godziny szukania, przetarg na 1. stronie → 2 H W PLECY', 'Scratch i krótki puzon'],
     [15.4, 'Zwrot', '„Aż w końcu ogarnąłem.” Cztery rozwiązania skreślają cztery flopy', 'Pełny bit, arpeggio'],
-    [22.3, 'Packshot', 'Mniej flopów. Więcej budowania. · Budos.io', 'Dźwiękowe logo C–Es–F']
+    [22.3, 'Packshot', 'Mniej flopów. Przetargi opanowane. · Zobacz demo bez konta', 'Dźwiękowe logo C–Es–F']
   ];
   return { BPM, BT, DUR, build, update, score, poster: 4.55, beats,
     k: 'Spot B · Reels', h: '„Flop-core”',
-    why: 'W Reels rośnie flop-core: zamiast sukcesów twórcy wrzucają swoje wpadki. Każdy wykonawca zna te cztery: spóźniona oferta, przeoczony warunek, zgubiony przecinek i dwie godziny przewijania. Humor robi zasięg, a druga połowa pokazuje, jak BudOS zamyka każdą wpadkę. Hasło końcowe to gra słów na „Mniej szukania”.',
+    why: 'W Reels rośnie flop-core: zamiast sukcesów twórcy wrzucają swoje wpadki. Każdy wykonawca zna te cztery: spóźniona oferta, przeoczony warunek, zgubiony przecinek i dwie godziny przewijania. Humor robi zasięg, a druga połowa pokazuje, jak BudOS zamyka każdą wpadkę. Na końcu hasło z landingu: „Przetargi opanowane.”',
     facts: [['Długość', '25,7 s'], ['Tempo', '140 BPM, jersey club'], ['Struktura', '4 flopy → 4 rozwiązania'], ['Napisy', 'karaoke, słowo po słowie']] };
 })();
 
@@ -858,12 +872,12 @@ const Bs = (() => {
 const C = (() => {
   const BPM = 120, BT = 60 / BPM, BEATS = 32, DUR = BEATS * BT; // 16 s
   const REV = [4, 7, 10, 13, 16, 19];
-  const LINES = ['Twoja branża', 'Nowy przetarg z dziś', 'Termin za 17 dni', 'Kryteria: cena 90%', 'Skład pozycji: 253 zł', 'A pod ostatnim…'];
+  const LINES = ['Jedna lista z BZP, TED i BIP', 'SWZ z numerem strony', 'Najpierw decyzja', 'Przedmiar z PDF w kosztorysie', 'Formularze z danymi firmy', 'A pod ostatnim…'];
   let built = false;
   function build() {
     if (built) return; built = true;
     [...$('cGrid').children].forEach((tl, i) => { const cv = document.createElement('div'); cv.className = 'cover'; cv.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="9" opacity=".5"/></svg>TAPNIJ`; tl.appendChild(cv); const no = document.createElement('div'); no.className = 'no'; no.textContent = i + 1; tl.appendChild(no); });
-    buildEnd($('cEnd'), 'Mniej szukania.', 'Więcej budowania.', 'link w bio · budos.io');
+    buildEnd($('cEnd'), 'Przetargi', 'opanowane.', 'link w bio · budos.io');
   }
   const tileXY = i => [72 + (i % 2) * 438 + 209, 440 + Math.floor(i / 2) * 340 + 160];
   function update(b, t) {
@@ -871,7 +885,7 @@ const C = (() => {
     // second caption line: changes per reveal
     let line = 'Co kryje się pod blurem?', la = 0;
     REV.forEach((r, i) => { if (b >= r) { line = LINES[i]; la = r; } });
-    if (b >= 22) { line = 'Wszystko o przetargu. Bez przekopywania.'; la = 22; }
+    if (b >= 22) { line = 'Od ogłoszenia do oferty.'; la = 22; }
     if (b >= 31.2) { line = 'Co kryje się pod blurem?'; la = 31.2; }
     $('cCap2t').textContent = line; capPop($('cCap2'), b, la === 0 ? -1 : la, la === 22 ? 23.8 : 999);
     // tiles
@@ -926,10 +940,10 @@ const C = (() => {
   }
   const beats = [
     [0, 'Hak', '„Tapnij, żeby odkryć” i sześć rozmytych kafelków', 'Cisza pokoju, miękki akord'],
-    [2, 'Odkrywanie', 'Branża → nowy przetarg → termin → kryteria → skład pozycji', 'Pop i dzwonek na każdy tap, lo-fi house'],
+    [2, 'Odkrywanie', 'Znajdź → Sprawdź → decyzja → Policz → Złóż, kafelki z demo mają podpis', 'Pop i dzwonek na każdy tap, lo-fi house'],
     [9.5, 'Ostatni kafelek', 'Pod ostatnim blurem: logo BudOS', 'Najwyższa nuta skali'],
-    [11, 'Podsumowanie', '„Wszystko o przetargu. Bez przekopywania.”', 'Filtr się otwiera'],
-    [12.3, 'Packshot', 'Mniej szukania. Więcej budowania. · Budos.io', 'Dźwiękowe logo C–Es–F'],
+    [11, 'Podsumowanie', '„Od ogłoszenia do oferty.”', 'Filtr się otwiera'],
+    [12.3, 'Packshot', 'Przetargi opanowane. · Zobacz demo bez konta', 'Dźwiękowe logo C–Es–F'],
     [15.5, 'Pętla', 'Kadr wraca do rozmytej siatki, więc film zapętla się bez szwu', 'Odwrócony szum domyka pętlę']
   ];
   return { BPM, BT, DUR, build, update, score, poster: 9.0, beats,
@@ -1023,6 +1037,6 @@ const boot = () => {
   let s = EX ? EX.spot : 'A'; if (!EX) { try { const v = localStorage.getItem('budos-short'); if (v && SPOTS[v]) s = v; } catch (e) {} }
   selectSpot(s, !EX); window.__budosReady = true;
 };
-(document.fonts && document.fonts.load) ? Promise.all(['800 60px Onest', '900 60px Onest', '600 20px Onest', '500 20px "JetBrains Mono"', '700 20px "JetBrains Mono"'].map(f => document.fonts.load(f))).then(boot, boot) : boot();
+(document.fonts && document.fonts.load) ? Promise.all(['700 60px "Space Grotesk"', '600 20px "Space Grotesk"', '500 20px "Martian Mono"', '700 20px "Martian Mono"'].map(f => document.fonts.load(f))).then(boot, boot) : boot();
 })();
 </script>

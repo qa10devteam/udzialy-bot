@@ -42,11 +42,11 @@ Zasady prawdy z landingu v4: kadry z demo mają podpis „Przykład z demo · pr
 
 | Spot | Trend | Pomysł | Muzyka |
 |---|---|---|---|
-| A | „I Try to Act Normal” | Na zewnątrz „Jasne, pod kontrolą.”, w środku SWZ na 186 stron i puls 180. Po BudOS puls spada do 72: „Teraz to nawet prawda.” | 100 BPM, napięcie → luźny trap z Rhodesem |
-| B | „Flop-core” | Cztery wtopy (spóźniona oferta, przeoczony warunek, zgubiony przecinek, 2 h przewijania), potem cztery rozwiązania. Hasło: „Mniej flopów. Więcej budowania.” | 140 BPM, jersey club, muzyka urywa się na każdej wpadce |
-| C | „Tap to reveal” | Sześć rozmytych kafelków, sześć tapnięć, pod ostatnim logo. Ostatnia klatka = pierwsza, więc spot się zapętla | 120 BPM, lo-fi house, ASMR-owe popy |
+| A | „I Try to Act Normal” | Szef pyta o przetarg na remont urzędu w Poznaniu. Na zewnątrz „Jasne, pod kontrolą.”, w środku 39 plików dokumentacji i puls 180. Potem termin, analiza SWZ i kosztorys z demo (z podpisem) i puls spada do 72: „Teraz to nawet prawda.” | 100 BPM, napięcie → luźny trap z Rhodesem |
+| B | „Flop-core” | Cztery wtopy (spóźniona oferta, przeoczony warunek, zgubiony przecinek, 2 h przewijania), potem cztery rozwiązania słowami landingu: termin w Zwiadzie, wyciąg i flagi z numerem strony, przedmiar z PDF i ceny z bazy, na górze listy Twoja robota. Hasło: „Mniej flopów. Przetargi opanowane.” | 140 BPM, jersey club, muzyka urywa się na każdej wpadce |
+| C | „Tap to reveal” | Sześć rozmytych kafelków: Znajdź, Sprawdź, decyzja, Policz, Złóż, a pod ostatnim logo. Kafelki z liczbami z demo mają podpis „demo”. Ostatnia klatka = pierwsza, więc spot się zapętla | 120 BPM, lo-fi house, ASMR-owe popy |
 
-Wspólne zasady: napis-hak od pierwszej klatki, ważne treści poza strefami interfejsu (górne 150 px, prawe 140 px, dolne 380 px), dźwiękowe logo C–Es–F na końcu każdego spotu.
+Wspólne zasady: napis-hak od pierwszej klatki, ważne treści poza strefami interfejsu (górne 150 px, prawe 140 px, dolne 380 px), dźwiękowe logo C–Es–F na końcu każdego spotu. Każdy kończy się hasłem „Przetargi opanowane.” i przyciskiem „Zobacz demo bez konta”, jak na landingu.
 
 Render: `PAGE=shorts.html SPOT=A node render.cjs f916 /tmp/out 30` (plus `FFMPEG`, `FONTCACHE`, `NODE_PATH` jak niżej).
 
